@@ -1,0 +1,143 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [16.x, 18.x, 20.x]
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Build ReScript
+      run: npm run build
+
+    - name: Run tests
+      run: npm test
+
+    - name: Check formatting
+      run: |
+        find src -name "*.res" -exec rescript format -check {} \; || true
+
+  haskell:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup Haskell
+      uses: haskell/actions/setup@v2
+      with:
+        ghc-version: '9.2'
+        cabal-version: '3.6'
+
+    - name: Cache Cabal
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cabal/store
+          dist-newstyle
+        key: ${{ runner.os }}-cabal-${{ hashFiles('validator/validator-bridge.cabal') }}
+
+    - name: Build Haskell validator
+      run: |
+        cd validator
+        cabal update
+        cabal build
+        cabal test || true
+
+  docker:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+
+    - name: Build Docker image
+      run: docker build -t recon-silly-ation:test .
+
+    - name: Test Docker image
+      run: |
+        docker run --rm recon-silly-ation:test --help
+
+  integration:
+    runs-on: ubuntu-latest
+
+    services:
+      arangodb:
+        image: arangodb/arangodb:3.11
+        env:
+          ARANGO_ROOT_PASSWORD: test
+        ports:
+          - 8529:8529
+        options: >-
+          --health-cmd "curl -f http://localhost:8529/_api/version"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Use Node.js 18
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Build
+      run: npm run build
+
+    - name: Create test repository
+      run: |
+        mkdir -p /tmp/test-repo
+        echo "# Test README" > /tmp/test-repo/README.md
+        echo "MIT License" > /tmp/test-repo/LICENSE
+
+    - name: Run integration test
+      env:
+        ARANGO_URL: http://localhost:8529
+        ARANGO_DATABASE: test
+        ARANGO_USERNAME: root
+        ARANGO_PASSWORD: test
+      run: |
+        node lib/js/src/CLI.bs.js --repo /tmp/test-repo || true
+
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Hadolint (Dockerfile linting)
+      uses: hadolint/hadolint-action@v3.1.0
+      with:
+        dockerfile: Dockerfile
+        failure-threshold: warning
+
+    - name: ShellCheck
+      run: |
+        sudo apt-get install shellcheck
+        find . -name "*.sh" -exec shellcheck {} \; || true

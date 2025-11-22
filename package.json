@@ -1,0 +1,30 @@
+{
+  "name": "recon-silly-ation",
+  "version": "0.1.0",
+  "description": "Documentation Reconciliation System - Automatically reconcile, deduplicate, and resolve conflicts in Git repository documentation",
+  "scripts": {
+    "build": "rescript build",
+    "clean": "rescript clean",
+    "watch": "rescript build -w",
+    "test": "node lib/js/tests/TestRunner.bs.js",
+    "dev": "npm run watch"
+  },
+  "keywords": [
+    "documentation",
+    "reconciliation",
+    "git",
+    "deduplication",
+    "conflict-resolution",
+    "rescript"
+  ],
+  "author": "Hyperpolymath",
+  "license": "MIT",
+  "devDependencies": {
+    "@rescript/core": "^1.5.0",
+    "rescript": "^11.0.1"
+  },
+  "dependencies": {
+    "arangojs": "^8.8.1",
+    "crypto": "^1.0.1"
+  }
+}

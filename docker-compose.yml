@@ -1,0 +1,80 @@
+version: '3.8'
+
+services:
+  # ArangoDB database
+  arangodb:
+    image: arangodb/arangodb:3.11
+    container_name: recon-arango
+    environment:
+      ARANGO_ROOT_PASSWORD: ${ARANGO_PASSWORD:-development}
+    ports:
+      - "8529:8529"
+    volumes:
+      - arango-data:/var/lib/arangodb3
+      - arango-apps:/var/lib/arangodb3-apps
+    networks:
+      - recon-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8529/_api/version"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+
+  # Documentation reconciliation service
+  reconciliation:
+    build: .
+    container_name: recon-service
+    depends_on:
+      arangodb:
+        condition: service_healthy
+    environment:
+      ARANGO_URL: http://arangodb:8529
+      ARANGO_DATABASE: ${ARANGO_DATABASE:-reconciliation}
+      ARANGO_USERNAME: ${ARANGO_USERNAME:-root}
+      ARANGO_PASSWORD: ${ARANGO_PASSWORD:-development}
+      NODE_ENV: ${NODE_ENV:-production}
+    volumes:
+      - ./data:/data
+      - ${REPO_PATH:-./examples}:/workspace:ro
+    networks:
+      - recon-network
+    command: >
+      sh -c "
+        echo 'Waiting for ArangoDB...' &&
+        sleep 10 &&
+        node lib/js/src/CLI.bs.js --repo /workspace --daemon --interval 300
+      "
+
+  # Optional: Graph visualization service
+  arangodb-ui:
+    image: arangodb/arangodb:3.11
+    container_name: recon-arango-ui
+    depends_on:
+      - arangodb
+    ports:
+      - "8530:8529"
+    environment:
+      ARANGO_ROOT_PASSWORD: ${ARANGO_PASSWORD:-development}
+    networks:
+      - recon-network
+    profiles:
+      - ui
+
+networks:
+  recon-network:
+    driver: bridge
+
+volumes:
+  arango-data:
+    driver: local
+  arango-apps:
+    driver: local
+
+# Usage:
+#   Development: docker-compose up
+#   With UI:     docker-compose --profile ui up
+#   Background:  docker-compose up -d
+#   Logs:        docker-compose logs -f reconciliation
+#   Stop:        docker-compose down
+#   Clean:       docker-compose down -v  (removes volumes)
