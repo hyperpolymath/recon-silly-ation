@@ -3,25 +3,13 @@
 // RSR (Rhodium Standard Repository) Compliance Verification Script
 // Checks project against RSR framework standards
 
-interface ComplianceCheck {
-  category: string;
-  checks: Check[];
-}
-
-interface Check {
-  name: string;
-  required: boolean;
-  check: () => Promise<boolean>;
-  points: number;
-}
-
 const GREEN = "\x1b[32m";
 const RED = "\x1b[31m";
 const YELLOW = "\x1b[33m";
 const RESET = "\x1b[0m";
 const BOLD = "\x1b[1m";
 
-async function fileExists(path: string): Promise<boolean> {
+async function fileExists(path) {
   try {
     await Deno.stat(path);
     return true;
@@ -30,7 +18,7 @@ async function fileExists(path: string): Promise<boolean> {
   }
 }
 
-async function fileContains(path: string, content: string): Promise<boolean> {
+async function fileContains(path, content) {
   try {
     const text = await Deno.readTextFile(path);
     return text.includes(content);
@@ -39,7 +27,7 @@ async function fileContains(path: string, content: string): Promise<boolean> {
   }
 }
 
-const complianceChecks: ComplianceCheck[] = [
+const complianceChecks = [
   {
     category: "1. Documentation",
     checks: [

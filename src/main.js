@@ -5,7 +5,7 @@ import { parseArgs } from "@std/cli/parse_args.ts";
 import { load as loadEnv } from "@std/dotenv/mod.ts";
 
 // Load WASM modules for acceleration
-import { initWasm, hashContentWasm } from "./wasm/mod.ts";
+import { initWasm, hashContentWasm } from "./wasm/mod.js";
 
 // Import ReScript-generated modules
 // Note: ReScript compiles to ES modules that Deno can import
@@ -18,25 +18,12 @@ const env = await loadEnv({ export: true });
 // Initialize WASM modules
 await initWasm();
 
-interface CliArgs {
-  repo?: string[];
-  daemon?: boolean;
-  interval?: number;
-  threshold?: number;
-  "arango-url"?: string;
-  "arango-db"?: string;
-  "arango-user"?: string;
-  "arango-password"?: string;
-  help?: boolean;
-  _: string[];
-}
-
 function printHelp() {
   console.log(`
 Documentation Reconciliation System (Deno Edition)
 ===================================================
 
-Usage: deno run --allow-all src/main.ts [command] [options]
+Usage: deno run --allow-all src/main.js [command] [options]
 
 Commands:
   scan              Scan repositories once
@@ -62,7 +49,7 @@ Environment Variables:
 
 Examples:
   # Scan a repository
-  deno run --allow-all src/main.ts scan --repo /path/to/repo
+  deno run --allow-all src/main.js scan --repo /path/to/repo
 
   # Compile to AOT binary (no runtime needed)
   deno task compile:aot
@@ -71,12 +58,12 @@ Examples:
   ./bin/recon-silly-ation-aot scan --repo /repo
 
   # Daemon mode with WASM acceleration
-  deno run --allow-all src/main.ts daemon --repo /repo --interval 300
+  deno run --allow-all src/main.js daemon --repo /repo --interval 300
 `);
 }
 
 async function main() {
-  const args = parseArgs<CliArgs>(Deno.args, {
+  const args = parseArgs(Deno.args, {
     boolean: ["daemon", "help"],
     string: [
       "repo",

@@ -1,13 +1,13 @@
 // WASM module loader and exports
 // Provides high-performance WebAssembly functions
 
-let wasmModule: WebAssembly.Instance | null = null;
+let wasmModule = null;
 
-export async function initWasm(): Promise<void> {
+export async function initWasm() {
   try {
     const wasmPath = new URL("./hasher.wasm", import.meta.url);
     const wasmBytes = await Deno.readFile(wasmPath);
-    const wasmModule = await WebAssembly.instantiate(wasmBytes);
+    wasmModule = await WebAssembly.instantiate(wasmBytes);
     console.log("✅ WASM modules loaded successfully");
   } catch (error) {
     console.warn("⚠️  WASM modules not found, using JS fallback");
@@ -16,7 +16,7 @@ export async function initWasm(): Promise<void> {
 }
 
 // WASM-accelerated content hashing
-export function hashContentWasm(content: string): string {
+export function hashContentWasm(content) {
   if (wasmModule) {
     // Call WASM hash function
     // This would be implemented in Rust/AssemblyScript
@@ -28,7 +28,7 @@ export function hashContentWasm(content: string): string {
 }
 
 // Native Deno crypto API (very fast)
-export function hashContentNative(content: string): string {
+export function hashContentNative(content) {
   const encoder = new TextEncoder();
   const data = encoder.encode(content);
   const hashBuffer = crypto.subtle.digestSync("SHA-256", data);
@@ -37,7 +37,7 @@ export function hashContentNative(content: string): string {
 }
 
 // WASM-accelerated content normalization
-export function normalizeContentWasm(content: string): string {
+export function normalizeContentWasm(content) {
   if (wasmModule) {
     // Call WASM normalization
   }
