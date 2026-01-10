@@ -492,7 +492,7 @@ deno run --allow-read scripts/verify-rsr-compliance.ts
 
 Dual License:
 
-* MIT License
+* Palimpsest-MPL-1.0 License
 * Palimpsest License v0.8
 
 See link:LICENSE.txt[] for details.
