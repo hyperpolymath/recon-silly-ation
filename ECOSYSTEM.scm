@@ -1,4 +1,4 @@
-;; SPDX-License-Identifier: MIT
+;; SPDX-License-Identifier: PMPL-1.0-or-later
 ;; ECOSYSTEM.scm - Project ecosystem positioning
 ;; Copyright (C) 2025 Jonathan D.A. Jewell
 
@@ -17,7 +17,7 @@
                  (description . "LLM-powered document generation with guardrails")))
       (docudactyl . ((relationship . "orchestrator")
                     (description . "Coordinates workflows between components")))
-      (gitvisor . ((relationship . "infrastructure")
+      (git-hud . ((relationship . "infrastructure")
                   (description . "Git repository management and monitoring")))
       (rhodium-standard . ((relationship . "compliance-framework")
                           (description . "RSR compliance checking and validation")))))

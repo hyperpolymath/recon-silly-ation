@@ -1,4 +1,4 @@
-;; SPDX-License-Identifier: MIT
+;; SPDX-License-Identifier: PMPL-1.0-or-later
 ;; STATE.scm - RSR State File
 ;; Copyright (C) 2025 Jonathan D.A. Jewell
 
