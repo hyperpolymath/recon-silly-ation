@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
 // Command-line interface for documentation reconciliation
 // Usage: node lib/js/src/CLI.bs.js [options]
 

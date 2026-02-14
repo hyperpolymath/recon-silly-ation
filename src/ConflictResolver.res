@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
 // Conflict resolution with confidence scoring and rule-based strategies
 // Auto-resolve when confidence > 0.9, escalate otherwise
 

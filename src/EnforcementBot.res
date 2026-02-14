@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: AGPL-3.0-or-later
+// SPDX-License-Identifier: PMPL-1.0-or-later
 //
 // EnforcementBot - Automated document bundle enforcement and cleanup
 //
@@ -102,17 +102,17 @@ let rsrComplianceRule: enforcementRule = {
 
 // License compliance
 let licenseComplianceRule: enforcementRule = {
-  name: "license-agpl",
-  description: "Ensure AGPL-3.0-or-later license is used",
+  name: "license-pmpl",
+  description: "Ensure PMPL-1.0-or-later (Palimpsest) license is used",
   reconforthCode: `
     "LICENSE" bundle-get-type nil <>
     [
       "LICENSE" bundle-get-type doc-content
-      dup "AGPL" str-contains? not
-      [ drop "License must be AGPL-3.0-or-later" error! ]
+      dup "Palimpsest" str-contains? not
+      [ drop "License must be PMPL-1.0-or-later (Palimpsest)" error! ]
       [
-        "3.0" str-contains? not
-        [ "License should specify version 3.0" warn! ] when
+        "1.0" str-contains? not
+        [ "License should specify version 1.0" warn! ] when
       ]
       if
     ]

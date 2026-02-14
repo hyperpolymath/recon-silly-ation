@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
 // ReScript bridge to Haskell validator
 // Calls Haskell validator for schema enforcement
 

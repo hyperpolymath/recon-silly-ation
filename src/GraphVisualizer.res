@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
 // Graph visualization for documentation relationships
 // Generates DOT format for Graphviz rendering
 

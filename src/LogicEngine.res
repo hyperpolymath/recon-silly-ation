@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
 // miniKanren/Datalog-style logical inference for documentation reconciliation
 // Cross-document reasoning for complex reconciliation rules
 

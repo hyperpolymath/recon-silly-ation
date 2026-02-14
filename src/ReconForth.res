@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: AGPL-3.0-or-later
+// SPDX-License-Identifier: PMPL-1.0-or-later
 //
 // ReconForth - ReScript bindings for the ReconForth DSL
 //
@@ -138,10 +138,10 @@ let standardPack = `
   "SUPPORT" pack-optional
 
   -- Custom validation rules
-  "license-agpl" [
+  "license-pmpl" [
     "LICENSE" bundle-get-type nil <>
-    [ "LICENSE" bundle-get-type doc-content "AGPL" str-contains?
-      "License must be AGPL-3.0-or-later" require!
+    [ "LICENSE" bundle-get-type doc-content "Palimpsest" str-contains?
+      "License must be PMPL-1.0-or-later (Palimpsest)" require!
     ] when
   ] pack-rule
 

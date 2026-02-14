@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
 // Core domain types for documentation reconciliation system
 // Content-addressable storage with graph-based conflict resolution
 

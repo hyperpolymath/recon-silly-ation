@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
 // CCCP Compliance Checker
 // Detects Python files and recommends ReScript/Deno migrations
 // Issues "Patrojisign/insulti" warnings for Python usage

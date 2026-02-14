@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
 // LLM integration layer with guardrails
 // CRITICAL: Never auto-commit LLM output; always requiresApproval: true
 

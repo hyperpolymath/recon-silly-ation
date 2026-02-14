@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: AGPL-3.0-or-later
+// SPDX-License-Identifier: PMPL-1.0-or-later
 //
 // PackShipper - Document bundle packaging and distribution
 //
@@ -96,8 +96,8 @@ let hyperpolymathPackSpec = `
     "LICENSE" bundle-get-type nil <>
     [
       "LICENSE" bundle-get-type doc-content
-      "AGPL-3.0-or-later" str-contains?
-      "License must be AGPL-3.0-or-later" require!
+      "Palimpsest" str-contains?
+      "License must be PMPL-1.0-or-later (Palimpsest)" require!
     ] when
   ] pack-rule
 
@@ -196,7 +196,7 @@ let createManifest = (
     version,
     description,
     author,
-    license: "AGPL-3.0-or-later",
+    license: "PMPL-1.0-or-later",
     created: Js.Date.now(),
     documents,
     validation: {

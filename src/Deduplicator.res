@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
 // Content-addressable deduplication using cryptographic hashing
 // Guarantees: Same hash = same content = single entry
 

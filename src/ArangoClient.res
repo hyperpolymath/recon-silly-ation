@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
 // Type-safe ArangoDB client for graph operations
 // Multi-model database: document storage + graph relationships
 

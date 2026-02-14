@@ -2,7 +2,7 @@
 name = "recon-wasm"
 version = "0.2.0"
 edition = "2021"
-authors = ["Hyperpolymath"]
+authors = ["Jonathan D.A. Jewell <jonathan.jewell@open.ac.uk>"]
 
 [lib]
 crate-type = ["cdylib"]

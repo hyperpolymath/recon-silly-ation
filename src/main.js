@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
 // Deno main entry point for documentation reconciliation
 // Replaces Node.js/npm with Deno runtime
 
