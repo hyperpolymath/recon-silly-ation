@@ -1,14 +1,17 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
 # Multi-stage Containerfile for Podman
-# Deno + Rust/WASM + Haskell + ReScript
+# Deno + Rust/WASM + Haskell
+# Base images: cgr.dev/chainguard/wolfi-base (Chainguard)
 
 # Stage 1: Build Rust WASM modules
-FROM rust:1.75-alpine AS wasm-builder
+FROM cgr.dev/chainguard/wolfi-base:latest AS wasm-builder
+
+RUN apk add --no-cache rust cargo musl-dev
 
 WORKDIR /build
 
 # Install wasm target
-RUN rustup target add wasm32-unknown-unknown && \
-    apk add --no-cache musl-dev
+RUN rustup target add wasm32-unknown-unknown
 
 # Copy Rust source
 COPY wasm-modules/Cargo.toml wasm-modules/Cargo.lock* ./
@@ -18,7 +21,9 @@ COPY wasm-modules/src ./src
 RUN cargo build --release --target wasm32-unknown-unknown
 
 # Stage 2: Build Haskell validator
-FROM haskell:9.2-slim AS haskell-builder
+FROM cgr.dev/chainguard/wolfi-base:latest AS haskell-builder
+
+RUN apk add --no-cache ghc cabal-install
 
 WORKDIR /validator
 
@@ -31,31 +36,12 @@ RUN cabal update && \
     cabal build && \
     cabal install --installdir=/usr/local/bin
 
-# Stage 3: Build ReScript
-FROM denoland/deno:alpine-1.40.0 AS rescript-builder
+# Stage 3: Final runtime image with Deno
+FROM cgr.dev/chainguard/wolfi-base:latest
+
+RUN apk add --no-cache deno ca-certificates tini curl
 
 WORKDIR /app
-
-# Copy ReScript config
-COPY bsconfig.json package.json* ./
-
-# Install ReScript and build
-RUN if [ -f package.json ]; then \
-    apk add --no-cache npm && \
-    npm ci && \
-    npm run build; \
-    fi
-
-# Stage 4: Final runtime image with Deno
-FROM denoland/deno:alpine-1.40.0
-
-WORKDIR /app
-
-# Install runtime dependencies
-RUN apk add --no-cache \
-    ca-certificates \
-    tini \
-    curl
 
 # Copy WASM modules
 COPY --from=wasm-builder /build/target/wasm32-unknown-unknown/release/recon_wasm.wasm ./src/wasm/hasher.wasm
@@ -63,16 +49,13 @@ COPY --from=wasm-builder /build/target/wasm32-unknown-unknown/release/recon_wasm
 # Copy Haskell validator
 COPY --from=haskell-builder /usr/local/bin/validator-bridge /usr/local/bin/
 
-# Copy ReScript compiled output
-COPY --from=rescript-builder /app/lib ./lib
-
 # Copy Deno source and configuration
 COPY deno.json deno.lock* ./
 COPY src ./src
 COPY scripts ./scripts
 
 # Cache Deno dependencies
-RUN deno cache --lock=deno.lock src/main.ts
+RUN deno cache --lock=deno.lock src/main.js
 
 # Copy configuration files
 COPY justfile ./
@@ -91,7 +74,7 @@ ENV ARANGO_DATABASE=reconciliation
 ENTRYPOINT ["/sbin/tini", "--"]
 
 # Default command
-CMD ["deno", "run", "--allow-all", "src/main.ts", "help"]
+CMD ["deno", "run", "--allow-all", "src/main.js", "help"]
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
@@ -100,6 +83,7 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
 # Labels
 LABEL org.opencontainers.image.title="recon-silly-ation"
 LABEL org.opencontainers.image.description="Documentation Reconciliation System (Deno + WASM)"
-LABEL org.opencontainers.image.version="0.2.0"
-LABEL org.opencontainers.image.authors="Hyperpolymath"
-LABEL org.opencontainers.image.source="https://github.com/Hyperpolymath/recon-silly-ation"
+LABEL org.opencontainers.image.version="0.3.0"
+LABEL org.opencontainers.image.authors="Jonathan D.A. Jewell <jonathan.jewell@open.ac.uk>"
+LABEL org.opencontainers.image.source="https://github.com/hyperpolymath/recon-silly-ation"
+LABEL org.opencontainers.image.licenses="PMPL-1.0-or-later"
