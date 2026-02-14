@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
 // Idempotent orchestration pipeline
 // Scan → Normalize → Dedupe → Detect → Resolve → Ingest → Report
 // Each stage is rerunnable and atomic
@@ -28,6 +29,54 @@ external basename: string => string = "basename"
 
 @module("path") @val
 external extname: string => string = "extname"
+
+@module("child_process") @val
+external execSync: (string, 'a) => string = "execSync"
+
+// Parse version from content (e.g., "v1.2.3", "version 2.0.0", "Version: 3.1.4")
+let parseVersionFromContent = (content: string): option<version> => {
+  let re = %re("/(?:v|version[:\s]+)(\d+)\.(\d+)\.(\d+)/i")
+  switch re->Js.Re.exec_(content) {
+  | None => None
+  | Some(result) => {
+      let captures = Js.Re.captures(result)
+      switch (
+        captures->Belt.Array.get(1)->Belt.Option.flatMap(Js.Nullable.toOption),
+        captures->Belt.Array.get(2)->Belt.Option.flatMap(Js.Nullable.toOption),
+        captures->Belt.Array.get(3)->Belt.Option.flatMap(Js.Nullable.toOption),
+      ) {
+      | (Some(major), Some(minor), Some(patch)) =>
+        switch (
+          Belt.Int.fromString(major),
+          Belt.Int.fromString(minor),
+          Belt.Int.fromString(patch),
+        ) {
+        | (Some(maj), Some(min), Some(pat)) => Some({major: maj, minor: min, patch: pat})
+        | _ => None
+        }
+      | _ => None
+      }
+    }
+  }
+}
+
+// Detect current git branch, fallback to "main"
+let detectGitBranch = (repoPath: string): string => {
+  try {
+    let result = execSync(
+      "git rev-parse --abbrev-ref HEAD",
+      {"cwd": repoPath, "encoding": "utf8"},
+    )
+    let trimmed = result->Js.String2.trim
+    if Js.String2.length(trimmed) > 0 {
+      trimmed
+    } else {
+      "main"
+    }
+  } catch {
+  | _ => "main"
+  }
+}
 
 // Stage: Scan repositories for documentation files
 let scanRepository = (repoPath: string): result<array<document>, string> => {
@@ -83,10 +132,10 @@ let scanRepository = (repoPath: string): result<array<document>, string> => {
                   path: path,
                   documentType: dt,
                   lastModified: Js.Date.now(),
-                  version: None, // TODO: Parse version from content
+                  version: parseVersionFromContent(content),
                   canonicalSource: canonicalSource,
                   repository: repoPath,
-                  branch: "main", // TODO: Detect current branch
+                  branch: detectGitBranch(repoPath),
                 }
 
                 let doc = Deduplicator.createDocument(content, metadata)
