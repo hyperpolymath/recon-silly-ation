@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: AGPL-3.0-or-later
+// SPDX-License-Identifier: PMPL-1.0-or-later
 //
 // recon-wasm - WASM-accelerated document reconciliation
 //
@@ -11,6 +11,7 @@ use sha2::{Digest, Sha256};
 use wasm_bindgen::prelude::*;
 
 pub mod reconforth;
+pub mod security;
 
 use reconforth::{Bundle, Document, VM};
 
