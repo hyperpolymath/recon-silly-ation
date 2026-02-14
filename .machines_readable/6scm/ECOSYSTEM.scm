@@ -1,6 +1,6 @@
 ;; SPDX-License-Identifier: PMPL-1.0-or-later
 ;; ECOSYSTEM.scm - Project ecosystem positioning
-;; Copyright (C) 2025 Jonathan D.A. Jewell
+;; Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <jonathan.jewell@open.ac.uk>
 
 (ecosystem
   ((version . "1.0.0")
