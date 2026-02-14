@@ -8,7 +8,7 @@ This document lists the maintainers of the recon-silly-ation project and describ
 
 * **Hyperpolymath** - @Hyperpolymath
   * Role: Project founder, architecture, RSR compliance
-  * Email: hyperpolymath@example.com (replace with actual)
+  * Email: jonathan.jewell@open.ac.uk
   * Timezone: UTC
   * Available: Weekdays, asynchronous communication preferred
 
@@ -88,9 +88,9 @@ Former maintainers who remain available for consultation:
 ## Contact
 
 * **General Questions**: GitHub Discussions
-* **Security Issues**: security@example.com (see SECURITY.md)
-* **CoC Violations**: conduct@example.com (see CODE_OF_CONDUCT.md)
-* **Maintainer Team**: maintainers@example.com
+* **Security Issues**: jonathan.jewell@open.ac.uk (see SECURITY.md)
+* **CoC Violations**: jonathan.jewell@open.ac.uk (see CODE_OF_CONDUCT.md)
+* **Maintainer Team**: jonathan.jewell@open.ac.uk
 
 ## Acknowledgments
 

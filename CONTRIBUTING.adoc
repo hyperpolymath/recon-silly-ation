@@ -53,7 +53,7 @@ curl -fsSL https://deno.land/install.sh | sh
 deno task build:wasm
 
 # Cache dependencies
-deno cache src/main.ts
+deno cache src/main.js
 
 # Run tests
 deno task test
@@ -120,7 +120,7 @@ deno fmt --check src/ tests/
 deno lint src/ tests/
 
 # Type check
-deno check src/main.ts
+deno check src/main.js
 ----
 
 *Minimum Requirements:*
@@ -252,18 +252,17 @@ This project maintains *RSR (Rhodium Standard Repository)* compliance:
 *DO NOT* create public issues for security vulnerabilities.
 
 Instead:
-- Email: security@example.com (replace with actual)
+- Email: jonathan.jewell@open.ac.uk
 - Use GitHub Security Advisories
 - See link:SECURITY.md[] for full policy
 
 == License
 
-By contributing, you agree that your contributions will be licensed under the project's dual license:
+By contributing, you agree that your contributions will be licensed under the project's license:
 
-* MIT License
-* Palimpsest License v0.8
+* PMPL-1.0-or-later (Palimpsest License)
 
-See link:LICENSE.txt[] for full terms.
+See link:LICENSE[] for full terms.
 
 == Attribution
 
@@ -278,7 +277,7 @@ Contributors are recognized in:
 * *Discussions*: GitHub Discussions
 * *Chat*: (TBD - Matrix/Discord)
 * *Issues*: GitHub Issues
-* *Email*: community@example.com (replace with actual)
+* *Email*: jonathan.jewell@open.ac.uk
 
 == Emotional Safety
 

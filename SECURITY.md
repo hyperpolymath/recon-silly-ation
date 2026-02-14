@@ -18,7 +18,7 @@ We take security seriously. If you discover a security vulnerability, please fol
 
 Instead, please report security vulnerabilities by emailing:
 
-**security@example.com** (replace with actual email)
+**jonathan.jewell@open.ac.uk**
 
 Or use GitHub's security advisory feature:
 https://github.com/Hyperpolymath/recon-silly-ation/security/advisories/new
@@ -73,8 +73,8 @@ When using recon-silly-ation:
    - Validate all file paths before access
    - Sanitize user input
 
-2. **Docker Security**
-   - Use official base images
+2. **Podman Security**
+   - Use Chainguard base images
    - Run as non-root user where possible
    - Scan images for vulnerabilities
    - Keep base images updated
@@ -100,9 +100,9 @@ When using recon-silly-ation:
    - Maintain audit trail
 
 3. **Dependencies**
-   - Regularly update dependencies (`npm audit`)
+   - Regularly update dependencies (`deno lint`)
    - Review dependency security advisories
-   - Use lock files (`package-lock.json`)
+   - Use lock files (`deno.lock`)
    - Minimize dependency count
 
 ## Known Security Considerations
@@ -160,10 +160,10 @@ This project includes CCCP compliance checking:
 
 ## Contact
 
-- **Security Email**: security@example.com (replace with actual)
+- **Security Email**: jonathan.jewell@open.ac.uk
 - **Repository**: https://github.com/Hyperpolymath/recon-silly-ation
 - **Security Advisories**: https://github.com/Hyperpolymath/recon-silly-ation/security/advisories
 
 ---
 
-Last updated: 2025-11-22
+Last updated: 2026-02-14

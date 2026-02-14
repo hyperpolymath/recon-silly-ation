@@ -5,7 +5,7 @@ synopsis:           Haskell validator bridge for documentation schema enforcemen
 description:        Type-safe schema validation for documentation reconciliation system
 license:            MIT
 author:             Hyperpolymath
-maintainer:         maintainer@example.com
+maintainer:         jonathan.jewell@open.ac.uk
 category:           Validation
 build-type:         Simple
 

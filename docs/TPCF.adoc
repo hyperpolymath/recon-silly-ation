@@ -261,7 +261,7 @@ Potential additions:
 == Questions?
 
 * GitHub Discussions
-* Email: community@example.com
+* Email: jonathan.jewell@open.ac.uk
 * See link:../MAINTAINERS.md[Maintainers]
 
 ---
