@@ -248,7 +248,7 @@ supersedes(X, Y) :- same_type(X, Y), version_greater(X, Y).
 
 == Deployment
 
-=== Docker Architecture
+=== Container Architecture
 
 [source,yaml]
 ----

@@ -16,7 +16,7 @@ and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Version
 - CODE_OF_CONDUCT.md following Contributor Covenant 2.1
 - MAINTAINERS.md with governance model
 - .well-known/ directory (security.txt, ai.txt, humans.txt)
-- Dual MIT + Palimpsest v0.8 licensing
+- PMPL-1.0-or-later (Palimpsest) licensing
 - flake.nix for Nix reproducibility
 - RSR compliance verification script
 
@@ -37,13 +37,13 @@ and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Version
 - docker-compose.yml → podman-compose.yml
 - README.md → README.adoc (AsciiDoc format)
 - CLAUDE.md → CLAUDE.adoc (AsciiDoc format)
-- LICENSE → LICENSE.txt
+- LICENSE updated to PMPL-1.0-or-later (Palimpsest)
 - Complete justfile rewrite for Deno/WASM/Podman
 - CI/CD updated for Deno + Rust + Podman
 
 === Removed
 - npm/Node.js dependencies
-- Docker-specific files
+- Docker-specific files (replaced by Podman/Containerfile)
 
 === Performance
 - Hash operations: 2-3x faster with WASM
@@ -63,7 +63,7 @@ and this project adheres to https://semver.org/spec/v2.0.0.html[Semantic Version
 - Haskell schema validator bridge
 - CCCP compliance checking
 - Graph visualization (DOT/Mermaid)
-- Docker deployment
+- Podman container deployment
 - Comprehensive test suite (14+ tests)
 - CI/CD automation (GitHub Actions)
 - Complete documentation

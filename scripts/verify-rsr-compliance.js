@@ -39,9 +39,9 @@ const complianceChecks = [
         points: 2,
       },
       {
-        name: "LICENSE.txt exists",
+        name: "LICENSE exists",
         required: true,
-        check: () => fileExists("LICENSE.txt"),
+        check: () => fileExists("LICENSE"),
         points: 2,
       },
       {
@@ -119,21 +119,21 @@ const complianceChecks = [
     category: "3. Licensing",
     checks: [
       {
-        name: "LICENSE.txt exists",
+        name: "LICENSE exists",
         required: true,
-        check: () => fileExists("LICENSE.txt"),
+        check: () => fileExists("LICENSE"),
         points: 2,
       },
       {
-        name: "Dual license (MIT + Palimpsest)",
+        name: "PMPL-1.0-or-later (Palimpsest) license",
         required: false,
-        check: () => fileContains("LICENSE.txt", "Palimpsest"),
+        check: () => fileContains("LICENSE", "Palimpsest"),
         points: 3,
       },
       {
         name: "Copyright year present",
         required: true,
-        check: () => fileContains("LICENSE.txt", "2025"),
+        check: () => fileContains("LICENSE", "2025"),
         points: 1,
       },
     ],

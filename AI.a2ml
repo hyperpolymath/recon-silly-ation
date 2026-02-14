@@ -5,11 +5,17 @@
 - `recon-silly-ation` is treated as a Rhodium Standard Repository; obey the Rhodium policies, maintain `.bot_directives`, and keep `.machines_readable/6scm/` authoritative.
 - Prefer to keep generated files out of source control, and regenerate them with the documented commands before committing.
 
+## Machine-Readable Locations
+- `.machine_readable/` — canonical RSR location (STATE.scm, META.scm, ECOSYSTEM.scm, AGENTIC.scm, NEUROSYM.scm, PLAYBOOK.scm)
+- `.machines_readable/6scm/` — authoritative per this AI.a2ml (kept in sync with `.machine_readable/`)
+- Both directories contain identical content and must be updated together.
+
 ## Workflow
-1. Inspect `.machines_readable/6scm/STATE.scm` for blockers and next actions.
-2. Respect any constraints listed inside `.machines_readable/6scm/AGENTIC.scm` when tooling changes are requested.
-3. After finishing edits, update STATE with your outcomes and commit with a concise, imperative message.
+1. Read this file (AI.a2ml) first.
+2. Inspect `.machines_readable/6scm/STATE.scm` for blockers and next actions.
+3. Respect any constraints listed inside `.machines_readable/6scm/AGENTIC.scm` when tooling changes are requested.
+4. After finishing edits, update STATE in both locations and commit with a concise, imperative message.
 
 ## Delivery Promises
 - Mention in summaries whether STATE, `contractiles/`, or `.bot_directives/` changed.
-- Keep this file in sync with the repository’s status; update it if the governance changes.
+- Keep this file in sync with the repository's status; update it if the governance changes.

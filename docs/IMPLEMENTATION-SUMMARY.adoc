@@ -78,11 +78,11 @@
 |Build automation with 25+ recipes
 |✅ Complete
 
-|`Dockerfile`
-|Multi-stage build (ReScript + Haskell)
+|`Containerfile`
+|Multi-stage Podman build (WASM + Haskell)
 |✅ Complete
 
-|`docker-compose.yml`
+|`podman-compose.yml`
 |Full stack with ArangoDB
 |✅ Complete
 
@@ -301,18 +301,18 @@ Type-safe validation with specific rules per document type:
 node lib/js/src/CLI.bs.js --repo /path/to/repo
 ----
 
-=== 2. Docker Container
+=== 2. Podman Container
 
 [source,bash]
 ----
-docker run -v /repo:/workspace recon-silly-ation:latest
+podman run -v /repo:/workspace recon-silly-ation:latest
 ----
 
-=== 3. Docker Compose Stack
+=== 3. Podman Compose Stack
 
 [source,bash]
 ----
-docker-compose up  # Full stack with ArangoDB
+podman-compose up  # Full stack with ArangoDB
 ----
 
 === 4. Daemon Mode
@@ -385,7 +385,7 @@ Phase 1 MVP is complete with all core features implemented:
 ✅ Logical inference engine
 ✅ Haskell validation bridge
 ✅ CCCP compliance checking
-✅ Docker deployment
+✅ Podman deployment
 ✅ CI/CD automation
 
 The system is production-ready for:

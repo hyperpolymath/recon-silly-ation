@@ -54,16 +54,16 @@ deno task build
 [source,bash]
 ----
 # Scan a repository
-deno run --allow-all src/main.ts scan --repo /path/to/repo
+deno run --allow-all src/main.js scan --repo /path/to/repo
 
 # With custom ArangoDB
-deno run --allow-all src/main.ts scan \
+deno run --allow-all src/main.js scan \
   --repo /path/to/repo \
   --arango-url http://localhost:8529 \
   --arango-db reconciliation
 
 # Run in daemon mode (continuous scanning)
-deno run --allow-all src/main.ts daemon \
+deno run --allow-all src/main.js daemon \
   --repo /path/to/repo \
   --interval 300
 ----
@@ -267,7 +267,7 @@ Performance-critical operations run in WebAssembly:
 deno task build:wasm
 
 # WASM is automatically loaded at runtime
-deno run --allow-all src/main.ts scan --repo /repo
+deno run --allow-all src/main.js scan --repo /repo
 ----
 
 === LLM Integration
@@ -359,7 +359,7 @@ dot -Tsvg -o graph.svg graph.dot
 [source,bash]
 ----
 # Install Deno dependencies
-deno cache src/main.ts
+deno cache src/main.js
 
 # Build WASM modules
 deno task build:wasm
@@ -381,8 +381,8 @@ deno task test
 [source]
 ----
 recon-silly-ation/
-├── src/                      # TypeScript/ReScript source
-│   ├── main.ts              # Deno entry point
+├── src/                      # ReScript source (compiled to JS)
+│   ├── main.js              # Deno entry point
 │   ├── wasm/                # WASM module loader
 │   ├── Types.res            # Core types
 │   ├── Deduplicator.res     # Deduplication
@@ -399,7 +399,7 @@ recon-silly-ation/
 ├── podman-compose.yml       # Stack deployment
 ├── justfile                 # Build automation
 ├── deno.json                # Deno configuration
-└── LICENSE.txt              # MIT license
+└── LICENSE                  # PMPL-1.0-or-later
 ----
 
 == Testing
@@ -468,7 +468,7 @@ This project follows the *RSR (Rhodium Standard Repository)* framework for softw
 
 * ✅ Documentation (README, CONTRIBUTING, CHANGELOG, etc.)
 * ✅ Security (.well-known/security.txt, SECURITY.md)
-* ✅ Licensing (Dual MIT + Palimpsest v0.8)
+* ✅ Licensing (PMPL-1.0-or-later)
 * ✅ Build Reproducibility (flake.nix, justfile, Containerfile)
 * ✅ Testing (tests/, CI/CD)
 * ✅ Community Governance (CODE_OF_CONDUCT, MAINTAINERS)
@@ -485,17 +485,14 @@ This project follows the *RSR (Rhodium Standard Repository)* framework for softw
 Verify compliance:
 [source,bash]
 ----
-deno run --allow-read scripts/verify-rsr-compliance.ts
+deno run --allow-read scripts/verify-rsr-compliance.js
 ----
 
 == License
 
-Dual License:
+PMPL-1.0-or-later (Palimpsest License)
 
-* Palimpsest-MPL-1.0 License
-* Palimpsest License v0.8
-
-See link:LICENSE.txt[] for details.
+See link:LICENSE[] for details.
 
 == Security
 

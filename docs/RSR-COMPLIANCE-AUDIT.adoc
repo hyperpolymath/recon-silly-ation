@@ -21,7 +21,7 @@
 |*3. Licensing*
 |⚠️ Partial
 |5/10
-|Have: LICENSE.txt (MIT). Missing: Palimpsest v0.8 dual licensing
+|Have: LICENSE (PMPL-1.0-or-later Palimpsest)
 
 |*4. Build Reproducibility*
 |⚠️ Partial
@@ -79,7 +79,7 @@
 5. ✅ .well-known/security.txt - RFC 9116 security contact
 6. ✅ .well-known/ai.txt - AI training policy
 7. ✅ .well-known/humans.txt - Human attribution
-8. ✅ LICENSE.txt update - Dual MIT + Palimpsest v0.8
+8. ✅ LICENSE update - PMPL-1.0-or-later (Palimpsest)
 9. ✅ flake.nix - Nix reproducibility
 10. ✅ TPCF documentation - Perimeter declaration
 
@@ -99,7 +99,7 @@
 
 . Create all missing documentation files
 . Add .well-known/ directory with required files
-. Update LICENSE.txt for dual licensing
+. Update LICENSE for PMPL-1.0-or-later licensing
 . Create flake.nix for Nix users
 . Add RSR compliance checker
 . Document TPCF perimeter

@@ -446,10 +446,10 @@ Define new words with `:` and `;`:
   "CHANGELOG" pack-optional
 
   -- Custom validation rules
-  "license-must-be-agpl" [
+  "license-must-be-pmpl" [
     "LICENSE" bundle-get-type
-    doc-content "AGPL" str-contains?
-    "License must be AGPL-3.0-or-later" require!
+    doc-content "Palimpsest" str-contains?
+    "License must be PMPL-1.0-or-later (Palimpsest)" require!
   ] pack-rule
 
   "readme-has-badges" [
