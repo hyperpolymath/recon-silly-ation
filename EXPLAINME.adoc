@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: CC-BY-SA-4.0
 // Copyright (c) Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
-= RSR Template Repo - Explainme
+= recon-silly-ation - Explainme
 image:https://img.shields.io/badge/License-MPL_2.0-blue.svg[License: MPL-2.0,link="https://opensource.org/licenses/MPL-2.0"]
 
 :toc:
@@ -59,33 +59,23 @@ Caveat:
 == Template Token Policy
 
 Claim:
-Placeholders are explicit template content until initialization.
+This repository has been instantiated from the RSR template — the
+`{{PLACEHOLDER}}` tokens that once stood for project identity have been
+substituted with recon-silly-ation's real values.
 
 How this is implemented:
 
-* `README.adoc` and bootstrap recipes keep `{{TOKEN}}` placeholders visible.
-* `just init` performs token replacement.
+* `README.adoc` and the community-health files under `.github/` carry the
+  project's real name, owner, and licence instead of template tokens.
+* `.machine_readable/ai/PLACEHOLDERS.adoc` remains as the historical
+  reference for the substitution mechanism `just init` used to perform.
 
 Caveat:
 
-* Uninitialized placeholders must not be treated as project-specific truth.
-
-== Julia Registry Packages — Standalone Repo Requirement
-
-Claim:
-If this template is used to create a Julia package, it must remain a standalone repository registered with the Julia package registry.
-
-How this is implemented:
-
-* Julia's package registry (General.jl or other) expects each package to be a standalone GitHub repository with `Project.toml` at the repository root.
-* Installation via `Pkg.add()`, dependency resolution, and automated CI/CD all depend on this canonical structure.
-
-Caveat:
-
-* Do NOT move this repository into a monorepo or subdirectory, as this breaks registry registration and package discoverability.
-* See `JULIA-REGISTRY-REQUIREMENT.md` (workspace root) for the complete list of 34 registered Julia packages and enforcement rationale.
-* Non-registry Julia packages can be organized differently if they are not published to any registry.
-
+* `docs-template/`, the ADR template (`docs/decisions/0000-template.adoc`),
+  and the K9 component templates under `.machine_readable/self-validating/`
+  are deliberately still generic — they are seed kits for future
+  doc-authoring and component authoring, not this repo's own identity.
 
 == License
 
