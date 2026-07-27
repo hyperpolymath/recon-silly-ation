@@ -1,18 +1,19 @@
 # SPDX-License-Identifier: MPL-2.0
-# Dustfile — Cleanup and hygiene contract for rsr-template-repo
+# Dustfile — Cleanup and hygiene contract for recon-silly-ation
 # Author: Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
 #
 # Paired runner: dust.ncl
 # Verb:          dust
 # Semantics:     What should be cleaned up. Housekeeping, not blockers.
 #
-# This repository: rsr-template-repo is the canonical template.
-# Cleanup items here ensure the template itself remains pristine.
+# This repository: recon-silly-ation, instantiated from rsr-template-repo.
+# Cleanup items here ensure the instantiated repo stays free of leftover
+# template machinery and drift.
 
 @abstract:
-Cleanup and hygiene items for rsr-template-repo. These are maintenance tasks
-that ensure the template repository remains clean and ready for distribution
-to new repositories.
+Cleanup and hygiene items for recon-silly-ation. These are maintenance tasks
+that ensure the repository stays clean of stale template artefacts inherited
+from rsr-template-repo.
 @end
 
 ## Stale Files

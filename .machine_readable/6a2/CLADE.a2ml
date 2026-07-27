@@ -3,11 +3,14 @@
 # See: https://github.com/hyperpolymath/gv-clade-index
 
 [identity]
-uuid = "a5ea1382-a34c-5334-8a46-a2ebe904c810"
+# NOTE: this uuid was regenerated during instantiation — the value inherited
+# from rsr-template-repo would have collided with the template's own entry
+# in the gv-clade-index registry.
+uuid = "df5a6230-b430-4b24-aa38-ac764f6b8ca7"
 primary-forge = "github"
 primary-owner = "hyperpolymath"
-canonical-name = "rsr-template-repo"
-prefixed-name = "rm-rsr-template-repo"
+canonical-name = "recon-silly-ation"
+prefixed-name = "rm-recon-silly-ation"
 
 [clade]
 primary = "rm"
@@ -16,9 +19,9 @@ assigned = "2026-03-16"
 rationale = ""
 
 [forges]
-github = "hyperpolymath/rsr-template-repo"
-gitlab = "hyperpolymath/rsr-template-repo"
-bitbucket = "hyperpolymath/rsr-template-repo"
+github = "hyperpolymath/recon-silly-ation"
+gitlab = "hyperpolymath/recon-silly-ation"
+bitbucket = "hyperpolymath/recon-silly-ation"
 
 [lineage]
 type = "standalone"

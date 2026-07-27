@@ -1,51 +1,46 @@
 // SPDX-License-Identifier: CC-BY-SA-4.0
 // Copyright (c) Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
 // SPDX-FileCopyrightText: 2024-2026 Jonathan D.A. Jewell (hyperpolymath)
-= {{PROJECT_NAME}}
+= recon-silly-ation
 :toc:
 :toc-placement: preamble
 
-image:https://img.shields.io/badge/OpenSSF-Best_Practices-green?logo=opensourcesecurity[OpenSSF Best Practices,link="https://www.bestpractices.dev/en/projects/new?repo_url=https://{{FORGE}}/{{OWNER}}/{{REPO}}"]
+image:https://img.shields.io/badge/OpenSSF-Best_Practices-green?logo=opensourcesecurity[OpenSSF Best Practices,link="https://www.bestpractices.dev/en/projects/new?repo_url=https://github.com/hyperpolymath/recon-silly-ation"]
 image:https://img.shields.io/badge/License-MPL_2.0-blue.svg[License: MPL-2.0,link="https://opensource.org/licenses/MPL-2.0"]
-image:https://api.thegreenwebfoundation.org/greencheckimage/{{FORGE}}[Green Web,link="https://www.thegreenwebfoundation.org/green-web-check/?url={{FORGE}}"]
+image:https://api.thegreenwebfoundation.org/greencheckimage/github.com[Green Web,link="https://www.thegreenwebfoundation.org/green-web-check/?url=github.com"]
 
-{{PROJECT_DESCRIPTION}}
-
-[IMPORTANT]
-====
-*This file is a template.* You are reading `README.adoc` from the *RSR template repo*
-(or a freshly-cloned copy of it). Run `just init` to replace every `{{PLACEHOLDER}}`
-token with your project's details, then delete this admonition. Until you do, the
-`{{...}}` markers below are intentional placeholders, not content.
-====
+WASM document reconciliation, built around the ReconForth VM. It is an
+`interop` component of the `reposystem` tool ecosystem (see
+`reposystem/config/tools.ncl`), exposing a `reconcile` action.
 
 == What this is
 
-A new repository scaffolded from the *Rhodium Standard Repository (RSR)* template:
-a batteries-included starting point that ships with CI/CD, machine-readable project
-metadata, an AI-agent gatekeeper protocol, a formally-typed ABI/FFI seam
-(Idris2 + Zig), container and reproducible-build scaffolding, and governance
-infrastructure — all wired and passing the RSR validators on day one.
+recon-silly-ation reconciles documents by running the ReconForth virtual
+machine compiled to WebAssembly. It is registered in `reposystem` as an
+`interop`-role tool with `status = 'extracted` (a gitlink submodule of
+`reposystem`), whose sole declared action is `reconcile`.
 
-Replace this section with a description of *your* project once initialised.
+The repository is scaffolded from the *Rhodium Standard Repository (RSR)*
+template, so it ships with CI/CD, machine-readable project metadata, an
+AI-agent gatekeeper protocol, a formally-typed ABI/FFI seam (Idris2 + Zig),
+container and reproducible-build scaffolding, and governance infrastructure.
 
 == Quick start
 
 [source,bash]
 ----
-# 1. Create a repo from this template (or clone it), then from the repo root:
-just init                # interactive bootstrap: fills every {{PLACEHOLDER}}
+git clone https://github.com/hyperpolymath/recon-silly-ation.git
+cd recon-silly-ation
 
-# 2. See the available tasks:
+# See the available tasks:
 just                     # lists all phases (build, test, validate, audit, ...)
 
-# 3. Check the repo still satisfies the RSR shape:
+# Build the Zig FFI bridge:
+just build
+
+# Check the repo still satisfies the RSR shape:
 just validate            # structure + metadata checks
 ----
-
-`just init` prompts for the project name, owner, author, licence contact, and the
-other values listed in `.machine_readable/ai/PLACEHOLDERS.adoc`, substitutes them
-across the tree, validates the result, and (if available) runs the `k9-svc` checks.
 
 == What you get
 

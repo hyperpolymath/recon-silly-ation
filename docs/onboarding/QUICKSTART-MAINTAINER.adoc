@@ -1,30 +1,30 @@
 // SPDX-License-Identifier: CC-BY-SA-4.0
 // Copyright (c) Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
-// Template: QUICKSTART-MAINTAINER.adoc — packaging, deploying, and maintaining
-// Replace rsr-template-repo, {{PACKAGE_NAME}}, {{DEPS}} with actuals
-= rsr-template-repo — Quick Start for Platform Maintainers
+= recon-silly-ation — Quick Start for Platform Maintainers
 :toc:
 :toclevels: 2
 
 == Overview
 
-This guide covers packaging, deploying, and maintaining rsr-template-repo for
-distribution on your platform.
+This guide covers packaging, deploying, and maintaining recon-silly-ation
+(WASM document reconciliation via the ReconForth VM) for distribution on
+your platform.
 
 == Runtime Dependencies
 
-{{DEPS}}
+Zig 0.16.0 toolchain (build-time); a WASM-capable runtime at execution time.
+Idris2 is only needed if regenerating the ABI headers from `abi.ipkg`.
 
 == Build from Source
 
 [source,bash]
 ----
-git clone https://github.com/hyperpolymath/rsr-template-repo.git
-cd rsr-template-repo
+git clone https://github.com/hyperpolymath/recon-silly-ation.git
+cd recon-silly-ation
 just build-release
 ----
 
-Output: `{{BUILD_OUTPUT_PATH}}`
+Output: `src/interface/ffi/zig-out/`
 
 == Packaging
 
@@ -47,7 +47,7 @@ nix build
 [source,bash]
 ----
 just stapeln-export    # Generates Containerfile
-podman build -t rsr-template-repo .
+podman build -t recon-silly-ation .
 ----
 
 === Manual Package
@@ -66,10 +66,10 @@ Files installed:
 | `$PREFIX/bin/`
 | Executables
 
-| `$PREFIX/share/{{PACKAGE_NAME}}/`
+| `$PREFIX/share/recon_silly_ation/`
 | Data files, assets
 
-| `$PREFIX/share/doc/{{PACKAGE_NAME}}/`
+| `$PREFIX/share/doc/recon_silly_ation/`
 | Documentation
 
 | `$PREFIX/share/applications/`
@@ -81,17 +81,19 @@ Files installed:
 
 == Configuration
 
-Default config location: `$XDG_CONFIG_HOME/{{PACKAGE_NAME}}/config.toml`
+Default config location: `$XDG_CONFIG_HOME/recon_silly_ation/config.toml`
 
-Fallback: `$HOME/.config/{{PACKAGE_NAME}}/config.toml`
+Fallback: `$HOME/.config/recon_silly_ation/config.toml`
 
 == Health Checks
+
+recon-silly-ation is an FFI/WASM library (the ReconForth VM), not a
+standalone executable, so there is no `just run`. Use:
 
 [source,bash]
 ----
 just doctor            # Full diagnostic
-just run --version   # Version check
-just run --selftest  # Built-in self-test
+just test              # Runs the Zig FFI test suite (zig build test)
 ----
 
 == Updating
@@ -103,7 +105,7 @@ just build-release
 just install --prefix=/usr/local
 ----
 
-Or via OPSM: `opsm update {{PACKAGE_NAME}}`
+Or via OPSM: `opsm update recon_silly_ation`
 
 == Security Notes
 
@@ -118,13 +120,13 @@ For deploying multiple instances (e.g., different users or tenants):
 
 [source,bash]
 ----
-just install --prefix=/opt/{{PACKAGE_NAME}}-instance1 --config=/etc/{{PACKAGE_NAME}}/instance1.toml
-just install --prefix=/opt/{{PACKAGE_NAME}}-instance2 --config=/etc/{{PACKAGE_NAME}}/instance2.toml
+just install --prefix=/opt/recon_silly_ation-instance1 --config=/etc/recon_silly_ation/instance1.toml
+just install --prefix=/opt/recon_silly_ation-instance2 --config=/etc/recon_silly_ation/instance2.toml
 ----
 
 Each instance has isolated config, data, and logs.
 
 == Reporting Issues
 
-* Upstream: https://github.com/hyperpolymath/rsr-template-repo/issues
+* Upstream: https://github.com/hyperpolymath/recon-silly-ation/issues
 * With diagnostic: `just help-me` (pre-fills context)

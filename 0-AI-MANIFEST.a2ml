@@ -5,11 +5,11 @@
 #
 [metadata]
 version = "0.1.0"
-last-updated = "{{CURRENT_DATE}}"
+last-updated = "2026-07-27"
 
 [project]
-name = "[YOUR-REPO-NAME]"
-purpose = "{{PROJECT_DESCRIPTION}}"
+name = "recon-silly-ation"
+purpose = "WASM document reconciliation (ReconForth VM); interop component of the reposystem tool ecosystem."
 
 [ai-allocation]
 agents = [
