@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: MPL-2.0
-# Mustfile — Physical state contract for rsr-template-repo
+# Mustfile — Physical state contract for recon-silly-ation
 # Author: Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
 #
 # What MUST be true about this repository. Hard requirements.
@@ -7,9 +7,9 @@
 # Fix with: must fix (where a deterministic fix exists)
 
 @abstract:
-Physical-state invariants for rsr-template-repo. This is the canonical
-RSR template repository. These are hard requirements — CI and pre-commit
-hooks fail if any check fails.
+Physical-state invariants for recon-silly-ation, an RSR-compliant repository
+instantiated from rsr-template-repo. These are hard requirements — CI and
+pre-commit hooks fail if any check fails.
 @end
 
 ## File Presence
@@ -76,18 +76,13 @@ hooks fail if any check fails.
 - run: test -d .machine_readable/self-validating && test -d .machine_readable/self-validating/k9-svc && test -d .machine_readable/self-validating/examples
 - severity: warning
 
-## Template Integrity
+## Instantiation Integrity
 
 ### no-placeholder-values
-- description: No placeholder values remain in template files
-- run: test -z "$(grep -r '{{' .machine_readable/contractiles/ 2>/dev/null)"
+- description: No RSR identity placeholder values remain
+- run: test -z "$(grep -rE '\{\{[A-Z_]+\}\}|\{\{project\}\}|\{\{PROJECT\}\}' --exclude-dir=docs-template --exclude-dir=machine-readable-design . 2>/dev/null)"
 - severity: critical
-- notes: All placeholders must be substituted when copying this template
-
-### template-readonly
-- description: Template marker files are not modified
-- run: grep -q 'RSR_TEMPLATE_DO_NOT_EDIT' .machine_readable/0.1-AI-MANIFEST.a2ml
-- severity: warning
+- notes: All identity placeholders must stay substituted post-instantiation
 
 ## Git State
 

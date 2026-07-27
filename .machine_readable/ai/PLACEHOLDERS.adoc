@@ -3,6 +3,10 @@
 = Template Placeholders
 # Template Placeholders
 
+NOTE: recon-silly-ation has already been instantiated — its `{{PLACEHOLDER}}`
+tokens have been substituted. This file is kept as historical reference for
+the substitution mechanism `just init` used, not as a live checklist.
+
 All placeholders in this template follow the `{{PLACEHOLDER}}` pattern.
 After cloning, replace them with your project-specific values.
 
