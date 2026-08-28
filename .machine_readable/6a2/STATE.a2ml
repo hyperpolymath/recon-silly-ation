@@ -6,12 +6,12 @@
 [metadata]
 project = "recon-silly-ation"
 version = "0.1.0"
-last-updated = "2026-07-27"
+last-updated = "2026-08-28"
 status = "active"  # active | paused | archived
 
 [project-context]
 name = "recon-silly-ation"
-purpose = "WASM document reconciliation, built around the ReconForth VM. Registered in the reposystem tool ecosystem as an `interop`-role, `extracted` (gitlink submodule) tool with a single declared action: `reconcile`. Scaffolded from rsr-template-repo, so it ships with CI/CD, AI manifests, ABI/FFI standards, container ecosystem, and governance infrastructure inherited from there."
+purpose = "Experimental cross-document consistency reconciliation for repository documentation, history, metadata, terminology, language policy, and attribution. ForthWall is a proposed bounded Forth rule engine beneath the reconciler, not the product identity and not an implemented capability. Registered in reposystem as an `interop`-role, `extracted` tool with a planned `reconcile` action."
 completion-percentage = 20
 
 [position]
@@ -22,19 +22,20 @@ maturity = "experimental"  # experimental | alpha | beta | production | lts
 milestones = [
   { name = "RSR scaffolding instantiated (CI/CD, AI manifests, governance, container packaging)", completion = 100 },
   { name = "Typed ABI/FFI seam (Idris2 Abi/{Types,Layout,Foreign}.idr + Zig src/interface/ffi)", completion = 100 },
-  { name = "ReconForth VM compiled to WebAssembly", completion = 0 },
+  { name = "Bounded ForthWall VM compiled to WebAssembly", completion = 0 },
   { name = "Document reconciliation logic (the actual `reconcile` action)", completion = 0 },
 ]
 
 [blockers-and-issues]
 # No active blockers. The gap is scope, not obstruction: the RSR scaffolding
-# and ABI/FFI seam are in place, but the ReconForth VM / WASM reconciliation
+# and ABI/FFI seam are in place, but the ForthWall VM / WASM reconciliation
 # logic itself has not been implemented yet.
 
 [critical-next-actions]
 actions = [
-  "Implement the ReconForth VM and compile it to WebAssembly.",
+  "Specify, implement, and prove the bounded ForthWall VM, then compile it to WebAssembly.",
   "Implement the `reconcile` action behind the ABI/FFI seam.",
+  "Gate every capability claim on planted positive/negative, confinement, idempotence, non-interference, attribution-scope, adversarial, and independently verified end-to-end tests.",
   "Populate src/core, src/definitions, src/aspects, src/errors, src/bridges beyond their current scaffolding.",
 ]
 

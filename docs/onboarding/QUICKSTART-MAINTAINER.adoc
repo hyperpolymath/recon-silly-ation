@@ -6,9 +6,11 @@
 
 == Overview
 
-This guide covers packaging, deploying, and maintaining recon-silly-ation
-(WASM document reconciliation via the ReconForth VM) for distribution on
-your platform.
+This guide records the intended packaging and maintenance surface for
+recon-silly-ation, an experimental cross-document consistency reconciler. The
+actual reconciliation engine and its proposed bounded ForthWall VM are not yet
+implemented or proved; the commands below exercise scaffolding and must not be
+treated as evidence of a distributable reconciliation runtime.
 
 == Runtime Dependencies
 
@@ -87,8 +89,9 @@ Fallback: `$HOME/.config/recon_silly_ation/config.toml`
 
 == Health Checks
 
-recon-silly-ation is an FFI/WASM library (the ReconForth VM), not a
-standalone executable, so there is no `just run`. Use:
+recon-silly-ation currently has an FFI/WASM scaffold, not an operational
+ForthWall library or standalone reconciliation executable, so there is no
+`just run`. The following commands check only the present scaffold:
 
 [source,bash]
 ----

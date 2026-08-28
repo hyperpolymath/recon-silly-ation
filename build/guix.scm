@@ -47,10 +47,11 @@
   (inputs
    (list))
   (home-page "https://github.com/hyperpolymath/recon-silly-ation")
-  (synopsis "WASM document reconciliation (ReconForth VM)")
-  (description "recon-silly-ation reconciles documents by running the
-ReconForth virtual machine compiled to WebAssembly. It is an interop
-component of the reposystem tool ecosystem, exposing a reconcile action.")
+  (synopsis "Experimental cross-document consistency reconciler")
+  (description "recon-silly-ation is intended to find and safely reconcile
+contradictions across documentation, history, metadata, terminology, language
+policy, and attribution. Its proposed bounded ForthWall execution layer and
+reconcile action are not yet implemented or proved.")
   (license (list
             ;; MPL-2.0 extends MPL-2.0
             mpl2.0)))
