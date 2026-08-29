@@ -20,7 +20,7 @@ machinery has now been removed as no longer applicable:
 | *Source modules* | 6 | 3 Idris2 ABI (Foreign, Layout, Types), 2 Zig FFI (build, main), 1 Zig integration test
 | *Unit tests* | 0 | None in main source (inline tests in main.zig, if any)
 | *Integration tests* | 1 | `src/interface/ffi/test/integration_test.zig` — still template-shaped (see below)
-| *E2E tests* | 1 | `tests/e2e.sh` — banner + mostly-commented example matrix, not yet wired to real reconciliation or ForthWall flows
+| *E2E tests* | 1 | tests/e2e.sh — banner + mostly-commented example matrix, not yet wired to real reconciliation or ForthWall flows
 | *Aspect tests* | 1 | `tests/aspect_tests.sh` — cross-cutting invariant checks
 | *Workflow tests* | 1 | `tests/workflows/validate_workflows_test.sh` — validates GitHub Actions workflow structure
 |===
