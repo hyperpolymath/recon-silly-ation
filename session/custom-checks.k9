@@ -1,21 +1,4 @@
-K9!
-# SPDX-License-Identifier: MPL-2.0
 # Local repository session checks (thin policy layer)
-
----
-pedigree:
-  schema_version: "1.0.0"
-  security:
-    leash: Kennel
-    trust_level: "data-only"
-    allow_network: false
-    allow_filesystem_write: false
-    allow_subprocess: false
-  metadata:
-    name: "recon-silly-ation-session-checks"
-    version: "0.1.0"
-    description: "Declarative repository-specific session checks"
-
 version: "0.1"
 
 checks:

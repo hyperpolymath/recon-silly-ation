@@ -95,12 +95,11 @@ report_issue() {
 normalise_level() {
     local raw="$1"
     # Remove surrounding quotes, tick prefix ('Kennel -> Kennel), whitespace
-    raw="${raw#*=}"              # Remove everything before = (Nickel)
-    raw="${raw#*:}"              # Remove everything before : (YAML)
+    raw="${raw#*=}"              # Remove everything before =
     raw="${raw//\"/}"            # Remove double quotes
     raw="${raw//\'/}"            # Remove single quotes (Nickel tick)
     raw="${raw//,/}"             # Remove trailing commas
-    raw="${raw#"${raw%%[![:space:]]*}"}" # Trim leading whitespace
+    raw="${raw## }"              # Trim leading space
     raw="${raw%% }"              # Trim trailing space
     raw="${raw%%#*}"             # Remove inline comments
     raw="${raw## }"              # Trim again
@@ -164,10 +163,7 @@ validate_k9() {
     local security_level_line=0
     local has_signature_field=false
     local in_pedigree=false
-    local pedigree_format=""
     local pedigree_depth=0
-    local pedigree_indent=0
-    local pedigree_start_line=0
 
     line_num=0
     while IFS= read -r line; do
@@ -183,46 +179,19 @@ validate_k9() {
         # brace, depth started at 0, and the first nested block's close
         # prematurely terminated the validator's view of the pedigree —
         # making `pedigree.metadata.name` invisible.
-        # K9 has two serialisations in this estate: Nickel (.k9.ncl) uses
-        # `pedigree = {`, while the YAML-based .k9 coordination/session files
-        # use `pedigree:`.  Validate both instead of treating valid YAML K9 as
-        # though it were malformed Nickel.
-        if [[ "$line" =~ ^[[:space:]]*pedigree[[:space:]]*(=|:) ]]; then
+        if [[ "$line" =~ ^[[:space:]]*pedigree[[:space:]]*= ]]; then
             has_pedigree=true
             in_pedigree=true
             pedigree_depth=0
-            pedigree_start_line=$line_num
-            if [[ "$line" =~ ^[[:space:]]*pedigree[[:space:]]*= ]]; then
-                pedigree_format="nickel"
-            else
-                pedigree_format="yaml"
-                local pedigree_leading="${line%%[![:space:]]*}"
-                pedigree_indent=${#pedigree_leading}
-            fi
             # fall through
         fi
 
-        # YAML blocks end when a non-comment key returns to the pedigree
-        # key's indentation level (or above). Nickel blocks are delimited by
-        # braces and continue to use the depth tracking below.
-        if [[ "$in_pedigree" == "true" && "$pedigree_format" == "yaml" && \
-              $line_num -gt $pedigree_start_line ]]; then
-            local yaml_content="${line#"${line%%[![:space:]]*}"}"
-            local yaml_leading="${line%%[![:space:]]*}"
-            if [[ -n "$yaml_content" && "$yaml_content" != \#* && \
-                  ${#yaml_leading} -le $pedigree_indent ]]; then
-                in_pedigree=false
-            fi
-        fi
-
         if [[ "$in_pedigree" == "true" ]]; then
-            if [[ "$pedigree_format" == "nickel" ]]; then
-                # Track brace depth to know when Nickel pedigree block ends
-                local opens closes
-                opens="${line//[^\{]/}"
-                closes="${line//[^\}]/}"
-                pedigree_depth=$(( pedigree_depth + ${#opens} - ${#closes} ))
-            fi
+            # Track brace depth to know when pedigree block ends
+            local opens closes
+            opens="${line//[^\{]/}"
+            closes="${line//[^\}]/}"
+            pedigree_depth=$(( pedigree_depth + ${#opens} - ${#closes} ))
 
             if [[ $pedigree_depth -le 0 && "$has_pedigree" == "true" ]]; then
                 # Check this final line too before leaving
@@ -240,38 +209,37 @@ validate_k9() {
             #      was missed entirely because the pedigree block opened and
             #      closed in one line, never reaching the ^[[:space:]]+ check on
             #      a subsequent iteration.)
-            if [[ "$line" =~ ^[[:space:]]+name[[:space:]]*(=|:) ]] || \
+            if [[ "$line" =~ ^[[:space:]]+name[[:space:]]*= ]] || \
                [[ "$line" =~ [[:space:]]name[[:space:]]*= ]]; then
                 has_pedigree_name=true
             fi
 
             # Check for version field
-            if [[ "$line" =~ ^[[:space:]]+(version|schema_version)[[:space:]]*(=|:) ]] || \
+            if [[ "$line" =~ ^[[:space:]]+(version|schema_version)[[:space:]]*= ]] || \
                [[ "$line" =~ [[:space:]](version|schema_version)[[:space:]]*= ]]; then
                 has_pedigree_version=true
             fi
 
             # Check for security level (leash field)
-            if [[ "$line" =~ ^[[:space:]]+(leash|security_level)[[:space:]]*(=|:) ]]; then
+            if [[ "$line" =~ ^[[:space:]]+(leash|security_level)[[:space:]]*= ]]; then
                 has_security_level=true
                 security_level_value="$(normalise_level "$line")"
                 security_level_line=$line_num
             fi
 
             # Check for signature fields
-            if [[ "$line" =~ ^[[:space:]]+(signature|signature_required)[[:space:]]*(=|:) ]]; then
+            if [[ "$line" =~ ^[[:space:]]+(signature|signature_required)[[:space:]]*= ]]; then
                 has_signature_field=true
             fi
 
-            # End of Nickel pedigree block
-            if [[ "$pedigree_format" == "nickel" && $pedigree_depth -le 0 && \
-                  "$has_pedigree" == "true" && "$line" == *"}"* ]]; then
+            # End of pedigree block
+            if [[ $pedigree_depth -le 0 && "$has_pedigree" == "true" && "$line" == *"}"* ]]; then
                 in_pedigree=false
             fi
         fi
 
         # Also check for signature fields outside pedigree (top-level)
-        if [[ "$line" =~ ^[[:space:]]*(signature)[[:space:]]*(=|:) ]]; then
+        if [[ "$line" =~ ^[[:space:]]*(signature)[[:space:]]*= ]]; then
             has_signature_field=true
         fi
     done < "$file"
