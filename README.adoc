@@ -76,7 +76,7 @@ link:docs/status/TEST-NEEDS.adoc[`TEST-NEEDS`] and
 https://github.com/hyperpolymath/recon-silly-ation/issues/44[issue #44].
 
 The repository remains registered in `reposystem` as an `interop`-role tool
-with `status = 'extracted` (a gitlink submodule), whose sole declared action is
+with status = `extracted` (a gitlink submodule), whose sole declared action is
 `reconcile`.
 
 The repository is scaffolded from the *Rhodium Standard Repository (RSR)*
