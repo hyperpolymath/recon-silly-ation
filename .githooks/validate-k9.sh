@@ -95,7 +95,8 @@ report_issue() {
 normalise_level() {
     local raw="$1"
     # Remove surrounding quotes, tick prefix ('Kennel -> Kennel), whitespace
-    raw="${raw#*=}"              # Remove everything before =
+    raw="${raw#*=}"              # Remove everything before = (Nickel)
+    raw="${raw#*:}"              # Remove everything before : (YAML)
     raw="${raw//\"/}"            # Remove double quotes
     raw="${raw//\'/}"            # Remove single quotes (Nickel tick)
     raw="${raw//,/}"             # Remove trailing commas
@@ -179,7 +180,11 @@ validate_k9() {
         # brace, depth started at 0, and the first nested block's close
         # prematurely terminated the validator's view of the pedigree —
         # making `pedigree.metadata.name` invisible.
-        if [[ "$line" =~ ^[[:space:]]*pedigree[[:space:]]*= ]]; then
+        # K9 has two serialisations in this estate: Nickel (.k9.ncl) uses
+        # `pedigree = {`, while the YAML-based .k9 coordination/session files
+        # use `pedigree:`.  Validate both instead of treating valid YAML K9 as
+        # though it were malformed Nickel.
+        if [[ "$line" =~ ^[[:space:]]*pedigree[[:space:]]*(=|:) ]]; then
             has_pedigree=true
             in_pedigree=true
             pedigree_depth=0
@@ -209,19 +214,19 @@ validate_k9() {
             #      was missed entirely because the pedigree block opened and
             #      closed in one line, never reaching the ^[[:space:]]+ check on
             #      a subsequent iteration.)
-            if [[ "$line" =~ ^[[:space:]]+name[[:space:]]*= ]] || \
+            if [[ "$line" =~ ^[[:space:]]+name[[:space:]]*(=|:) ]] || \
                [[ "$line" =~ [[:space:]]name[[:space:]]*= ]]; then
                 has_pedigree_name=true
             fi
 
             # Check for version field
-            if [[ "$line" =~ ^[[:space:]]+(version|schema_version)[[:space:]]*= ]] || \
+            if [[ "$line" =~ ^[[:space:]]+(version|schema_version)[[:space:]]*(=|:) ]] || \
                [[ "$line" =~ [[:space:]](version|schema_version)[[:space:]]*= ]]; then
                 has_pedigree_version=true
             fi
 
             # Check for security level (leash field)
-            if [[ "$line" =~ ^[[:space:]]+(leash|security_level)[[:space:]]*= ]]; then
+            if [[ "$line" =~ ^[[:space:]]+(leash|security_level)[[:space:]]*(=|:) ]]; then
                 has_security_level=true
                 security_level_value="$(normalise_level "$line")"
                 security_level_line=$line_num
