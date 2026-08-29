@@ -72,6 +72,6 @@ human review.
 
 * [ ] Give `integration_test.zig` real test bodies against the FFI surface.
 * [ ] Wire `tests/e2e.sh` to a real ForthWall reconcile round-trip via the WASM
-  build, with bounded capabilities and independent verification of every
-  applied edit and the final document state.
+  build, with bounded capabilities and independent verification of every applied
+  edit and the final document state.
 * [ ] Integrate `just test` / `just e2e` / `just aspect` into CI.
