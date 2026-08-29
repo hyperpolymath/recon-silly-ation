@@ -9,7 +9,7 @@
 
 [metadata]
 version = "1.0.0"
-last-updated = "2026-07-27"
+last-updated = "2026-08-28"
 spec = "https://github.com/hyperpolymath/standards/blob/main/agentic-a2ml/docs/ADR-002-methodology-layer.adoc"
 
 # ============================================================================
