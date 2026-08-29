@@ -38,7 +38,7 @@ machinery has now been removed as no longer applicable:
 
 == Capability Evidence Required
 
-The project purpose is broader than its proposed Forth VM. Each capability
+The project purpose is broader than its proposed bounded ForthWall VM. Each capability
 must have independently reproducible evidence before it may be marked complete
 or operational:
 
@@ -72,5 +72,6 @@ human review.
 
 * [ ] Give `integration_test.zig` real test bodies against the FFI surface.
 * [ ] Wire `tests/e2e.sh` to a real ForthWall reconcile round-trip via the WASM
-  build, with bounded capabilities and independent result verification.
+  build, with bounded capabilities and independent verification of every applied
+  edit and the final document state.
 * [ ] Integrate `just test` / `just e2e` / `just aspect` into CI.

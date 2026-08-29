@@ -70,7 +70,7 @@ FROM cgr.dev/chainguard/wolfi-base:latest
 
 # OCI image labels (compatible with cerro-torre .ctp bundle metadata)
 LABEL org.opencontainers.image.title="recon-silly-ation" \
-      org.opencontainers.image.description="Experimental cross-document consistency reconciler; proposed ForthWall engine not yet implemented or proved." \
+      org.opencontainers.image.description="Experimental cross-document consistency reconciler; proposed bounded, capability-restricted ForthWall engine not yet implemented or proved." \
       org.opencontainers.image.url="https://github.com/hyperpolymath/recon-silly-ation" \
       org.opencontainers.image.source="https://github.com/hyperpolymath/recon-silly-ation" \
       org.opencontainers.image.vendor="hyperpolymath" \
