@@ -26,11 +26,13 @@ repos:
         name: Validate A2ML manifests
 
   # --- K9 contract validation ---
-  - repo: https://github.com/hyperpolymath/k9-pre-commit
-    rev: main
+  - repo: local
     hooks:
       - id: validate-k9
         name: Validate K9 contracts
+        entry: .githooks/validate-k9.sh
+        language: system
+        pass_filenames: false
 
   # --- Shell linting ---
   - repo: https://github.com/shellcheck-py/shellcheck-py
