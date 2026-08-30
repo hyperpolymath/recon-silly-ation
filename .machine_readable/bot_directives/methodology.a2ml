@@ -9,7 +9,7 @@
 
 [metadata]
 version = "1.0.0"
-last-updated = "2026-07-27"
+last-updated = "2026-08-29"
 spec = "https://github.com/hyperpolymath/standards/blob/main/agentic-a2ml/docs/ADR-002-methodology-layer.adoc"
 
 # ============================================================================
@@ -55,7 +55,7 @@ perfective = 10   # % for SPDX headers, doc updates, formatting, style
 # Customise this per project — the template default is generic.
 
 [methodology.unique-strength]
-description = "Runs the ReconForth VM compiled to WebAssembly for portable, sandboxed document reconciliation."
+description = "Reconciles evidenced cross-document inconsistencies; a bounded, capability-restricted ForthWall VM is proposed as an optional execution layer and is not yet implemented or proved."
 deepen-not-broaden = true
 
 # ============================================================================

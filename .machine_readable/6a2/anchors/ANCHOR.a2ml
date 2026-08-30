@@ -5,7 +5,7 @@
 
 [metadata]
 version = "1.0.0"
-last-updated = "2026-07-27"
+last-updated = "2026-08-28"
 
 [anchor]
 schema = "hyperpolymath.anchor/1"
@@ -21,7 +21,7 @@ purpose = [
 [identity]
 project = "recon-silly-ation"
 kind = "tool"                # language | library | service | tool
-one-sentence = "Reconciles documents via a WASM-hosted ReconForth virtual machine, as an interop component of the reposystem tool ecosystem."
+one-sentence = "Finds and safely reconciles cross-document and repository inconsistencies; its proposed bounded ForthWall execution layer is not yet implemented or proved."
 domain = "document reconciliation"
 
 [semantic-authority]

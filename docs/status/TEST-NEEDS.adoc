@@ -2,7 +2,7 @@
 // Copyright (c) Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
 = TEST-NEEDS: recon-silly-ation
 
-== Current State (Updated 2026-07-27)
+== Current State (Updated 2026-08-28)
 
 recon-silly-ation was instantiated from `rsr-template-repo`. This document
 previously described the *template's own* test suite for validating
@@ -20,7 +20,7 @@ machinery has now been removed as no longer applicable:
 | *Source modules* | 6 | 3 Idris2 ABI (Foreign, Layout, Types), 2 Zig FFI (build, main), 1 Zig integration test
 | *Unit tests* | 0 | None in main source (inline tests in main.zig, if any)
 | *Integration tests* | 1 | `src/interface/ffi/test/integration_test.zig` — still template-shaped (see below)
-| *E2E tests* | 1 | `tests/e2e.sh` — banner + mostly-commented example matrix, not yet wired to real ReconForth flows
+| *E2E tests* | 1 | tests/e2e.sh — banner + mostly-commented example matrix, not yet wired to real reconciliation or ForthWall flows
 | *Aspect tests* | 1 | `tests/aspect_tests.sh` — cross-cutting invariant checks
 | *Workflow tests* | 1 | `tests/workflows/validate_workflows_test.sh` — validates GitHub Actions workflow structure
 |===
@@ -33,8 +33,35 @@ machinery has now been removed as no longer applicable:
   `recon_silly_ation_*` FFI functions in `src/interface/ffi/src/main.zig`.
 * [ ] `tests/e2e.sh` has a real banner and structure but its actual
   assertions are still example/commented-out matrix entries — it does not
-  yet exercise a real ReconForth reconciliation round-trip.
+  yet exercise a real reconciliation or ForthWall round-trip.
 * [ ] No fuzz harness is wired up yet (see `benches/` history above).
+
+== Capability Evidence Required
+
+The project purpose is broader than its proposed bounded ForthWall VM. Each capability
+must have independently reproducible evidence before it may be marked complete
+or operational:
+
+* [ ] planted positive and negative fixtures for project/file renames, stale
+  links and claims, changelog accuracy, language-style consistency, terminology,
+  conceptual analogies, and attribution scope;
+* [ ] punctuation-sensitive semantic fixtures, including vocative boundaries
+  and other cases where punctuation changes grammatical roles or meaning;
+* [ ] executable specifications for ForthWall's VM and every exposed
+  document-level word;
+* [ ] exact input hashes, source/evidence spans, proposed changes, and
+  deterministic replay traces;
+* [ ] idempotence, non-interference, capability confinement, stale-input
+  refusal, parser-disagreement refusal, and coordinate-drift refusal;
+* [ ] attribution tests proving a local contributor credit cannot become
+  repository-wide authorship;
+* [ ] adversarial, malformed-input, Unicode-confusable, cross-format, and
+  cross-surface end-to-end fixtures; and
+* [ ] an independent verifier for every automatically applied edit.
+
+A repeatable edit is not necessarily a correct edit. Automatic mutation must
+remain disabled until these gates exist and pass; ambiguous findings require
+human review.
 
 == CRG Notes
 
@@ -44,6 +71,7 @@ machinery has now been removed as no longer applicable:
 == Next Steps
 
 * [ ] Give `integration_test.zig` real test bodies against the FFI surface.
-* [ ] Wire `tests/e2e.sh` to a real ReconForth reconcile round-trip via the
-  WASM build.
+* [ ] Wire `tests/e2e.sh` to a real ForthWall reconcile round-trip via the WASM
+  build, with bounded capabilities and independent verification of every applied
+  edit and the final document state.
 * [ ] Integrate `just test` / `just e2e` / `just aspect` into CI.

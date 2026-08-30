@@ -9,16 +9,75 @@ image:https://img.shields.io/badge/OpenSSF-Best_Practices-green?logo=opensources
 image:https://img.shields.io/badge/License-MPL_2.0-blue.svg[License: MPL-2.0,link="https://opensource.org/licenses/MPL-2.0"]
 image:https://api.thegreenwebfoundation.org/greencheckimage/github.com[Green Web,link="https://www.thegreenwebfoundation.org/green-web-check/?url=github.com"]
 
-WASM document reconciliation, built around the ReconForth VM. It is an
-`interop` component of the `reposystem` tool ecosystem (see
-`reposystem/config/tools.ncl`), exposing a `reconcile` action.
+An experimental cross-document consistency reconciler. It finds small-looking
+contradictions that make a repository's documentation, history, metadata, and
+attribution disagree. It is registered as an `interop` component of the
+`reposystem` tool ecosystem, exposing a planned `reconcile` action.
 
 == What this is
 
-recon-silly-ation reconciles documents by running the ReconForth virtual
-machine compiled to WebAssembly. It is registered in `reposystem` as an
-`interop`-role tool with `status = 'extracted` (a gitlink submodule of
-`reposystem`), whose sole declared action is `reconcile`.
+The name combines *reconnaissance for silly inconsistencies* with
+*reconciliation*: inspect every relevant surface, retain evidence for each
+disagreement, and propose the smallest coherent resolution.
+
+The intended scope includes:
+
+* project or file renames that were not propagated through READMEs, wikis,
+  examples, links, repository metadata, and the GitHub description;
+* changelog or release claims that do not match the change, omit consequential
+  side effects, or continue foregrounding obsolete generations;
+* contributor credit that is missing where it belongs or incorrectly expands
+  into repository-wide authorship;
+* inconsistent language policy (including UK, US, and Oxford English),
+  terminology, capitalisation, analogies, and conceptual explanations;
+* references to files, faults, features, versions, commands, or names that no
+  longer exist; and
+* explanations that cannot all be true, even when a superficial text
+  normalisation would make them look alike.
+
+Ambiguous conflicts are findings for review, not permission to rewrite. Every
+finding and proposed edit must retain its sources, evidence spans, and
+provenance.
+
+== ForthWall
+
+*ForthWall* is the proposed name for an optional bounded Forth rule engine
+beneath the reconciler. It is not the meaning of `recon` in the project name,
+not the whole product, and not currently an implemented capability.
+
+The intended wall admits only declared inputs and approved document-level
+words. It must not expose raw memory, arbitrary filesystem access, shell
+execution, networking, or unrestricted writes. It must refuse automatic repair
+when evidence is ambiguous, inputs are stale, parsers disagree, or coordinates
+have drifted.
+
+== Proof and delivery status
+
+This repository currently contains project scaffolding and an ABI/FFI seam; it
+does *not* contain a proven reconciliation engine or an operational ForthWall
+VM. The machine-readable state records both the VM and actual `reconcile`
+action as 0% complete. Design documents and deterministic execution alone are
+not evidence that a proposed edit is semantically correct.
+
+A capability may be described as delivered only when the repository contains
+independently reproducible evidence for it:
+
+* an executable specification for the VM and every document-level word;
+* planted positive and negative fixtures for every inconsistency class;
+* exact input hashes, evidence spans, proposed changes, and replayable traces;
+* idempotence, non-interference, scope-confinement, and stale-input tests;
+* attribution tests proving local credit cannot become global authorship;
+* adversarial and cross-format end-to-end fixtures; and
+* an independent verifier for every automatically applied edit.
+
+Until those gates exist and pass, results are proposals requiring review and
+automatic mutation must remain disabled. See
+link:docs/status/TEST-NEEDS.adoc[`TEST-NEEDS`] and
+https://github.com/hyperpolymath/recon-silly-ation/issues/44[issue #44].
+
+The repository remains registered in `reposystem` as an `interop`-role tool
+with status = `extracted` (a gitlink submodule), whose sole declared action is
+`reconcile`.
 
 The repository is scaffolded from the *Rhodium Standard Repository (RSR)*
 template, so it ships with CI/CD, machine-readable project metadata, an

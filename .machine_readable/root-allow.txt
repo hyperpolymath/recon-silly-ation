@@ -82,3 +82,6 @@ flake.nix                  # TOLERATED, NOT BLESSED. Nix was retired estate-wide
 #     never written for it. Read from the estate-rules gate's own output.
 .githooks/                  # Top-level component directory of this project.
 REQUIRES_INITIALISATION.md  # Project documentation.
+CHANGELOG.adoc
+CONTRIBUTING.adoc
+SECURITY.adoc

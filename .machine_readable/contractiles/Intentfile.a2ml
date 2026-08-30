@@ -20,17 +20,18 @@
 #            contractile for hard gates.
 
 @abstract:
-North-star contractile for recon-silly-ation, an RSR-compliant repository
-instantiated from rsr-template-repo. It reconciles documents via a
-WASM-hosted ReconForth VM, as an interop component of the reposystem tool
-ecosystem.
+North-star contractile for recon-silly-ation, an experimental cross-document
+consistency reconciler. ForthWall is its proposed bounded Forth rule layer, not
+its product identity and not yet an implemented or proved capability.
 @end
 
 ## Purpose
 
-recon-silly-ation reconciles documents by running the ReconForth virtual
-machine compiled to WebAssembly, registered in `reposystem` as an
-`interop`-role tool exposing a `reconcile` action.
+recon-silly-ation performs reconnaissance for small inconsistencies and
+reconciles documentation, history, metadata, terminology, language policy, and
+attribution without allowing a local correction to silently redefine unrelated
+surfaces. It is registered in `reposystem` as an `interop`-role tool exposing a
+planned `reconcile` action.
 
 ## Anti-Purpose
 
@@ -38,6 +39,8 @@ This repository is NOT:
 - The RSR template itself (that is rsr-template-repo, upstream)
 - A general-purpose project scaffold (it is an instantiated consumer)
 - A runtime library that other repos should copy wholesale
+- A licence to normalise ambiguous text or rewrite beyond evidenced scope
+- An operational ForthWall VM until its implementation and proofs are present
 
 ## If In Doubt
 
@@ -65,13 +68,13 @@ If you are unsure whether a change is in scope, ask. Sensitive areas:
 ### Near Horizon
 
 #### e2e-reconcile-roundtrip
-- description: tests/e2e.sh exercises a real ReconForth reconcile round-trip via the WASM build
+- description: tests/e2e.sh exercises a real ForthWall reconcile round-trip via the WASM build, including evidence preservation and independent verification
 - horizon: near
 - status: declared
 
 ### Mid Horizon
 
 #### formal-verification
-- description: Idris2 proofs for all critical contractile invariants
+- description: Idris2 proofs cover VM semantics, capability confinement, scope preservation, idempotence, non-interference, stale-input refusal, and attribution locality
 - horizon: mid
 - status: declared

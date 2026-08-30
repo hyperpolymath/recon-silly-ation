@@ -9,7 +9,7 @@
 name = "recon-silly-ation"
 version = "0.1.0"
 revision = 1
-summary = "WASM document reconciliation (ReconForth VM)."
+summary = "Experimental cross-document consistency reconciler; proposed bounded, capability-restricted ForthWall engine not yet implemented or proved."
 description = """
 recon-silly-ation — containerised service packaged as a verified
 cerro-torre .ctp bundle with Ed25519 signing and full provenance

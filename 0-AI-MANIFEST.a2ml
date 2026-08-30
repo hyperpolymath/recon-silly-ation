@@ -5,11 +5,11 @@
 #
 [metadata]
 version = "0.1.0"
-last-updated = "2026-07-27"
+last-updated = "2026-08-28"
 
 [project]
 name = "recon-silly-ation"
-purpose = "WASM document reconciliation (ReconForth VM); interop component of the reposystem tool ecosystem."
+purpose = "Experimental cross-document consistency reconciliation for names, links, claims, attribution, terminology, language style, and repository metadata; the proposed bounded ForthWall engine is not yet implemented or proved."
 
 [ai-allocation]
 agents = [
