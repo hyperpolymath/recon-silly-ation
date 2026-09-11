@@ -1,3 +1,8 @@
+K9!
+# SPDX-License-Identifier: MIT
+pedigree = {
+  name = "recon-silly-ation"
+}
 # Thin coordination bindings for central session-management standards
 
 session_management:

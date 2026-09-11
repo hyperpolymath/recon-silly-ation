@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: MPL-2.0
-# Adjustfile — Drift-tolerance contract for rsr-template-repo
+# Adjustfile — Drift-tolerance contract for recon-silly-ation
 # Author: Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
 #
 # Cumulative-drift catchment: tolerance bands + corrective actions.
@@ -8,20 +8,19 @@
 # Fix with: adjust fix (applies deterministic patches; advisory otherwise)
 
 @abstract:
-Drift tolerances and corrective actions for rsr-template-repo. Unlike
-MUST (hard gate), ADJUST tracks cumulative drift against tolerance bands
-and proposes corrective actions. Advisory — it warns and trends, it does
-not block.
+Drift tolerances and corrective actions for recon-silly-ation, an RSR-shaped
+repository instantiated from rsr-template-repo. Unlike MUST (hard gate),
+ADJUST tracks cumulative drift against tolerance bands and proposes
+corrective actions. Advisory — it warns and trends, it does not block.
 @end
 
-## Template Drift
+## Instantiation Drift
 
 ### placeholder-drift
-- description: Template placeholders should be replaced when copied
-- tolerance: 0 placeholder markers in copied repos
+- description: RSR identity placeholders should never reappear post-instantiation
+- tolerance: 0 unfilled {{PLACEHOLDER}} markers outside docs-template/, machine-readable-design/, and the ADR/K9 component templates
 - corrective: Search and replace all {{PLACEHOLDER}} markers
 - severity: advisory
-- notes: This check only applies to repos that copied from this template
 
 ### template-version-drift
 - description: Template version should match RSR spec version

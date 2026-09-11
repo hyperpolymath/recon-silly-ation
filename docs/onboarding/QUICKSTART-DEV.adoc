@@ -1,14 +1,12 @@
 // SPDX-License-Identifier: CC-BY-SA-4.0
 // Copyright (c) Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
-// Template: QUICKSTART-DEV.adoc — clone → build → test → PR
-// Replace rsr-template-repo, {{BUILD_CMD}}, {{TEST_CMD}}, {{LANG_STACK}} with actuals
-= rsr-template-repo — Quick Start for Developers
+= recon-silly-ation — Quick Start for Developers
 :toc:
 :toclevels: 2
 
 == Tech Stack
 
-{{LANG_STACK}}
+Zig (FFI bridge, `src/interface/ffi/`), Idris2 (ABI definitions, `abi.ipkg`)
 
 == Set Up Development Environment
 
@@ -30,8 +28,8 @@ nix develop
 
 [source,bash]
 ----
-git clone https://github.com/hyperpolymath/rsr-template-repo.git
-cd rsr-template-repo
+git clone https://github.com/hyperpolymath/recon-silly-ation.git
+cd recon-silly-ation
 just setup-dev
 ----
 
@@ -39,21 +37,21 @@ just setup-dev
 
 [source,bash]
 ----
-{{BUILD_CMD}}
+cd src/interface/ffi && zig build
 ----
 
 == Test
 
 [source,bash]
 ----
-{{TEST_CMD}}
+cd src/interface/ffi && zig build test
 ----
 
 == Project Structure
 
 [source]
 ----
-rsr-template-repo/
+recon-silly-ation/
 ├── src/                  # Source code
 ├── src/abi/              # Idris2 ABI definitions (if applicable)
 ├── ffi/zig/              # Zig FFI bridge (if applicable)
@@ -89,10 +87,9 @@ just panic-scan     # No new security issues
 
 == Contractile Invariants
 
-Read `.machine_readable/MUST.contractile` before making changes.
-Key invariants that must never be violated:
-
-{{MUST_INVARIANTS}}
+Read `.machine_readable/contractiles/Mustfile.a2ml` before making changes.
+It enumerates the hard gates (SPDX headers, no unsubstituted `{{...}}`
+placeholders, licence consistency) that must never be violated.
 
 == LLM/AI Agent Development
 
@@ -108,5 +105,5 @@ Or read `0-AI-MANIFEST.a2ml` and `.claude/CLAUDE.md` directly.
 == Get Help
 
 * **Architecture**: link:EXPLAINME.adoc[EXPLAINME.adoc]
-* **Wiki**: https://github.com/hyperpolymath/rsr-template-repo/wiki
+* **Wiki**: https://github.com/hyperpolymath/recon-silly-ation/wiki
 * **Report issue**: `just help-me`

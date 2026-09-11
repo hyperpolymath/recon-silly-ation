@@ -19,9 +19,9 @@ set positional-arguments := true
 import? "build/contractile.just"
 
 # Project metadata — customize these
-project := "rsr-template-repo"
+project := "recon_silly_ation"
 OWNER := "hyperpolymath"
-REPO := "rsr-template-repo"
+REPO := "recon-silly-ation"
 version := "0.1.0"
 tier := "infrastructure"  # 1 | 2 | infrastructure
 
@@ -52,7 +52,7 @@ info:
     @echo "Version: {{version}}"
     @echo "RSR Tier: {{tier}}"
     @echo "Recipes: $(just --summary | wc -w)"
-    @[ -f ".machine_readable/STATE.a2ml" ] && grep -oP 'phase\s*=\s*"\K[^"]+' .machine_readable/STATE.a2ml | head -1 | xargs -I{} echo "Phase: {}" || true
+    @[ -f ".machine_readable/6a2/STATE.a2ml" ] && grep -oP 'phase\s*=\s*"\K[^"]+' .machine_readable/6a2/STATE.a2ml | head -1 | xargs -I{} echo "Phase: {}" || true
 
 # Run Invariant Path overlay tools for this repository
 invariant-path *ARGS:
@@ -83,38 +83,24 @@ import? "build/just/assess.just"
 # Build the project (debug mode)
 build *args:
     @echo "Building {{project}} (debug)..."
-    # TODO: Replace with your build command
-    # Examples:
-    #   cargo build {{args}}                    # Rust
-    #   mix compile {{args}}                    # Elixir
-    #   zig build {{args}}                      # Zig
-    #   deno task build {{args}}                # Deno/ReScript
+    cd src/interface/ffi && zig build {{args}}
     @echo "Build complete"
 
 # Build in release mode with optimizations
 build-release *args:
     @echo "Building {{project}} (release)..."
-    # TODO: Replace with your release build command
-    # Examples:
-    #   cargo build --release {{args}}
-    #   MIX_ENV=prod mix compile {{args}}
-    #   zig build -Doptimize=ReleaseFast {{args}}
+    cd src/interface/ffi && zig build -Doptimize=ReleaseFast {{args}}
     @echo "Release build complete"
 
-# Build and watch for changes (requires entr or similar)
+# Build and watch for changes (requires entr)
 build-watch:
     @echo "Watching for changes..."
-    # TODO: Customize file patterns for your language
-    # Examples:
-    #   find src -name '*.rs' | entr -c just build
-    #   mix compile --force --warnings-as-errors
-    #   deno task dev
+    find src/interface/ffi -name '*.zig' | entr -c just build
 
 # Clean build artifacts [reversible: rebuild with `just build`]
 clean:
     @echo "Cleaning..."
-    # TODO: Customize for your build system
-    rm -rf target/ _build/ build/ dist/ out/ obj/ bin/
+    rm -rf src/interface/ffi/zig-out src/interface/ffi/.zig-cache
 
 # Deep clean including caches [reversible: rebuild]
 clean-all: clean
@@ -127,63 +113,30 @@ clean-all: clean
 # Run all tests
 test *args:
     @echo "Running tests..."
-    # TODO: Replace with your test command
-    # Examples:
-    #   cargo test {{args}}
-    #   mix test {{args}}
-    #   zig build test {{args}}
-    #   deno test {{args}}
+    cd src/interface/ffi && zig build test {{args}}
     @echo "Tests passed!"
 
 # Run tests with verbose output
 test-verbose:
     @echo "Running tests (verbose)..."
-    # TODO: Replace with verbose test command
-
-# Smoke test
-test-smoke:
-    @echo "Smoke test..."
-    # TODO: Add basic sanity checks
+    cd src/interface/ffi && zig build test --summary all
 
 # Run end-to-end tests (full pipeline: build → run → verify)
 e2e:
     @echo "Running E2E tests..."
-    # TODO: Replace with your E2E test command. Examples:
-    #   bash tests/e2e.sh                    # Shell-based E2E
-    #   npx playwright test                  # Browser E2E
-    #   mix test test/integration/e2e_test.exs  # Elixir E2E
-    #   cargo test --test end_to_end         # Rust E2E
+    bash tests/e2e.sh
     @echo "E2E tests passed!"
 
 # Run aspect tests (cross-cutting concern validation)
 aspect:
     @echo "Running aspect tests..."
-    # TODO: Replace with your aspect test command. Examples:
-    #   bash tests/aspect_tests.sh           # Shell-based aspect tests
-    #   cargo test --test aspects             # Rust aspect tests
+    bash tests/aspect_tests.sh
     # Aspect tests validate architectural invariants:
     #   - Thread safety (mutex in FFI modules)
     #   - ABI/FFI contract (declarations match exports)
     #   - SPDX compliance (all files have license headers)
     #   - No dangerous patterns (believe_me, assert_total, etc.)
     @echo "Aspect tests passed!"
-
-# Run benchmarks (performance regression detection)
-bench:
-    @echo "Running benchmarks..."
-    # TODO: Replace with your benchmark command. Examples:
-    #   cargo bench                           # Rust criterion
-    #   zig build bench                       # Zig benchmarks
-    #   mix run bench/benchmarks.exs          # Elixir benchee
-    #   deno bench                            # Deno bench
-    @echo "Benchmarks complete!"
-
-# Run readiness tests (Component Readiness Grade: D/C/B)
-readiness:
-    @echo "Running readiness tests..."
-    # TODO: Replace with your readiness test command. Examples:
-    #   cargo test --test readiness -- --nocapture
-    @echo "Readiness tests complete!"
 
 # Print the current CRG grade (reads from READINESS.md '**Current Grade:** X' line)
 crg-grade:
@@ -208,8 +161,8 @@ crg-badge:
     echo "[![CRG $$grade](https://img.shields.io/badge/CRG-$$grade-$$color?style=flat-square)](https://github.com/hyperpolymath/standards/tree/main/component-readiness-grades)"
 
 # Run the full merge-requirement test suite (ALL categories)
-# Per STANDING rule: P2P + E2E + aspect + execution + lifecycle + bench
-test-all: test e2e aspect bench readiness
+# Per STANDING rule: P2P + E2E + aspect
+test-all: test e2e aspect
     @echo "All test categories passed — safe to merge!"
 
 # Run all quality checks
@@ -227,49 +180,31 @@ fix: fmt
 # Format all source files [reversible: git checkout]
 fmt:
     @echo "Formatting source files..."
-    # TODO: Replace with your formatter
-    # Examples:
-    #   cargo fmt
-    #   mix format
-    #   gleam format
-    #   deno fmt
+    zig fmt src/interface/ffi
 
 # Check formatting without changes
 fmt-check:
     @echo "Checking formatting..."
-    # TODO: Replace with your format check
-    # Examples:
-    #   cargo fmt --check
-    #   mix format --check-formatted
-    #   gleam format --check
+    zig fmt --check src/interface/ffi
 
-# Run linter
+# Run linter (Idris2 ABI typecheck + Zig compile check)
 lint:
     @echo "Linting source files..."
-    # TODO: Replace with your linter
-    # Examples:
-    #   cargo clippy -- -D warnings
-    #   mix credo --strict
-    #   gleam check
+    @command -v idris2 >/dev/null 2>&1 && idris2 --typecheck abi.ipkg || echo "WARN: idris2 not found — skipping ABI typecheck"
+    cd src/interface/ffi && zig build
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# RUN & EXECUTE
+# INSTALL
 # ═══════════════════════════════════════════════════════════════════════════════
 
-# Run the application
-run *args: build
-    # TODO: Replace with your run command
-    echo "Run not configured yet"
-
-# Run with verbose output
-run-verbose *args: build
-    # TODO: Replace with verbose run command
-    echo "Run not configured yet"
-
-# Install to user path
+# Install build artifacts to PREFIX (default /usr/local; override with PREFIX env var)
 install: build-release
     @echo "Installing {{project}}..."
-    # TODO: Replace with your install command
+    @PREFIX="$${PREFIX:-/usr/local}"; \
+    mkdir -p "$$PREFIX/lib" "$$PREFIX/include"; \
+    cp -r src/interface/ffi/zig-out/lib/. "$$PREFIX/lib/" 2>/dev/null || echo "  (no lib/ artifacts yet — build first)"; \
+    cp -r generated/abi/*.h "$$PREFIX/include/" 2>/dev/null || echo "  (no generated ABI headers yet)"; \
+    echo "Installed to $$PREFIX"
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # DEPENDENCIES
@@ -278,20 +213,13 @@ install: build-release
 # Install/check all dependencies
 deps:
     @echo "Checking dependencies..."
-    # TODO: Replace with your dependency check
-    # Examples:
-    #   cargo check
-    #   mix deps.get
-    #   gleam deps download
+    @command -v zig >/dev/null 2>&1 && echo "  [OK] zig ($$(zig version))" || echo "  [FAIL] zig not found"
+    @command -v idris2 >/dev/null 2>&1 && echo "  [OK] idris2 ($$(idris2 --version))" || echo "  [WARN] idris2 not found (only needed to regenerate ABI headers)"
     @echo "All dependencies satisfied"
 
 # Audit dependencies for vulnerabilities
 deps-audit:
     @echo "Auditing for vulnerabilities..."
-    # TODO: Replace with your audit command
-    # Examples:
-    #   cargo audit
-    #   mix audit
     @command -v trivy >/dev/null && trivy fs --severity HIGH,CRITICAL --quiet . || true
     @echo "Audit complete"
 
@@ -362,7 +290,7 @@ container-init:
 
     if [ ! -d "container" ]; then
         echo "Error: container/ directory not found."
-        echo "This repo may not have been created from rsr-template-repo."
+        echo "This repo may not have been created from the RSR template scaffold."
         exit 1
     fi
 
@@ -549,14 +477,14 @@ import? "build/just/validate.just"
 
 # Update STATE.a2ml timestamp
 state-touch:
-    @if [ -f ".machine_readable/STATE.a2ml" ]; then \
-        sed -i 's/last-updated = "[^"]*"/last-updated = "'"$(date +%Y-%m-%d)"'"/' .machine_readable/STATE.a2ml && \
+    @if [ -f ".machine_readable/6a2/STATE.a2ml" ]; then \
+        sed -i 's/last-updated = "[^"]*"/last-updated = "'"$(date +%Y-%m-%d)"'"/' .machine_readable/6a2/STATE.a2ml && \
         echo "STATE.a2ml timestamp updated"; \
     fi
 
 # Show current phase from STATE.a2ml
 state-phase:
-    @grep -oP 'phase\s*=\s*"\K[^"]+' .machine_readable/STATE.a2ml 2>/dev/null | head -1 || echo "unknown"
+    @grep -oP 'phase\s*=\s*"\K[^"]+' .machine_readable/6a2/STATE.a2ml 2>/dev/null | head -1 || echo "unknown"
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # GUIX & NIX
@@ -681,7 +609,7 @@ assail:
 
 # Self-diagnostic — checks dependencies, permissions, paths
 doctor:
-    @echo "Running diagnostics for rsr-template-repo..."
+    @echo "Running diagnostics for recon-silly-ation..."
     @echo "Checking required tools..."
     @command -v just >/dev/null 2>&1 && echo "  [OK] just" || echo "  [FAIL] just not found"
     @command -v git >/dev/null 2>&1 && echo "  [OK] git" || echo "  [FAIL] git not found"
@@ -691,7 +619,7 @@ doctor:
 
 # Guided tour of key features
 tour:
-    @echo "=== rsr-template-repo Tour ==="
+    @echo "=== recon-silly-ation Tour ==="
     @echo ""
     @echo "1. Project structure:"
     @ls -la
@@ -706,12 +634,12 @@ tour:
 
 # Open feedback channel with diagnostic context
 help-me:
-    @echo "=== rsr-template-repo Help ==="
+    @echo "=== recon-silly-ation Help ==="
     @echo "Platform: $(uname -s) $(uname -m)"
     @echo "Shell: $SHELL"
     @echo ""
     @echo "To report an issue:"
-    @echo "  https://github.com/hyperpolymath/rsr-template-repo/issues/new"
+    @echo "  https://github.com/hyperpolymath/recon-silly-ation/issues/new"
     @echo ""
     @echo "Include the output of 'just doctor' in your report."
 

@@ -1,4 +1,7 @@
+# This workflow is managed by gh actions-lock.
 # SPDX-License-Identifier: MPL-2.0
+# This workflow is managed by gh actions-lock.
+# This workflow is managed by gh actions-lock.
 name: CodeQL Security Analysis
 on:
   push:
@@ -31,13 +34,23 @@ jobs:
             build-mode: none
     steps:
       - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - name: Initialize CodeQL
+<<<<<<< HEAD
         uses: github/codeql-action/init@0d579ffd059c29b07949a3cce3983f0780820c98 # v3
+=======
+        uses: github/codeql-action/init@cdf488f595d80d6e07e03d4674febd5ab45fa938 # v3
+>>>>>>> 988d4f5d011adea8df6b220bde58cf1d9bc85b26
         with:
           languages: ${{ matrix.language }}
           build-mode: ${{ matrix.build-mode }}
       - name: Perform CodeQL Analysis
+<<<<<<< HEAD
         uses: github/codeql-action/analyze@0d579ffd059c29b07949a3cce3983f0780820c98 # v3
+=======
+        uses: github/codeql-action/analyze@cdf488f595d80d6e07e03d4674febd5ab45fa938 # v3
+>>>>>>> 988d4f5d011adea8df6b220bde58cf1d9bc85b26
         with:
           category: "/language:${{ matrix.language }}"

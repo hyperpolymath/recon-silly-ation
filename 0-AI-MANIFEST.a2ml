@@ -5,11 +5,11 @@
 #
 [metadata]
 version = "0.1.0"
-last-updated = "{{CURRENT_DATE}}"
+last-updated = "2026-08-28"
 
 [project]
-name = "[YOUR-REPO-NAME]"
-purpose = "{{PROJECT_DESCRIPTION}}"
+name = "recon-silly-ation"
+purpose = "Experimental cross-document consistency reconciliation for names, links, claims, attribution, terminology, language style, and repository metadata; the proposed bounded ForthWall engine is not yet implemented or proved."
 
 [ai-allocation]
 agents = [
