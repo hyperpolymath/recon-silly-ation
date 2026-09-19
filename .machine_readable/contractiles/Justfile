@@ -190,7 +190,7 @@ fmt-check:
 # Run linter (Idris2 ABI typecheck + Zig compile check)
 lint:
     @echo "Linting source files..."
-    @command -v idris2 >/dev/null 2>&1 && idris2 --typecheck abi.ipkg || echo "WARN: idris2 not found — skipping ABI typecheck"
+    @command -v idris2 >/dev/null 2>&1 && idris2 --typecheck src/interface/abi.ipkg || echo "WARN: idris2 not found — skipping ABI typecheck"
     cd src/interface/ffi && zig build
 
 # ═══════════════════════════════════════════════════════════════════════════════
