@@ -30,7 +30,7 @@ repos:
     hooks:
       - id: validate-k9
         name: Validate K9 contracts
-        entry: .githooks/validate-k9.sh
+        entry: .github/hooks/validate-k9.sh
         language: system
         pass_filenames: false
 

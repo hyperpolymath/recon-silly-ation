@@ -28,7 +28,6 @@ CHANGELOG.md
 # ─── Build entry points (must live at root for their tooling) ────────────────
 Justfile                   # delegates phases to build/just/*.just
 coordination.k9            # repo-local session binding (template-mandated)
-abi.ipkg                   # Idris2 package for the ABI seam; sourcedir=src/interface (estate canon: root-level *-abi.ipkg). Single case-consistent src/interface/Abi/ dir. Typecheck: `idris2 --typecheck abi.ipkg`.
 
 # ─── Conventional dotfiles (tool-required at root) ───────────────────────────
 .editorconfig
@@ -81,7 +80,7 @@ flake.nix                  # TOLERATED, NOT BLESSED. Nix was retired estate-wide
 #     these are this project's real top-level shape. Moving them would
 #     break every path that references them, to satisfy a map that was
 #     never written for it. Read from the estate-rules gate's own output.
-.githooks/                  # Top-level component directory of this project.
+.github/hooks/                  # Top-level component directory of this project.
 REQUIRES_INITIALISATION.md  # Project documentation.
 CHANGELOG.adoc
 CONTRIBUTING.adoc
