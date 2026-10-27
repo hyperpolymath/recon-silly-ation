@@ -1,0 +1,16 @@
+# SPDX-License-Identifier: MPL-2.0
+# Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+#
+# SD004 assumes every legacy descriptile must move to descriptiles/.
+# This repository has already adopted recon-silly-ation_chora.deed instead:
+# its preamble freezes the A2ML sources for deletion, and
+# docs/status/HANDOVER-2026-10-27.adoc records their separate removal step.
+# Existing consumers (including openssf-compliance.yml) still require 6a2/.
+# Retain these six paths until that removal; remove each exception with its
+# file. Other rules and other misplaced descriptile paths remain checked.
+structural_drift/SD004:.machine_readable/6a2/STATE.a2ml
+structural_drift/SD004:.machine_readable/6a2/META.a2ml
+structural_drift/SD004:.machine_readable/6a2/ECOSYSTEM.a2ml
+structural_drift/SD004:.machine_readable/6a2/AGENTIC.a2ml
+structural_drift/SD004:.machine_readable/6a2/NEUROSYM.a2ml
+structural_drift/SD004:.machine_readable/6a2/PLAYBOOK.a2ml

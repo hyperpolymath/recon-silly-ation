@@ -1,23 +1,24 @@
-# This workflow is managed by gh actions-lock.
 # SPDX-License-Identifier: MPL-2.0
-# This workflow is managed by gh actions-lock.
 # This workflow is managed by gh actions-lock.
 # Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 #
 # Release workflow — triggered by version tags (v*).
 # Builds artifacts, generates changelog via git-cliff, creates a GitHub Release,
-# and produces SLSA provenance attestations.
+# and produces GitHub native build-provenance attestations (OIDC + Sigstore).
 name: Release
 on:
   push:
     tags:
       - 'v*'
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
 permissions:
   contents: read
 jobs:
   build:
     name: Build Artifacts
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     permissions:
       contents: read
@@ -31,6 +32,7 @@ jobs:
           if [ -f "mix.exs" ]; then
             echo "::notice::Detected Elixir/Gleam project (mix.exs)"
             echo "build_type=mix" >> "$GITHUB_OUTPUT"
+            echo "artifact_path=_build/prod/rel/" >> "$GITHUB_OUTPUT"
             mix local.hex --force --if-missing
             mix local.rebar --force --if-missing
             mix deps.get --only prod
@@ -38,45 +40,48 @@ jobs:
           elif [ -f "Cargo.toml" ]; then
             echo "::notice::Detected Rust project (Cargo.toml)"
             echo "build_type=cargo" >> "$GITHUB_OUTPUT"
+            echo "artifact_path=target/release/" >> "$GITHUB_OUTPUT"
             cargo build --release
           elif [ -f "build.zig" ]; then
             echo "::notice::Detected Zig project (build.zig)"
             echo "build_type=zig" >> "$GITHUB_OUTPUT"
+            echo "artifact_path=zig-out/" >> "$GITHUB_OUTPUT"
             zig build -Doptimize=ReleaseSafe
-          elif [ -f "deno.json" ] || [ -f "deno.jsonc" ]; then
-            echo "::notice::Detected Deno project (deno.json)"
-            echo "build_type=deno" >> "$GITHUB_OUTPUT"
-            deno task build
           elif [ -f "gossamer.conf.json" ]; then
             echo "::notice::Detected Gossamer project (gossamer.conf.json)"
             echo "build_type=gossamer" >> "$GITHUB_OUTPUT"
+            echo "artifact_path=dist/" >> "$GITHUB_OUTPUT"
             gossamer build
           elif [ -f "gleam.toml" ]; then
             echo "::notice::Detected Gleam project (gleam.toml)"
             echo "build_type=gleam" >> "$GITHUB_OUTPUT"
+            echo "artifact_path=build/" >> "$GITHUB_OUTPUT"
             gleam build
           elif [ -f "rebar.config" ]; then
             echo "::notice::Detected Erlang/Rebar project (rebar.config)"
             echo "build_type=rebar" >> "$GITHUB_OUTPUT"
+            echo "artifact_path=_build/prod/rel/" >> "$GITHUB_OUTPUT"
             rebar3 as prod release
           elif [ -f "Justfile" ] || [ -f "justfile" ]; then
             echo "::notice::Detected Justfile — running 'just build'"
             echo "build_type=just" >> "$GITHUB_OUTPUT"
+            echo "artifact_path=src/interface/ffi/zig-out/" >> "$GITHUB_OUTPUT"
             just build
           else
             echo "::error::No recognised build system found."
-            echo "Expected one of: mix.exs, Cargo.toml, build.zig, deno.json, gossamer.conf.json, gleam.toml, rebar.config, Justfile"
+            echo "Expected one of: mix.exs, Cargo.toml, build.zig, gossamer.conf.json, gleam.toml, rebar.config, Justfile"
             exit 1
           fi
-        # TODO: Upload build artifacts if needed
-        # - uses: actions/upload-artifact@v4
-        #
-        # with:
-        #     name: release-artifacts
-        #     path: target/release/
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: release-artifacts
+          path: ${{ steps.build.outputs.artifact_path }}
+          if-no-files-found: error
+          retention-days: 5
   changelog:
     name: Generate Changelog
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     permissions:
       contents: read
@@ -117,18 +122,23 @@ jobs:
   release:
     name: Create GitHub Release
     needs: [build, changelog]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     permissions:
       contents: write
+      id-token: write       # mint the OIDC token attestation provenance is signed with
+      attestations: write   # write the build-provenance attestation (the "claim")
     steps:
       - uses: actions/checkout@v7.0.1
-      # TODO: Download build artifacts if uploading to the release
-      # - uses: actions/download-artifact@v4
-      #
-      # with:
-      #     name: release-artifacts
-      #     path: artifacts/
+      - name: Download build artifacts
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: release-artifacts
+          path: artifacts/
+      - name: Attest build provenance
+        uses: actions/attest-build-provenance@v4.2.2
+        with:
+          subject-path: 'artifacts/**/*'
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v3.0.3
         with:
@@ -136,23 +146,7 @@ jobs:
           draft: false
           prerelease: ${{ contains(github.ref_name, '-rc') || contains(github.ref_name, '-beta') || contains(github.ref_name, '-alpha') }}
           generate_release_notes: false
-          # TODO: Add artifact files to the release
-          # files: |
-          #   artifacts/*
+          files: 'artifacts/**/*'
+          fail_on_unmatched_files: true
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  provenance:
-    name: SLSA Provenance
-    needs: [build]
-    permissions:
-      actions: read
-      id-token: write
-      contents: write
-    # SLSA generator must run in a separate, isolated workflow
-    # See: https://slsa.dev/spec/v1.0/requirements#build-l3
-    uses: slsa-framework/slsa-github-generator/.github/workflows/generator_generic_slsa3.yml@f7dd8c54c2067bafc12ca7a55595d5ee9b75204a # v2.1.0
-    with:
-      base64-subjects: ""
-      # TODO: Replace with actual artifact hashes
-      # Generate with: sha256sum artifact | base64 -w0
-      # base64-subjects: "${{ needs.build.outputs.hashes }}"
+          GITHUB_TOKEN: ${{ github.token }}

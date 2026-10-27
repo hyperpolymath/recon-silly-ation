@@ -35,6 +35,7 @@ recon-silly-ation_chora.deed  # the repo deed (standards#837, D312): one machine
 .envrc
 .gitattributes
 .gitignore
+.hypatia-ignore            # SD004 exceptions for the six frozen A2ML sources pending deletion
 .tool-versions
 
 # ─── Directories ─────────────────────────────────────────────────────────────
