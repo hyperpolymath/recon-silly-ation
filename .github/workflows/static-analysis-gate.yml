@@ -1,7 +1,7 @@
 # This workflow is managed by gh actions-lock.
 # SPDX-License-Identifier: MPL-2.0
 # Static Analysis Gate — Deep recon & fleet-learning deposit.
-# Builds and caches pinned panic-attack, pons-asinorum, and Hypatia (OTP 27),
+# Builds and caches pinned panic-attack, pons-asinorum, and Hypatia (OTP 28.3),
 # executes real scans without silent fallback, and deposits unified findings.
 name: Static Analysis Gate
 on:
