@@ -1,0 +1,5 @@
+# Agda proof manifest — read by scripts/check-proofs.sh agda
+# Format: <source-root>|<module-relative-to-source-root>|gated|quarantine|<note>
+# NOT GROUND-TRUTHED (no agda on PATH, 2026-10-27). Byte-identical to the
+# template's copy, which compiled under `agda --safe` on 2026-07-17.
+verification/proofs/agda|Properties.agda|gated| template; compiled in the template 2026-07-17, unverified here

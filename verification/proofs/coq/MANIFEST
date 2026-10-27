@@ -1,0 +1,5 @@
+# Coq proof manifest — read by scripts/check-proofs.sh coq
+# Format: <source-root>|<module-relative-to-source-root>|gated|quarantine|<note>
+# NOT GROUND-TRUTHED (no coqc on PATH, 2026-10-27). Byte-identical to the
+# template's copy, which compiled under coqc on 2026-07-17.
+verification/proofs/coq|TypeSafety.v|gated| template; compiled in the template 2026-07-17, unverified here
