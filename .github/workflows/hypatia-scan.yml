@@ -24,7 +24,7 @@ permissions:
 
 jobs:
   hypatia:
-    name: Hypatia Neurosymbolic Analysis
+    name: hypatia-scan
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     permissions:
