@@ -1,0 +1,92 @@
+// SPDX-License-Identifier: CC-BY-SA-4.0
+// Copyright (c) 2026 Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+= ADR 0002: Where reconciliation ends and silent normalisation begins
+:toc:
+:sectnums:
+
+Date: 2026-10-27
+
+== Status
+
+Accepted. Records owner ruling *D152* (2026-09-30, scope: repo, basis:
+owner via selector), given on
+https://github.com/hyperpolymath/recon-silly-ation/issues/68[issue #68] and
+surfaced on `standards#787`. Future agents act on this record rather than
+re-asking.
+
+== Context
+
+`blocky-writer` asked (issue #68) whether this repository had written down
+where *reconciliation* stops and *silent normalisation* starts, because clause
+4 of the precision-document-suite composition contract
+(https://github.com/hyperpolymath/docmatrix/issues/71[docmatrix#71]) reads:
+
+[quote]
+____
+No component silently normalises punctuation, Unicode/whitespace,
+attribution, terminology, document structure, or page geometry.
+____
+
+Normalising is this project's job; refusing to normalise is blocky-writer's.
+The two remits have the same shape pointed at different targets, so the
+boundary has to be stated once and cited by both.
+
+== Decision (D152, verbatim)
+
+[quote, owner ruling D152, 2026-09-30]
+____
+Reconciliation stops where a change would alter meaning: report, never
+normalise silently (clause 4); verify docmatrix#70 covers blocky-writer before
+relying on it.
+____
+
+Operationally, for every candidate edit this tool produces:
+
+. *Compare, don't collapse.* The reconciler may compare two surfaces *through*
+  a normalising map (case-folding, whitespace, Unicode NFC, punctuation
+  classes) in order to decide whether they agree. It may not *replace* either
+  surface with the normalised form. In echo-types vocabulary
+  (`hyperpolymath/echo-types`): comparison happens on the image of the map;
+  the fibre over that image is reported, never discarded.
+. *Meaning-preserving edits only.* An edit may be *proposed* only where the
+  change is declared meaning-preserving by the owner of the fact (a rename
+  recorded in the repo deed's `(lineage :previous-names …)`, a path that the
+  filesystem shows moved, an SPDX identifier that the licence policy fixes).
+  Anything else, including conflicting analogies, punctuation that changes
+  grammatical role, and terminology with two live readings, is a *finding for
+  review*.
+. *Never silent.* Every proposal carries the exact input hash, the evidence
+  spans on every surface it read, the authority it relied on, and a replayable
+  trace. A proposal with no authority is a report.
+. *Never automatic, yet.* Automatic mutation stays disabled until the gates
+  in link:../status/TEST-NEEDS.adoc[`TEST-NEEDS`] and issue #44 exist and
+  pass. A deterministic trace proves repeatability, not correctness.
+
+== Answers to the two questions in #68
+
+. *Is the boundary written down?* It is now: this record, citing D152.
+. *Does this repository implement docmatrix#70's safety model* (bounded
+  capabilities, exact input hashes, evidence spans, replayable records,
+  proposed-patch-not-auto-apply)? *No.* The model is adopted as a
+  *requirement* (`README.adoc` "Proof and delivery status",
+  `docs/status/TEST-NEEDS.adoc`) and nothing implements it: the repository
+  holds RSR scaffolding and a template ABI/FFI seam, and its machine-readable
+  state records the `reconcile` action at 0%. blocky-writer should cite
+  docmatrix#70 directly, and may cite this ADR for the *boundary*, not for an
+  implementation. The second half of D152 ("verify docmatrix#70 covers
+  blocky-writer before relying on it") is blocky-writer's to discharge.
+
+== Consequences
+
+* Clause 4 gains a named counterpart: *recon-silly-ation is the component
+  that reports normalisation candidates with evidence; no component, this one
+  included, applies them silently.* Proposed as a one-line addendum to
+  docmatrix#71 (see the ultraplan, `docs/proposals/ULTRAPLAN-2026-10-27.adoc`,
+  "Beyond this repository").
+* The reconciler's core abstraction follows from the ruling: a constraint
+  network over repository surfaces in which propagation *through an
+  authoritative slot* yields a proposal and propagation *without* one yields a
+  finding. The design is in the ultraplan.
+* `.machine_readable/contractiles/Intentfile.a2ml` already lists "A licence to
+  normalise ambiguous text" under Anti-Purpose; that line is now backed by a
+  ruling.

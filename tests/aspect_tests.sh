@@ -67,8 +67,16 @@ fi
 # ═══════════════════════════════════════════════════════════════════════
 bold "Aspect 2: Dangerous patterns"
 
-# Idris2 dangerous patterns
-DANGEROUS_IDRIS=$(grep -rn 'believe_me\|assert_total\|really_believe_me' src/abi/ 2>/dev/null | grep -v "^Binary" | grep -v "test" || true)
+# Idris2 dangerous patterns, in the real seam and proof tree (the template's
+# src/abi/ path does not exist here, so the old grep could never fail), with
+# comments and doc-comments stripped so prose naming a pattern is not a use.
+# shellcheck disable=SC2016 # the single-quoted program is Perl, not shell
+DANGEROUS_IDRIS=$(git ls-files -z -- 'src/*.idr' 'verification/*.idr' 2>/dev/null |
+  xargs -0 -r perl -0777 -ne '
+    my $f = $ARGV; my $s = $_;
+    $s =~ s/\{-.*?-\}/ /gs; $s =~ s/\|\|\|[^\n]*//g; $s =~ s/--[^\n]*//g;
+    print "$f: $1\n" while $s =~ /\b(really_believe_me|believe_me|assert_total)\b/g;
+  ' || true)
 if [ -n "$DANGEROUS_IDRIS" ]; then
     fail "Dangerous Idris2 patterns found:"
     echo "$DANGEROUS_IDRIS" | head -5
@@ -76,8 +84,19 @@ else
     pass "No dangerous Idris2 patterns (believe_me, assert_total)"
 fi
 
-# Coq/Lean dangerous patterns
-DANGEROUS_PROOF=$(grep -rn '\bAdmitted\b\|\bsorry\b\|\bunsafeCoerce\b\|\bObj\.magic\b' src/ verification/ 2>/dev/null | grep -v "test" | grep -v "comment" || true)
+# Coq/Lean/Haskell/OCaml dangerous patterns, in proof sources only and with
+# comments stripped: prose that names a banned pattern ("NO Admitted allowed")
+# is not a use of it. Ported from rsr-template-repo tests/aspect_tests.sh.
+# shellcheck disable=SC2016 # the single-quoted program is Perl, not shell
+DANGEROUS_PROOF=$(git ls-files -z -- 'src/*.v' 'verification/*.v' 'src/*.lean' 'verification/*.lean' \
+    'src/*.hs' 'verification/*.hs' 'src/*.ml' 'verification/*.ml' 2>/dev/null |
+  xargs -0 -r perl -0777 -ne '
+    my $f = $ARGV; my $s = $_;
+    if ($f =~ /\.(v|ml)$/)  { $s =~ s/\(\*.*?\*\)/ /gs }
+    if ($f =~ /\.lean$/)    { $s =~ s{/-.*?-/}{ }gs; $s =~ s/--[^\n]*//g }
+    if ($f =~ /\.hs$/)      { $s =~ s/\{-.*?-\}/ /gs; $s =~ s/--[^\n]*//g }
+    print "$f: $1\n" while $s =~ /\b(Admitted|sorry|unsafeCoerce|Obj\.magic)\b/g;
+  ' || true)
 if [ -n "$DANGEROUS_PROOF" ]; then
     fail "Dangerous proof patterns found:"
     echo "$DANGEROUS_PROOF" | head -5

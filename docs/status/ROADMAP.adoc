@@ -1,23 +1,61 @@
 // SPDX-License-Identifier: CC-BY-SA-4.0
 // Copyright (c) Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
-= YOUR Template Repo Roadmap
+= recon-silly-ation Roadmap
+
+STATE's journal. Milestones mirror `.machine_readable/6a2/STATE.a2ml`
+`[route-to-mvp]` (legacy A2ML, frozen; the deed will carry them after
+migration). Percentages are evidence-backed, not aspirational: a milestone
+is complete when the gates named in `TEST-NEEDS.adoc` pass.
 
 == Current Status
 
-Initial development phase.
+Phase: implementation. Maturity: experimental. Completion: 20%, which is the
+scaffolding and the template ABI/FFI seam. The reconciliation engine does not
+exist. See `docs/proposals/ULTRAPLAN-2026-10-27.adoc` for the plan and the
+measured census it rests on.
 
 == Milestones
 
-=== v0.1.0 - Foundation
-* [ ] Core functionality
-* [ ] Basic documentation
-* [ ] CI/CD pipeline
+=== M0 — RSR scaffolding (100%)
+* [x] CI/CD, AI manifests, governance, container packaging instantiated.
+* [ ] Scaffolding *honest*: 11 workflows red on `main` as of 2026-10-25, K9
+      validation failing on `methodology-guard.k9.ncl`, template placeholders
+      still in `ECOSYSTEM.a2ml`, dangling references in `README.adoc` and
+      `ANCHOR.a2ml`. These are the first fixtures for the tool itself.
 
-=== v1.0.0 - Stable Release
-* [ ] Full feature set
-* [ ] Comprehensive tests
-* [ ] Production ready
+=== M1 — Typed ABI/FFI seam (100% present, 0% specific to this project)
+* [x] Idris2 `Abi/{Types,Layout,Foreign}.idr` + Zig `src/interface/ffi`.
+* [ ] ABI and FFI name the same symbols (today: `rsr_*`/`librsr` in Idris2,
+      `recon_silly_ation_*` in Zig) and the same `Result` enum (4 vs 5 cases).
+* [ ] `integration_test.zig` has real bodies.
 
-== Future Directions
+=== M2 — Reconciliation core: surfaces, slots, constraint propagation (0%)
+* [ ] Surface extractors for README, deed/A2ML, CHANGELOG, GitHub metadata,
+      ipkg/Zig exports, CI, links.
+* [ ] Constraint network and propagation to fixpoint; findings with evidence
+      spans, input hashes, evidence class (pons-compatible), SARIF + I-JSON.
+* [ ] Planted positive and negative fixtures per inconsistency class; every
+      rule ships with a falsifier corpus.
+* [ ] Self-dogfood: the tool reports this repository's own drift.
 
-_To be determined based on community feedback._
+=== M3 — Proofs (0/7 mandatory, 0/N project-specific)
+* [ ] ABI-1..5, TP-1..2 (template obligations) checked by `check-proofs.sh`
+      with a MANIFEST, not by a gate that cannot fail.
+* [ ] Project obligations: propagation monotone and idempotent; confinement
+      (edits stay in the constraint component); attribution locality (no
+      propagation path from per-file credit to repo-wide authorship);
+      stale-input refusal. Prover per `standards/3-practice/PROOF-POLICY.adoc`.
+
+=== M4 — ForthWall (0%, deferred)
+* Bounded rule VM beneath the reconciler. Not on the MVP path: v0.1 rules are
+  constraints-as-data, not programs. Revisit when a rule needs computation
+  the constraint language cannot express.
+
+=== M5 — Evidence sink and estate campaign (0%)
+* [ ] VeriSimDB as drift store and provenance chain behind a trait, in-process
+      adapter first.
+* [ ] Template-drift campaign across RSR-minted repositories, report-only.
+
+== Blockers
+
+None external. The gap is scope: nothing reconciles yet.
