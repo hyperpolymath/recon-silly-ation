@@ -54,6 +54,7 @@ STRICT=0
 DRY_RUN=0
 REPORT=""
 
+# Print command-line help to standard output.
 usage() {
     cat <<'EOF'
 Usage: scripts/migrate-wellknown-to-www.sh [options]
@@ -72,6 +73,7 @@ Report actions: moved, deduped, quarantined, conflict, left.
 EOF
 }
 
+# Print the supplied message to standard error and exit the script with status 2.
 die() { echo "migrate-wellknown: ERROR — $*" >&2; exit 2; }
 
 while [ $# -gt 0 ]; do
@@ -99,6 +101,9 @@ if [ -n "$REPORT" ]; then
     printf 'action\tpath\tdetail\n' > "$REPORT"
 fi
 
+# Append action ($1), path ($2) and optional detail ($3) to REPORT as a TSV row.
+# An empty REPORT disables output; dry runs still write it. Write errors abort
+# the script under set -e; otherwise return success.
 rep() {
     if [ -n "$REPORT" ]; then
         printf '%s\t%s\t%s\n' "$1" "$2" "${3:-}" >> "$REPORT"
@@ -114,9 +119,13 @@ fi
 STAMP="$(date -u +%Y%m%d)"
 QUARANTINE="www/.legacy-well-known-$STAMP"
 
+# Return success if $1 matches an indexed path; Git errors return failure too.
 git_tracked() { git ls-files --error-unmatch "$1" >/dev/null 2>&1; }
 
-move_file() { # src dst — never overwrites; caller guarantees dst is free
+# Move $1 to $2, creating parent directories and updating the Git index for a
+# tracked source. The caller must supply an unused destination. Dry runs do
+# nothing; directory creation or move errors abort the script under set -e.
+move_file() {
     local src="$1" dst="$2"
     # The dry-run guard precedes every filesystem effect, mkdir included:
     # an empty directory is invisible to `git status` but is still a change
@@ -130,7 +139,9 @@ move_file() { # src dst — never overwrites; caller guarantees dst is free
     fi
 }
 
-remove_file() { # src
+# Remove $1, also updating the Git index if tracked. Dry runs do nothing;
+# removal errors abort the script under set -e.
+remove_file() {
     local src="$1"
     if [ "$DRY_RUN" -eq 1 ]; then return 0; fi
     if git_tracked "$src"; then
@@ -140,9 +151,10 @@ remove_file() { # src
     fi
 }
 
-# A quarantine target is never overwritten: if the dated name is taken, the
-# next free `.N` suffix is used instead.
-quarantine_dest() { # rel -> path
+# Print a path under QUARANTINE for $1, which is relative to ROOT. If taken,
+# use the next free `.N` suffix starting at 1; dangling symlinks count as free.
+# Does not create or reserve the path.
+quarantine_dest() {
     # Declared one per line on purpose: in `local a="$1" b="$a"` every
     # expansion happens before any assignment, so $a is still unset when it
     # is read — fatal under `set -u`.
