@@ -105,23 +105,43 @@ else
 fi
 
 # ═══════════════════════════════════════════════════════════════════════
-# Aspect 3: ABI/FFI Contract (if applicable)
+# Aspect 3: ABI/FFI contract — the Idris2 side and the Zig side name the
+# same symbols and the same library. Text-level: it checks names, not
+# types (the typed cross-check is proof obligation R-9 in the ultraplan).
 # ═══════════════════════════════════════════════════════════════════════
-# Uncomment if your project has Idris2 ABI + Zig FFI:
+bold "Aspect 3: ABI/FFI contract"
 
-# bold "Aspect 3: ABI/FFI contract"
-# if [ -d "src/abi" ] && [ -d "ffi/zig" ]; then
-#     # Check that every exported function in Idris2 ABI has a Zig FFI implementation
-#     ABI_EXPORTS=$(grep -h 'export' src/abi/*.idr 2>/dev/null | wc -l)
-#     FFI_EXPORTS=$(grep -h 'pub export fn' ffi/zig/src/*.zig 2>/dev/null | wc -l)
-#     if [ "$ABI_EXPORTS" -gt 0 ] && [ "$FFI_EXPORTS" -gt 0 ]; then
-#         pass "ABI ($ABI_EXPORTS exports) and FFI ($FFI_EXPORTS exports) both present"
-#     else
-#         fail "ABI/FFI mismatch: $ABI_EXPORTS ABI exports, $FFI_EXPORTS FFI exports"
-#     fi
-# else
-#     pass "ABI/FFI not applicable (no src/abi or ffi/zig)"
-# fi
+ABI_DIR="src/interface/Abi"; FFI_SRC="src/interface/ffi/src"; FFI_BUILD="src/interface/ffi/build.zig"
+if [ -d "$ABI_DIR" ] && [ -d "$FFI_SRC" ]; then
+    # Every C symbol the Idris2 ABI binds: %foreign "C:<name>,<lib>"
+    ABI_SYMS=$(grep -ho '%foreign "C:[A-Za-z0-9_]*,' "$ABI_DIR"/*.idr 2>/dev/null | sed -e 's/.*C://' -e 's/,$//' | sort -u)
+    ABI_LIBS=$(grep -ho '%foreign "C:[A-Za-z0-9_]*,[A-Za-z0-9_]*"' "$ABI_DIR"/*.idr 2>/dev/null | sed -e 's/.*,//' -e 's/"$//' | sort -u)
+    # Every symbol the Zig FFI exports, and the library name build.zig gives it.
+    FFI_SYMS=$(grep -ho 'export fn [A-Za-z0-9_]*' "$FFI_SRC"/*.zig 2>/dev/null | awk '{print $3}' | sort -u)
+    FFI_LIB="lib$(grep -o '\.name = "[A-Za-z0-9_]*"' "$FFI_BUILD" 2>/dev/null | head -1 | sed -e 's/.*"\(.*\)"/\1/')"
+
+    UNBOUND=$(comm -23 <(printf '%s\n' "$ABI_SYMS") <(printf '%s\n' "$FFI_SYMS") | grep . || true)
+    if [ -z "$ABI_SYMS" ]; then
+        fail "ABI binds no C symbols (no %foreign declarations in $ABI_DIR)"
+    elif [ -n "$UNBOUND" ]; then
+        fail "ABI binds symbols the FFI does not export:"
+        printf '%s\n' "$UNBOUND" | sed 's/^/    /'
+    else
+        pass "Every ABI-bound symbol ($(printf '%s\n' "$ABI_SYMS" | grep -c .)) is exported by the FFI"
+    fi
+
+    BAD_LIB=$(printf '%s\n' "$ABI_LIBS" | grep -v -x "$FFI_LIB" | grep . || true)
+    if [ -n "$BAD_LIB" ]; then
+        fail "ABI binds library '$(printf '%s' "$BAD_LIB" | tr '\n' ' ')' but build.zig builds '$FFI_LIB'"
+    else
+        pass "ABI library name matches build.zig ($FFI_LIB)"
+    fi
+
+    UNDECLARED=$(comm -13 <(printf '%s\n' "$ABI_SYMS") <(printf '%s\n' "$FFI_SYMS") | grep . || true)
+    [ -n "$UNDECLARED" ] && warn "FFI exports not bound by the ABI (fine, but the seam is wider than the spec): $(printf '%s' "$UNDECLARED" | tr '\n' ' ')"
+else
+    pass "ABI/FFI not applicable (no $ABI_DIR or $FFI_SRC)"
+fi
 
 # ═══════════════════════════════════════════════════════════════════════
 # Aspect 4: Error Handling (no raw panic in production code)

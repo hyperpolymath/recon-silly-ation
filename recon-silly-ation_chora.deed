@@ -1,0 +1,327 @@
+;; SPDX-License-Identifier: MPL-2.0
+;
+; The repo deed of recon-silly-ation: one deed per repo (standards#837, D312).
+; Hand-authored 2026-10-27 from the retired .machine_readable/ A2ML files
+; under the standards mapping specs (1-formats/deed/mappings/), one clause
+; per mapped family, and linted with 1-formats/deed/tools/deed_lint.js. No
+; converter was used (D313). The A2ML sources stay in the tree, frozen:
+; content may be deleted from them, never added. Every value below that is
+; not a verbatim translation says so in a comment beside it.
+;
+; Families carried: canon (template pin), identity/clade/forges/lineage/
+; status (clade-to-repo-deed), maturity (vocabulary/maturity.adoc),
+; ecosystem + meta (meta-ecosystem-to-repo-deed), agentic/neurosym/playbook
+; (agentic-neurosym-playbook-to-repo-deed), manifest (ai-manifest-decision,
+; option A as the worked model rsr-template-repo_chora.deed carries it),
+; anchor and bot-directives (as the worked model carries them), rsr-profile.
+; NOT carried, because no mapping spec lists them and the worked model's
+; versions are template canon: ply (the per-directory manifests), ensaid,
+; integrations, policies, egress. STATE's journal is docs/status/ROADMAP.adoc
+; (state-v1-decision, option B); its phase and maturity are below.
+; scripts/deed-field.sh reads any field.
+(repo-deed
+  :schema-version "1.0.0"
+  :canonical-name "recon-silly-ation"
+  :beholding-chora #u5"estate/chora"
+  ; The uuid is derived, not stored: uuid5(URL namespace, this name). The v4
+  ; value in .machine_readable/6a2/CLADE.a2ml is the A2ML-era identity and is
+  ; not copied (clade-to-repo-deed P-1). ADR-008 moves this to #u8 at P3.
+  :repo-uuid #u5"github.com/hyperpolymath/recon-silly-ation"
+  ; Canon pin: the release of hyperpolymath/standards canon.lock this repo
+  ; implements. Hashes equal canon.lock [canon.artifacts] at 2.1.3 (checked
+  ; 2026-10-27). :lockstep-since is this repo's adoption date.
+  (canon
+    :version "2.1.3"
+    :criteria-sha256 "6a5aa8857bd0d0d58ef48827938ca17c251b6b854dacf59d306388d61694d82a"
+    :gates-sha256 "2f31f46d4753432e0aa8c9c28f339e18e062c98dc6e6ef4ecbb76993cf37638b"
+    :lockstep-since "2026-10-27"
+    :order "spine-adopts-then-canon-releases")
+  ; Identity, clade, forges, lineage, status: CLADE.a2ml, field for field.
+  (identity
+    :primary-forge github
+    :owner "hyperpolymath"
+    :prefixed-name "rm-recon-silly-ation")
+  ; :secondary (gv) is CLADE.a2ml's value, verbatim. The template dropped its
+  ; own inherited gv on 2026-07 ("shipping governance files is not being a
+  ; governance project") and noted that the value had propagated into every
+  ; minted repo. Whether it is meant here is the owner's call: a clade choice
+  ; is a registration act, not a translation.
+  (clade
+    :primary rm
+    :primary-name "Repo Management & Tooling"
+    :secondary (gv)
+    :assigned "2026-03-16"
+    :rationale "")
+  (forges
+    :github "hyperpolymath/recon-silly-ation"
+    :gitlab "hyperpolymath/recon-silly-ation"
+    :bitbucket "hyperpolymath/recon-silly-ation")
+  ; CLADE.a2ml says :born "2026-03-16", which is rsr-template-repo's own born
+  ; date carried over at mint. The GitHub API reports created_at
+  ; 2026-06-21T19:02:10Z for this repository; that is the authority for the
+  ; field and is what is recorded. :parent is "" (a monorepo parent, never a
+  ; description); the template edge is :instantiated-from.
+  (lineage
+    :type standalone
+    :parent ""
+    :born "2026-06-21"
+    :previous-names ()
+    :instantiated-from "rsr-template-repo")
+  ; STATE.a2ml [metadata] status = "active"; CLADE.a2ml has no [status]
+  ; section, so :since is the repository's creation date.
+  (status
+    :phase active
+    :since "2026-06-21"
+    :present #t
+    :aliases ()
+    :merged-into ""
+    :superseded-by ""
+    :successors ()
+    :ended ""
+    (history
+      (entry :phase active :since "2026-06-21" :note "created from rsr-template-repo; scaffolding and template ABI/FFI seam only; the reconcile action is not implemented")))
+  ; STATE.a2ml [position] maturity = "experimental" (owner ruling 2026-10-02:
+  ; its own clause, not a status field).
+  (maturity
+    :level experimental
+    :since "2026-06-21")
+  ; ECOSYSTEM.a2ml in this repo still describes rsr-template-repo itself
+  ; (ultraplan corpus row 1), so it is not translated. This clause is written
+  ; from STATE.a2ml [project-context] and [ecosystem], README.adoc, and the
+  ; Intentfile's Anti-Purpose list. :coordination names the hub the README
+  ; registers this tool with (reposystem, role interop, status extracted).
+  (ecosystem
+    :project "recon-silly-ation"
+    :ecosystem "hyperpolymath"
+    :position-type "interop-tool"
+    :purpose "Experimental cross-document consistency reconciliation for repository documentation, history, metadata, terminology, language policy, and attribution. ForthWall is a proposed bounded Forth rule engine beneath the reconciler, not the product identity and not an implemented capability. Registered in reposystem as an interop-role, extracted tool with a planned reconcile action."
+    :not ("the RSR template itself (that is rsr-template-repo, upstream)"
+          "a general-purpose project scaffold (it is an instantiated consumer)"
+          "a runtime library that other repos should copy wholesale"
+          "a licence to normalise ambiguous text or rewrite beyond evidenced scope"
+          "an operational ForthWall VM until its implementation and proofs are present")
+    :pipeline-position "consumer"
+    :chain "standards → rsr-template-repo → recon-silly-ation → (repositories it reports on)"
+    :pipeline-notes "Reads repository surfaces, propagates declared constraints to a fixpoint, and emits findings with evidence; proposes an edit only along a declared authority (ADR 0002, D152). Never applies an edit automatically."
+    :coordination reposystem
+    (related :name "standards" :relationship standard-source :notes "Defines the RSR standard, the deed and K9 grammars, and the proof policy this repository follows.")
+    (related :name "rsr-template-repo" :relationship minted-from :notes "The template this repository was instantiated from on 2026-06-21.")
+    (related :name "gv-clade-index" :relationship registry :notes "Clade registry; registration is the owner's act, not derived from this deed.")
+    (related :name "stapeln" :relationship build-tooling :notes "Layer-based container build system; scaffolding inherited from the template.")
+    (related :name "selur-compose" :relationship build-tooling :notes "Service composition; scaffolding inherited from the template.")
+    (related :name "k9-svc" :relationship validation-tooling :notes "Runs the self-validating k9.ncl checks (.machine_readable/self-validating/).")
+    (related :name "cerro-torre" :relationship signing-tooling :notes "Container/image signing provider referenced by the container scaffolding.")
+    (related :name "svalinn" :relationship verification-tooling :notes "Supply-chain verification referenced by the container scaffolding.")
+    (related :name "vordr" :relationship verification-tooling :notes "Build/artifact verification referenced by the container scaffolding."))
+  ; META.a2ml, field for field. :languages () is the source's empty list,
+  ; verbatim; the seam is Idris2 + Zig and the chosen core is Rust (ultraplan
+  ; D-1), which the owner may record here when code exists.
+  (meta
+    :version "0.1.0"
+    :last-updated "2026-04-11"
+    :type library
+    :languages ()
+    :license MPL-2.0
+    :author "Jonathan D.A. Jewell (hyperpolymath)"
+    :build-tool just
+    :container-runtime podman
+    :ci-platform github-actions
+    :package-manager guix
+    :scoping-first #t
+    :execution-order "axis-1 > axis-2 > axis-3"
+    :axis-1 "must > intend > like"
+    :axis-2 "corrective > adaptive > perfective"
+    :axis-3 "systems > compliance > effects"
+    (scoping
+      :sources "README, roadmap, status docs, maintenance checklist, CI/security docs"
+      :marker-scan "TODO/FIXME/XXX/HACK/STUB/PARTIAL"
+      :idris-unsound-scan "believe_me/assert_total")
+    :corrective-first #t
+    :adaptive-second #t
+    :adaptive-focus "scope-change reconciliation, stale-reference removal, obsolete-work culling"
+    :perfective-third #t
+    :perfective-source "axis-1 honest state after corrective/adaptive updates"
+    (axis-3
+      :audit-focus "systems in place, documentation explains actual state, safety/security accounted for, observed effects reviewed"
+      :compliance-focus "seams/compromises/exception register, bounded exceptions, anti-drift checks"
+      :drift-risk-example "single exception broadening into policy violation (e.g. ReScript->TypeScript spread)"
+      :effects-evidence "benchmark execution/results and maintainer status dialogue/review"))
+  ; AGENTIC.a2ml, field for field; the comment-carried constraints and hooks
+  ; are template canon (mapping D4-1) and are not restated. :allow-silent-skip
+  ; #f is load-bearing and verbatim.
+  (agentic
+    :version "0.1.0"
+    :last-updated "2026-04-11"
+    (permissions :source #t :tests #t :docs #t :config #t :create-files #t)
+    (integrity
+      :fail-closed #t
+      :require-evidence-per-step #t
+      :allow-silent-skip #f
+      :require-rerun-after-fix #t
+      :release-claim-requires-hard-pass #t)
+    (methodology :instructions-clause "bot-directives" :default-mode hybrid))
+  ; 0-AI-MANIFEST.a2ml, field for field (ai-manifest-decision option A).
+  (manifest
+    :version "0.1.0"
+    :last-updated "2026-08-28"
+    :project "recon-silly-ation"
+    :purpose "Experimental cross-document consistency reconciliation for names, links, claims, attribution, terminology, language style, and repository metadata; the proposed bounded ForthWall engine is not yet implemented or proved."
+    (agent :name CLAUDE :role "proofs, compilers, repo-local implementation, CI/CD, formal verification, Rust/Idris2/Zig")
+    (agent :name CHATGPT :role "prose, papers, publication review, standards docs, outreach drafts, letters")
+    (agent :name GEMINI :role "estate audits, cross-repo sweeps, long-context triage, pattern detection")
+    (agent :name VIBE :role "UI/frontend, PanLL panels, ReScript components, theming, rapid prototyping")
+    (policy :rules ("Do not duplicate tasks across sections. If a task needs multiple LLMs, note the handoff." "Update THIS file during sessions. Do NOT recreate per-repo TODO files."))
+    (work :agent CLAUDE :task "proofs, compilers, repo-local implementation, CI/CD, formal verification, Rust/Idris2/Zig")
+    (work :agent CHATGPT :task "prose, papers, publication review, standards docs, outreach drafts, letters")
+    (work :agent GEMINI :task "estate audits, cross-repo sweeps, long-context triage, pattern detection")
+    (work :agent VIBE :task "UI/frontend, PanLL panels, ReScript components, theming, rapid prototyping"))
+  ; ANCHOR.a2ml, field for field, in the worked model's clause shape. The
+  ; source's (semantic-authority-files) named SPECIFICATION.md,
+  ; docs/proofs/PROOFS.adoc, docs/theory/THEORY.adoc and
+  ; docs/theory/ALGORITHMS.adoc, none of which exist (ultraplan corpus row 2);
+  ; an anchor must not point at files that are not there, so that sub-clause
+  ; returns when they do. "Markdown" stays in :allowed as the source has it,
+  ; although the estate default is AsciiDoc.
+  (anchor
+    :schema "hyperpolymath.anchor/1"
+    :repo "hyperpolymath/recon-silly-ation"
+    :authority "upstream-canonical"
+    :purpose (
+      "Define canonical semantics and policy boundaries for this repository."
+      "Declare what downstream/satellite repos can extend but not redefine."
+      "Provide a stable golden path and invariant contract for release readiness."
+      )
+    (metadata
+      :version "1.0.0"
+      :last-updated "2026-08-28")
+    (identity
+      :project "recon-silly-ation"
+      :kind "tool"
+      :one-sentence "Finds and safely reconciles cross-document and repository inconsistencies; its proposed bounded ForthWall execution layer is not yet implemented or proved."
+      :domain "document reconciliation")
+    (semantic-authority
+      :policy "canonical"
+      :owns (
+        "Project semantics and specification"
+        "Invariant definitions and contractiles"
+        "Reference implementation behavior"
+        ))
+    (implementation-policy
+      :allowed ("Rust" "Idris2" "Zig" "Scheme" "Shell" "Just" "AsciiDoc" "Markdown")
+      :forbidden ("Node.js" "npm"))
+    (golden-path
+      :smoke-test-command ("just test" "just quality")
+      :success-criteria (
+        "Core tests pass"
+        "Quality gates pass"
+        "No unresolved critical security findings"
+        ))
+    (satellite-policy
+      :must-pin-upstream #t
+      :must-declare-authority #t
+      :must-have-anchor #t
+      :must-have-golden-path #t))
+  ; NEUROSYM.a2ml, field for field; [symbolic-rules] and [neural-config] are
+  ; empty in the source and are dropped (mapping: unpopulated sections).
+  (neurosym
+    :version "0.1.0"
+    :last-updated "2026-04-11"
+    (hypatia
+      :scan-enabled #t
+      :scan-depth standard
+      :report-format "logtalk"))
+  ; PLAYBOOK.a2ml, field for field; the four empty operational sections are
+  ; slot-preserved as the mapping requires.
+  (playbook
+    :version "0.1.0"
+    :last-updated "2026-04-11"
+    (deployment)
+    (incident-response)
+    (release-process)
+    (maintenance-operations)
+    (skeleton
+      :version "1.0"
+      :last-updated "2026-04-30"
+      :authority-allowlist ".machine_readable/root-allow.txt"
+      :enforcement-workflow ".github/workflows/estate-rules.yml"))
+  ; bot_directives/{methodology,coverage,debt}.a2ml, field for field, in the
+  ; worked model's clause shape. methodology-guard.k9.ncl reads
+  ; bot-directives/coverage/metadata :last-updated from here.
+  (bot-directives
+    (methodology
+      (metadata
+        :version "1.0.0"
+        :last-updated "2026-08-29"
+        :spec "https://github.com/hyperpolymath/standards/blob/main/agentic-a2ml/docs/ADR-002-methodology-layer.adoc")
+      (methodology
+        :default-mode "hybrid"
+        :ring-ceiling 2
+        :wave-cap 2
+        :spike-required #t
+        (priority-weights
+          :must 3
+          :should 2
+          :could 1)
+        (convergent-budget
+          :structural 70
+          :corrective 20
+          :perfective 10)
+        (unique-strength
+          :description "Reconciles evidenced cross-document inconsistencies; a bounded, capability-restricted ForthWall VM is proposed as an optional execution layer and is not yet implemented or proved."
+          :deepen-not-broaden #t)
+        (divergent-invariants
+          :rules ())
+        (known-constraints
+          :constraints ())
+        ; The source's reject-if-contains list held the literal template
+        ; tokens; the worked model replaced that list with a regex after
+        ; repo-init ate the tokens it was meant to detect. The regex form is
+        ; recorded here for the same reason.
+        (state-validation
+          :reject-if-matches ("\\{\\{[A-Z][A-Z0-9_]*\\}\\}")
+          :reject-if-contains ("rsr-template-repo")
+          :reject-if-project-name-mismatch #t
+          :staleness-threshold-days 90
+          :fallback-files ("TODO.md" "TODO.adoc" "ROADMAP.adoc" "README.adoc"))))
+    (coverage
+      (metadata
+        :version "1.0.0"
+        :last-updated "2026-07-27")
+      (coverage
+        :total-components 0
+        :visited-components 0
+        :coverage-percent 0))
+    (debt
+      (metadata
+        :version "1.0.0"
+        :last-updated "2026-07-27")))
+  ; Capabilities this repository actually carries, declared directly so the
+  ; canon gates score it against modules it has (TEMPLATE-APPLICABILITY-POLICY).
+  (rsr-profile
+    :version "1.0.0"
+    :spec "rsr-criteria-v2"
+    :declares-against "2.1.1-draft"
+    :role "minted"
+    :capabilities (
+      ; src/interface/ffi/build.zig + Zig FFI layer
+      "zig"
+      ; src/interface/abi.ipkg + src/interface/Abi/
+      "idris2"
+      ; scripts/*.sh, tests/*.sh
+      "bash"
+      ; C-ABI FFI seam (Zig), src/interface/ffi/
+      "ffi"
+      ; src/interface/abi.ipkg + src/interface/Abi/
+      "abi"
+      ; verification/proofs/ (template proofs; none ground-truthed yet)
+      "formal-proofs"
+      ; .github/workflows/pages.yml
+      "docs-site"
+      ; container/ + .devcontainer/Containerfile
+      "container"
+      ; build/guix.scm
+      "reproducible-build"
+      )
+    (notes
+      :omitted-rationale "Not declared because no corresponding code exists in the tree: rust (no Cargo.toml yet; D-1 chose Rust for the core), cli and library (src/core is empty), benchmarks (no benches/ despite the README's repository map), governance-tier (AFFIRMATION.adoc, which the README links, does not exist), affinescript, mobile, web-ui, api-service, published-package."))
+)
