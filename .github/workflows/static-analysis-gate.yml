@@ -1,5 +1,5 @@
-# This workflow is managed by gh actions-lock.
 # SPDX-License-Identifier: MPL-2.0
+# This workflow is managed by gh actions-lock.
 # Static Analysis Gate — Deep recon & fleet-learning deposit.
 # Builds and caches pinned panic-attack, pons-asinorum, and Hypatia (OTP 28.3),
 # executes real scans without silent fallback, and deposits unified findings.
@@ -271,18 +271,29 @@ jobs:
         id: triage
         run: |
           export PATH="$HOME/.cargo/bin:$PATH"
-          set +e
-          panic-attack bridge triage --format json . > bridge-report.json 2>"$RUNNER_TEMP/pb.err"
-          set -e
-
-          if [ ! -s bridge-report.json ] || ! jq empty bridge-report.json 2>/dev/null; then
-            echo '{"cves":[],"mitigated":0,"unmitigable":0,"concatenative":0,"informational":0}' > bridge-report.json
+          set -euo pipefail
+          PB_EXIT=0
+          panic-attack bridge triage --format json . > bridge-report.json 2>"$RUNNER_TEMP/pb.err" || PB_EXIT=$?
+          if [ "$PB_EXIT" -ne 0 ]; then
+            cat "$RUNNER_TEMP/pb.err" >&2
+            echo "::error::panic-attack bridge triage failed (exit ${PB_EXIT})"
+            exit "$PB_EXIT"
           fi
 
-          UNMITIGABLE=$(jq '.unmitigable // 0' bridge-report.json)
-          MITIGATED=$(jq '.mitigated // 0' bridge-report.json)
-          CONCATENATIVE=$(jq '.concatenative // 0' bridge-report.json)
-          INFORMATIONAL=$(jq '.informational // 0' bridge-report.json)
+          if [ ! -s bridge-report.json ] || ! jq -e '
+            type == "object" and (.cves | type == "array") and
+            ([.unmitigable, .mitigated, .concatenative, .informational] |
+              all(.[]; type == "number" and . >= 0 and . == floor))
+          ' bridge-report.json >/dev/null 2>&1; then
+            cat "$RUNNER_TEMP/pb.err" >&2
+            echo "::error::panic-attack bridge triage produced an invalid or incomplete report"
+            exit 1
+          fi
+
+          UNMITIGABLE=$(jq '.unmitigable' bridge-report.json)
+          MITIGATED=$(jq '.mitigated' bridge-report.json)
+          CONCATENATIVE=$(jq '.concatenative' bridge-report.json)
+          INFORMATIONAL=$(jq '.informational' bridge-report.json)
 
           {
             echo "unmitigable=$UNMITIGABLE"

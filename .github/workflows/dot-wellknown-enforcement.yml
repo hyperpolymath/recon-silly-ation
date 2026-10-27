@@ -1,5 +1,5 @@
-# This workflow is managed by gh actions-lock.
 # SPDX-License-Identifier: MPL-2.0
+# This workflow is managed by gh actions-lock.
 name: Well-Known Standards (RFC 9116 + RSR)
 on:
   push:
@@ -16,6 +16,7 @@ on:
       - 'www/tests/**'
       - 'www/schemas/**'
       - '.well-known/**'   # legacy location — migration window (issue #53)
+      - 'security.txt'
   schedule:
     # Weekly expiry check (Mondays 09:00 UTC)
     - cron: '0 9 * * 1'
@@ -61,17 +62,22 @@ jobs:
           fi
 
           # Check expiry
-          EXPIRES=$(grep "^Expires:" "$SECTXT" | cut -d: -f2- | tr -d ' ' | head -1)
-          if date -d "$EXPIRES" > /dev/null 2>&1; then
-            DAYS=$(( ($(date -d "$EXPIRES" +%s) - $(date +%s)) / 86400 ))
-            if [ $DAYS -lt 0 ]; then
-              echo "::error::security.txt EXPIRED"
-              exit 1
-            elif [ $DAYS -lt 30 ]; then
-              echo "::warning::security.txt expires in $DAYS days"
-            else
-              echo "✅ security.txt valid ($DAYS days)"
-            fi
+          EXPIRES=$(grep "^Expires:" "$SECTXT" | head -1 | sed 's/^Expires:[[:blank:]]*//; s/[[:space:]]*$//')
+          RFC3339='^[0-9]{4}-[0-9]{2}-[0-9]{2}[Tt]([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]([.][0-9]+)?([Zz]|[+-]([01][0-9]|2[0-3]):[0-5][0-9])$'
+          if ! [[ "$EXPIRES" =~ $RFC3339 ]] || ! EXPIRY_TS=$(date -d "$EXPIRES" +%s 2>/dev/null); then
+            echo "::error::Expires must be a valid RFC 3339 date-time"
+            exit 1
+          fi
+          NOW_TS=$(date +%s)
+          if [ "$EXPIRY_TS" -le "$NOW_TS" ]; then
+            echo "::error::security.txt EXPIRED"
+            exit 1
+          fi
+          DAYS=$(( (EXPIRY_TS - NOW_TS) / 86400 ))
+          if [ "$DAYS" -lt 30 ]; then
+            echo "::warning::security.txt expires in $DAYS days"
+          else
+            echo "✅ security.txt valid ($DAYS days)"
           fi
       - name: RSR well-known compliance
         run: |

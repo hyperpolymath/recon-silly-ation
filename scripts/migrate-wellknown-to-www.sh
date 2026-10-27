@@ -62,7 +62,7 @@ Usage: scripts/migrate-wellknown-to-www.sh [options]
 Migrate a repository-root .well-known/ into www/.well-known/.
 
 Options:
-  --dry-run         report what would change; write nothing (always exit 0)
+  --dry-run         report what would change; write nothing (setup errors fail)
   --in-place        divergent content stays put, both copies kept, exit 1
                     (pre-stage-5 contract; for hand resolution)
   --strict          exit 1 if anything had to be quarantined
@@ -111,6 +111,10 @@ rep() {
     return 0
 }
 
+# Relocating relative symlinks can break their targets; reject links explicitly.
+if [ -L "$ROOT" ]; then
+    die "symbolic links are unsupported: $ROOT"
+fi
 if [ ! -d "$ROOT" ]; then
     echo "migrate-wellknown: no $ROOT/ at repository root — nothing to migrate."
     exit 0
@@ -179,6 +183,14 @@ while IFS= read -r -d '' src; do
     rel="${src#"$ROOT"/}"
     dst="$DEST/$rel"
 
+    if [ -L "$src" ]; then
+        rep left "$rel" "unsupported symbolic link; resolve before migrating"
+        die "symbolic links are unsupported: $src (left in place)"
+    fi
+    if [ -L "$dst" ]; then
+        die "refusing to overwrite symbolic link $dst"
+    fi
+
     if [ -f "$dst" ]; then
         if cmp -s "$src" "$dst"; then
             # Identical: the duplicate root copy goes; www is canonical.
@@ -218,16 +230,16 @@ while IFS= read -r -d '' src; do
         echo "  moved: $rel -> $dst"
         rep moved "$rel" "root-only; -> $DEST/$rel"
     fi
-done < <(find "$ROOT" -type f -print0 | sort -z)
+done < <(find "$ROOT" \( -type f -o -type l \) -print0 | sort -z)
 
 # Drop the root directory only when it is fully empty of files.
 left=0
-if [ -z "$(find "$ROOT" -type f -print -quit 2>/dev/null)" ]; then
+if [ -z "$(find "$ROOT" \( -type f -o -type l \) -print -quit 2>/dev/null)" ]; then
     if [ "$DRY_RUN" -eq 0 ]; then
         find "$ROOT" -depth -type d -empty -delete 2>/dev/null || true
     fi
 else
-    left=$(find "$ROOT" -type f | wc -l | tr -d '[:space:]')
+    left=$(find "$ROOT" \( -type f -o -type l \) -print0 | tr -cd '\0' | wc -c | tr -d '[:space:]')
 fi
 
 echo "migrate-wellknown: moved=$moved deduped=$deduped quarantined=$quarantined conflicts=$conflicts left_in_root=$left"
