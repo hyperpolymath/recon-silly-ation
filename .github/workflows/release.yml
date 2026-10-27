@@ -1,23 +1,24 @@
 # This workflow is managed by gh actions-lock.
 # SPDX-License-Identifier: MPL-2.0
-# This workflow is managed by gh actions-lock.
-# This workflow is managed by gh actions-lock.
 # Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 #
 # Release workflow — triggered by version tags (v*).
 # Builds artifacts, generates changelog via git-cliff, creates a GitHub Release,
-# and produces SLSA provenance attestations.
+# and produces GitHub native build-provenance attestations (OIDC + Sigstore).
 name: Release
 on:
   push:
     tags:
       - 'v*'
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
 permissions:
   contents: read
 jobs:
   build:
     name: Build Artifacts
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     permissions:
       contents: read
@@ -43,10 +44,6 @@ jobs:
             echo "::notice::Detected Zig project (build.zig)"
             echo "build_type=zig" >> "$GITHUB_OUTPUT"
             zig build -Doptimize=ReleaseSafe
-          elif [ -f "deno.json" ] || [ -f "deno.jsonc" ]; then
-            echo "::notice::Detected Deno project (deno.json)"
-            echo "build_type=deno" >> "$GITHUB_OUTPUT"
-            deno task build
           elif [ -f "gossamer.conf.json" ]; then
             echo "::notice::Detected Gossamer project (gossamer.conf.json)"
             echo "build_type=gossamer" >> "$GITHUB_OUTPUT"
@@ -65,18 +62,18 @@ jobs:
             just build
           else
             echo "::error::No recognised build system found."
-            echo "Expected one of: mix.exs, Cargo.toml, build.zig, deno.json, gossamer.conf.json, gleam.toml, rebar.config, Justfile"
+            echo "Expected one of: mix.exs, Cargo.toml, build.zig, gossamer.conf.json, gleam.toml, rebar.config, Justfile"
             exit 1
           fi
-        # TODO: Upload build artifacts if needed
-        # - uses: actions/upload-artifact@v4
-        #
-        # with:
+        # TODO: Upload build artifacts if needed (pin actions/upload-artifact
+        #   to a full commit SHA when enabling, per the SHA-pin policy):
+        # - uses: actions/upload-artifact@<full-commit-sha>  # vX.Y.Z
+        #   with:
         #     name: release-artifacts
         #     path: target/release/
   changelog:
     name: Generate Changelog
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     permissions:
       contents: read
@@ -117,16 +114,18 @@ jobs:
   release:
     name: Create GitHub Release
     needs: [build, changelog]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     permissions:
       contents: write
+      id-token: write       # mint the OIDC token attestation provenance is signed with
+      attestations: write   # write the build-provenance attestation (the "claim")
     steps:
       - uses: actions/checkout@v7.0.1
-      # TODO: Download build artifacts if uploading to the release
-      # - uses: actions/download-artifact@v4
-      #
-      # with:
+      # TODO: Download build artifacts if uploading to the release (pin
+      #   actions/download-artifact to a full commit SHA when enabling):
+      # - uses: actions/download-artifact@<full-commit-sha>  # vX.Y.Z
+      #   with:
       #     name: release-artifacts
       #     path: artifacts/
       - name: Create GitHub Release
@@ -140,19 +139,17 @@ jobs:
           # files: |
           #   artifacts/*
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  provenance:
-    name: SLSA Provenance
-    needs: [build]
-    permissions:
-      actions: read
-      id-token: write
-      contents: write
-    # SLSA generator must run in a separate, isolated workflow
-    # See: https://slsa.dev/spec/v1.0/requirements#build-l3
-    uses: slsa-framework/slsa-github-generator/.github/workflows/generator_generic_slsa3.yml@f7dd8c54c2067bafc12ca7a55595d5ee9b75204a # v2.1.0
-    with:
-      base64-subjects: ""
-      # TODO: Replace with actual artifact hashes
-      # Generate with: sha256sum artifact | base64 -w0
-      # base64-subjects: "${{ needs.build.outputs.hashes }}"
+          GITHUB_TOKEN: ${{ github.token }}
+      # GitHub native artifact attestation (build provenance). Generates a
+      # signed, verifiable claim binding each released artifact to this build
+      # (commit, workflow, runner) via OIDC + Sigstore — verify with
+      # `gh attest verify <artifact> --repo ${{ github.repository }}`.
+      # Replaces the older SLSA-generator job; native attestations need no
+      # separate isolated workflow.
+      # TODO: point subject-path at the artifacts this release actually ships
+      #   (must match the `files:` uploaded above, e.g. artifacts/*).
+      - name: Attest build provenance
+        if: ${{ hashFiles('artifacts/*') != '' }}   # skip until real artifacts are wired
+        uses: actions/attest-build-provenance@v4.2.2
+        with:
+          subject-path: 'artifacts/*'

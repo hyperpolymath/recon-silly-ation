@@ -1,0 +1,93 @@
+// SPDX-License-Identifier: CC-BY-SA-4.0
+// SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+= Handover: recon-silly-ation, session of 2026-10-27
+:toc:
+
+Read this first if you are picking the work up. It says what landed, what
+is true now, what was decided, what is open, and where to start. The plan
+itself is link:../proposals/ULTRAPLAN-2026-10-27.adoc[`ULTRAPLAN-2026-10-27.adoc`];
+the boundary ruling is link:../decisions/0002-reconciliation-boundary.adoc[ADR 0002].
+
+== What landed on `main`
+
+[cols="1,3",options="header"]
+|===
+|PR |Content
+
+|#73
+|ADR 0002 recording owner ruling D152 (reconciliation stops where a change
+would alter meaning; report, never normalise silently). The ultraplan:
+census, the repository's own inconsistencies as the first fixture corpus,
+aspect analysis, the constraint-propagation design, estate tools measured,
+proof obligations, waves gated by experiments. Honest `ROADMAP.adoc`.
+Aspect 2 of `tests/aspect_tests.sh` fixed. Closed issue #68.
+
+|#74
+|Wave 0. `methodology-guard.k9.ncl` repaired so K9 validation and the
+Dogfood Gate pass. `scripts/check-proofs.sh` + `scan-dangerous.sh` + four
+MANIFESTs: a missing prover is fatal, never a skip.
+`recon-silly-ation_chora.deed`, hand-authored from the mapping specs, lint
+clean. Idris2 ABI bound to the symbols and result codes the Zig FFI
+exports, with a real ABI/FFI contract check as Aspect 3.
+
+|the PR carrying this file
+|CI repair. Five workflows were rejected before any job ran, because the
+repository runs GitHub's actions lockfile and they called `standards`
+reusable workflows the lock cannot cover; `release.yml` had the same
+defect via the SLSA generator. All six are re-adopted from
+rsr-template-repo's current inline, SHA-pinned versions, plus `scorecard.yml`.
+`wellknown-enforcement.yml` looked for `security.txt` at the root after #56
+moved it to `www/.well-known/`; replaced by the template's
+`dot-wellknown-enforcement.yml`. `actions.lock` rebuilt (both sections) and
+two lines of Dependabot drift corrected. `security.txt` Policy pointed at a
+`SECURITY.md` that does not exist; now `SECURITY.adoc`.
+|===
+
+== Owner decisions taken (2026-10-27, via selector)
+
+* *D-1 core language:* Rust verified with Creusot; finding/proposal IR as
+  Idris2 types; Zig FFI only if a C consumer appears.
+* *D-2 VeriSimDB/squeakwell:* adopt the consonance model now, VeriSimDB as
+  a service behind a `DriftStore` trait when reachable, raise a shared
+  propagation core with squeakwell as a design issue. Never submit
+  `NORMALISE`.
+* *D-3 deed:* hand-authored in W0 (done); A2ML frozen, delete-only.
+* *D-4 #68:* recorded as ADR 0002 and closed (done).
+
+== True now, and not
+
+* Every local gate passes: aspect 5/5, root shape, K9 0 errors, A2ML 0
+  errors, scan-dangerous, deed lint, workflow validation.
+* *No proof has been compiled.* No Idris2, Zig, Agda, Lean or Rocq ran in
+  the session or runs in CI. The Idris2 ABI on `main` (`src/interface/Abi/`)
+  is aligned by name, checked by Aspect 3, and uncompiled. MANIFESTs list
+  every module as `gated` and say they are not ground-truthed.
+* *No reconciliation code exists.* `src/core/` is empty. The 12-row corpus
+  in the ultraplan is the specification for the first scan.
+* SonarCloud reported 39 issues on #74 with the gate passing; the host was
+  blocked from the session, so they were not read.
+
+== Open, for the owner
+
+. `(clade :secondary (gv))` in the deed is verbatim from CLADE.a2ml and
+  flagged; whether `gv` is meant here is a registration call.
+. Deleting the 118 frozen A2ML files is a separate, reviewable step; the
+  deed now carries every fact the mapping specs allow.
+. Cross-repo items (none acted on; list in the ultraplan, "Beyond this
+  repository"): docmatrix#71 clause-4 counterpart; template defects every
+  child inherits; pons-asinorum's parked rookie fixtures; squeakwell's
+  EXPLAINME file map; docudactyl README licence badge (*flag only*).
+
+== Where to start next
+
+. *W3 E3 first, cheaply:* add a CI job running `just proof-check-idris2` in
+  a digest-pinned Idris2 image (trope-checker uses
+  `ghcr.io/stefan-hoeck/idris2-pack@sha256:…`). The first run will demote
+  some MANIFEST entries to `quarantine` with the compiler's error; that is
+  the gate working.
+. *W1:* Rust crate under `src/core/`: surface extractors, slot/domain/
+  constraint types, propagation to a fixpoint, findings in pons-asinorum's
+  evidence-class shape plus `authority` and `proposal`, SARIF and
+  I-JSON/JCS reporters. Acceptance E1: `recon scan .` reports corpus rows
+  1–8 of the ultraplan and nothing else.
+. Keep each new gate's first run a planted failure.
