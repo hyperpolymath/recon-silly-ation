@@ -28,6 +28,7 @@ CHANGELOG.md
 # ─── Build entry points (must live at root for their tooling) ────────────────
 Justfile                   # delegates phases to build/just/*.just
 coordination.k9            # repo-local session binding (template-mandated)
+recon-silly-ation_chora.deed  # the repo deed (standards#837, D312): one machine-readable record per repo; read with scripts/deed-field.sh
 
 # ─── Conventional dotfiles (tool-required at root) ───────────────────────────
 .editorconfig
