@@ -1,0 +1,625 @@
+// SPDX-License-Identifier: CC-BY-SA-4.0
+// SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+= Ultraplan: recon-silly-ation as constraint propagation over repository surfaces
+Jonathan D.A. Jewell (hyperpolymath)
+v0.1.0, 2026-10-27
+:toc: left
+:toclevels: 3
+:sectnums:
+:icons: font
+:status: DRAFT v0.1.0 — census measured 2026-10-27 on branch `claude/nice-tesla-539nnf` (base `58d7350`); the decisions in <<decisions>> are OPEN and put to the owner through the selector
+
+[.lead]
+This document does five things. It measures the repository as it is, with
+commands anyone can re-run. It reads that mess *as the product's own first
+fixture corpus*, because every inconsistency class the README promises to
+find is present in the README's own repository. It proposes a core design,
+*constraint propagation over repository surfaces*, and shows that owner
+ruling D152 falls out of it as a boundary condition rather than a policy
+bolted on. It names which estate tools carry which part, with what each one
+actually implements today, not what its README says. And it lays out the
+work in waves, each with the experiment that has to pass before the next
+wave is paid for.
+
+Every claim about this repository cites a path and, where it is a count, the
+command. Every claim about another estate repository was checked on a
+shallow clone made 2026-10-27; where a README's claim and its file tree
+disagree, the file tree is reported. Nothing below was compiled with Idris2,
+Zig, Agda, Lean or Rocq: none of those toolchains is installed in this
+session, so proof files are reported as *present*, never as *checked*.
+
+== Verdict in one page
+
+*What this repository is.* 392 tracked files, 0 lines of reconciliation
+code. 118 `.a2ml` files in a format the estate retired (D99, D269c, D312,
+D313) and 0 `.deed`. An ABI/FFI seam copied from the template in which the
+Idris2 side binds `rsr_init`/`librsr` and the Zig side exports
+`recon_silly_ation_init`, with a `Result` enum of four cases on one side and
+five on the other. A roadmap that, until this branch, read "YOUR Template
+Repo Roadmap". Eleven workflows red on `main` as of 2026-10-25. One open
+issue, already answered by the owner on 2026-09-30 and not closed.
+
+*Why that is the interesting part.* The repository's stated purpose is to
+find "small-looking contradictions that make a repository's documentation,
+history, metadata, and attribution disagree". Its own scaffolding has
+generated, without anyone writing a line of product code, one instance of
+nearly every inconsistency class it names: an unpropagated rename (template
+name in `ECOSYSTEM.a2ml`), dangling references (`AFFIRMATION.adoc`,
+`benches/`, `SPECIFICATION.md`), a completion claim that outruns evidence
+(STATE says 20%; the 20% is the template), an attribution surface copied
+verbatim, and two explanations that cannot both be true (ABI vs FFI). The
+template did this to roughly three hundred minted repositories. *The product
+is a template-drift reconciler before it is anything else*, and its market is
+the estate.
+
+*The design.* Treat each repository *fact* (name, purpose, licence, status,
+symbol set, each link target, each contributor credit, each spelling policy)
+as a variable with a finite domain of *observed values*, one per surface that
+states it, each tagged with its evidence span and input hash. Treat each
+"these must agree" relation as a constraint. Run propagation to a fixpoint.
+Where the network has a declared *authority* for the fact (the deed, the
+filesystem, the licence policy), narrowing the other surfaces to the
+authoritative value is a *proposal* with provenance. Where it has none, an
+empty domain is a *finding for review*. That is D152 as a theorem shape, not
+a rule: reconciliation ends exactly where no authority licenses the
+narrowing. The estate already has this machine designed twice, as
+squeakwell's "cross-modal constraint convergence" over database modalities
+and as VeriSimDB's consonance loop over an octad of witnesses. This
+repository is the third instance, over documents, and should share the
+vocabulary and, in time, the core.
+
+*What to build first.* Not ForthWall. Rules in v0.1 are constraints as data,
+not programs; a VM is scope for a rule that needs computation, and no such
+rule is in the inconsistency list. Build the extractors, the constraint
+network, the findings bus in pons-asinorum's evidence-class shape, and the
+falsifier corpora, and point it at this repository. The first green run is
+the one that reports the eleven findings in <<corpus>>.
+
+*The recommended arm* for the owner's three open decisions is in
+<<decisions>>: Rust core verified with Creusot plus Idris2 for the finding
+and patch IR (the estate's mapped provers), the VeriSimDB *model* adopted now
+behind a trait and its *service* adopted when it is reachable, and
+ForthWall deferred with a written trigger condition.
+
+[#census]
+== 1. Census (measured 2026-10-27)
+
+[cols="3,1,4",options="header"]
+|===
+|Measure |Value |Command or source
+
+|Tracked files |392 |`find . -path ./.git -prune -o -type f -print \| wc -l`
+|`.a2ml` files (retired format) |118 |`find . -name '*.a2ml' \| wc -l`
+|`.deed` files |0 |`find . -name '*.deed'`
+|Lines of reconciliation logic |0 |`src/core/`, `src/definitions/`, `src/errors/`, `src/bridges/` contain only manifests and READMEs
+|Idris2 ABI modules |3 (+6 template proof modules) |`src/interface/Abi/`, `verification/proofs/idris2/`
+|Zig FFI exports |10 |`grep -c 'export fn' src/interface/ffi/src/main.zig`
+|Zig tests |3 inline + 1 placeholder |`main.zig`, `test/integration_test.zig`
+|Proof obligations done |0 of 7 |`docs/status/PROOF-STATUS.adoc`
+|Commits |53 (39 owner, 10 dependabot, 4 coderabbit) |`git shortlog -sn --all`
+|Open issues |1 (#68) |GitHub, 2026-10-27
+|Open PRs |0 |GitHub, 2026-10-27
+|Workflows red on `main` (latest run each) |11 |GitHub Actions, runs on `main` through 2026-10-26: Dogfood Gate, Governance, Hypatia, mirror, Scorecard (7 consecutive), secret-scanner, Well-Known (8 consecutive), Workflow Security Linter, Static Analysis Gate (`startup_failure`)
+|Local gates, this session |root-shape PASS; no-md-in-docs PASS; validate-a2ml PASS (6 warnings); validate-k9 *FAIL* (2 errors, `methodology-guard.k9.ncl`); workflows test PASS (8 recommendations); aspect test *FAIL* before this branch, PASS after |`scripts/check-root-shape.sh`, `scripts/check-no-md-in-docs.sh`, `.github/hooks/validate-{a2ml,k9}.sh`, `tests/workflows/validate_workflows_test.sh`, `tests/aspect_tests.sh`
+|Provers available here |none (idris2, zig, agda, lean, coqc, rocq all absent; rustc 1.97, bun 1.4.4 present) |`command -v`
+|GitHub description |matches README purpose |API, 2026-10-27
+|Repo topics |12, including `typed-provenance`, `equivalence-aware-computing` |API
+|===
+
+The Dogfood Gate failure is explained locally: `validate-k9.sh` rejects
+`.machine_readable/self-validating/methodology-guard.k9.ncl` for a missing
+`K9!` magic line and pedigree block. The Well-Known and Scorecard failures
+were not diagnosed here (logs not pulled); they are listed, not explained.
+
+[#corpus]
+== 2. The mess, read as the first fixture corpus
+
+Each row is an inconsistency this repository exhibits today, classified by
+the README's own taxonomy. Together they are the planted positives for
+Wave 2. The "authority" column says which surface, if any, licenses a
+proposal under D152; where it says *none*, the row is a finding for review
+and the tool must not propose.
+
+[cols="1,3,3,2,1",options="header"]
+|===
+|# |Class (README) |Evidence |Authority |Verdict shape
+
+|1 |Rename not propagated
+|`.machine_readable/6a2/ECOSYSTEM.a2ml` still says `project = "rsr-template-repo"` and describes the template's own pipeline position
+|deed `:canonical-name` (absent; `CLADE.a2ml` carries it)
+|proposal once a deed exists; finding until then
+
+|2 |Reference to file that no longer exists
+|`README.adoc` links `AFFIRMATION.adoc`; `README.adoc` repo map lists `benches/`; `ANCHOR.a2ml` names `SPECIFICATION.md`, `docs/proofs/PROOFS.adoc`, `docs/theory/{THEORY,ALGORITHMS}.adoc`; `READINESS.adoc` names `docs/practice/DOGFOOD-LOG.adoc`; `Mustfile.a2ml` requires `SECURITY.md` and `self-validating/k9-svc/`. All absent (`test -e`).
+|filesystem
+|proposal (delete or retarget) for links; finding for Mustfile (a gate that cannot pass is a policy question)
+
+|3 |Explanations that cannot all be true
+|Idris2 `Abi/Foreign.idr` binds `C:rsr_init,librsr`; Zig exports `recon_silly_ation_init`. `Abi/Types.idr` `Result` has 4 constructors; Zig `Result` has 5. Two `Layout` modules (`src/interface/Abi/Layout.idr`, `verification/proofs/idris2/ABI/Layout.idr`) define different `StructLayout` records.
+|none (which side is right is a design decision)
+|finding
+
+|4 |Completion claim does not match the change
+|`STATE.a2ml` records `completion-percentage = 20` and two milestones at 100%; the 100% items are the template's scaffolding and seam, and the seam does not name this project's symbols (row 3)
+|evidence inventory (`TEST-NEEDS.adoc`)
+|finding, with the arithmetic shown
+
+|5 |Obsolete generation foregrounded
+|`Bustfile.a2ml` still says "ReconForth VM crashes"; #44 required historical references to be *marked*, not silently renamed
+|issue #44 acceptance criterion
+|proposal: annotate as historical (A2ML is frozen: deletion allowed, no new facts, so the annotation goes in the deed when it exists)
+
+|6 |Inconsistent language policy
+|`README.adoc` "Licence" (UK) vs `.github/CONTRIBUTING.md` and `LICENSE` surfaces (US); `docs/governance/` mixes "normalise"/"normalize"
+|repo-declared spelling policy (none declared)
+|finding until a policy slot exists in the deed; then proposal
+
+|7 |Attribution scope
+|Template copyright lines name the owner on every file including files that are verbatim template content; `0-AI-MANIFEST.a2ml` allocates work to four named agents who have not touched the repo
+|git history (`git log --format=%an`)
+|finding (never a proposal: credit changes are meaning changes)
+
+|8 |Template residue
+|`tests/e2e.sh` is the template banner with commented examples; `docs/tech-debt-2026-05-26.adoc` is titled "rsr-template-repo"; `EXPLAINME.adoc` describes template token substitution
+|template provenance (`CLADE.a2ml` lineage)
+|finding
+
+|9 |Gate that cannot fail
+|`tests/aspect_tests.sh` grepped `src/abi/` (absent) for Idris2 patterns and matched its own README prose for Coq patterns. Fixed on this branch, with planted positives shown to be caught.
+|template (the template already carries the fix)
+|proposal (ported)
+
+|10 |Machine-readable state in a retired format
+|118 `.a2ml`; the dogfood gate accepts them "mid-migration" (standards#837)
+|standards D312 (one deed per repo)
+|proposal, but *not* by bulk conversion (D313): hand-author the deed from the mapping specs
+
+|11 |Open question already ruled
+|#68 open; owner comment of 2026-09-30 gives D152 and says future agents should act on it
+|owner comment
+|proposal: record as ADR (done: `docs/decisions/0002-reconciliation-boundary.adoc`), close
+|===
+
+Row 3 is the one to dwell on. The template ships an ABI and an FFI that do
+not name the same functions; a repository instantiated from it inherits two
+"truths" and a README that says they are proven to match. No per-side check
+can see it: the Idris2 typechecks, the Zig builds, each is internally
+consistent. That is exactly the silent cross-domain failure
+`invariant-path` exists for, and it is the first constraint the tool should
+check about itself.
+
+[#aspects]
+== 3. Aspect-oriented analysis
+
+Aspects here in the AOLD sense this repository's own `src/aspects/README.adoc`
+describes: concerns that cut across every phase and would be scattered if
+written inline. Each row says what the aspect demands of the design, where
+it is currently violated, and which estate tool owns the weave.
+
+[cols="1,3,3,2",options="header"]
+|===
+|Aspect |What it demands of the reconciler |Current state |Owner in the estate
+
+|*Identity*
+|One canonical name, one uuid, one lineage; every surface that states identity is a view of the deed.
+|No deed. `CLADE.a2ml` carries a v4 uuid (`df5a6230-…`) where ADR-008 wants v8 at next mint and `#u5` literals in deeds; `ECOSYSTEM.a2ml` carries the template's identity.
+|`gv-clade-index`, deed grammar (`standards/1-formats/deed`)
+
+|*Evidence and provenance*
+|Every finding carries input hashes, evidence spans, evidence class, and the authority it relied on; replayable.
+|Nothing emits findings. The README states the requirement.
+|pons-asinorum `Finding` (evidence class derived from tier; private fields; SARIF 2.1.0); VeriSimDB provenance chain
+
+|*Confinement (safety)*
+|A proposal changes only surfaces inside its constraint component; no filesystem, network or shell reach.
+|No executor exists. ForthWall is the proposed answer; the constraint model makes it unnecessary for v0.1.
+|trope-checker's "prevent" profile is the pattern: make the unsafe thing unrepresentable in the IR, do not catch it at the verdict
+
+|*Attribution*
+|Per-file credit never propagates to repo-wide authorship; merges of credit carry a provenance tag or are rejected.
+|Template copyright on every file (row 7).
+|trope-checker grade algebra: `merge = Fused(tau)` allowed, `Conflated` unrepresentable
+
+|*Meaning preservation (D152)*
+|Compare through normalising maps; never replace a surface by its normal form; propose only under a declared meaning-preserving relation.
+|Ruled, now recorded (ADR 0002); not implemented.
+|echo-types (fibre vocabulary); invariant-path (same-claim check)
+
+|*Proof*
+|Obligations mapped per PROOF-POLICY: code → Creusot, IR/ABI → Idris2, theory → Agda with Rocq/Lean rechecks; `TESTED` for bounded checks; no escape hatches.
+|7 template obligations, 0 done; template proof modules; no MANIFEST; `check-proofs.sh` absent so `just proof-check-*` cannot fail honestly.
+|`standards/3-practice/PROOF-POLICY.adoc`; `rsr-template-repo/scripts/check-proofs.sh`
+
+|*Gating and CI*
+|Every capability claim is gated by a test that has been watched to fail.
+|11 red workflows; one gate that could not fail (row 9); K9 validation failing.
+|rsr-template-repo gates; cicd-squabbler
+
+|*Formats and estate conformance*
+|Deed for repo facts, K9 for contracts, I-JSON/JCS for every JSON, KYAML for YAML, Bun for JS.
+|118 A2ML; `examples/web-project-deno.json` unchecked for JCS; `eclexiaiser-validate` job in `dogfood-gate.yml` runs inline `python3` (banned, D293-adjacent) — inherited from the template.
+|kyq / ijson-jcs; `deed_lint.js`
+
+|*Licence*
+|MPL-2.0 code, CC-BY-SA-4.0 prose, per file, from birth; flag-only on drift.
+|Consistent here. *Flag only, out of scope:* `docudactyl/README.adoc` badge reads "PMPL 1.0" with text "MPL-2.0 (Palimpsest License)" and docudactyl is not in the Palimpsest register.
+|`standards/3-practice/LICENCE-POLICY.adoc`; hypatia cap
+
+|*Observability*
+|Findings land on one bus; counts are queryable; runs are comparable across time.
+|No bus. The Kautz-ladder ultraplan (`standards/docs/ULTRAPLAN-KAUTZ-LADDER-2026-10-19.adoc` §"What we lack") names this as estate gap 3.
+|VeriSimDB as sink when reachable; SARIF now
+
+|*Accessibility and language*
+|UK/US/Oxford policy is a declared slot, not an inferred one; findings are readable without the tool.
+|No slot declared; mixed spellings (row 6).
+|deed `(meta)` clause (proposed new field)
+
+|*Ecology (where it runs)*
+|CI on minted repos, agent sessions, the gitbot-fleet at `:review` strategy, and a human reading SARIF in a PR. Never `:auto_execute`.
+|No consumer. `reposystem` registers a planned `reconcile` action.
+|hypatia / gitbot-fleet
+|===
+
+[#design]
+== 4. Core design: constraint propagation over surfaces
+
+=== 4.1 The model
+
+* A *surface* is a file or API view with an extractor `view_i : Repo → Partial(Facts)`: README, deed (or legacy A2ML), CHANGELOG, GitHub metadata, `abi.ipkg`, Zig exports, workflow names, every hyperlink.
+* A *fact slot* is a variable `x_f` for a fact `f` (canonical name, purpose sentence, licence, status, completion, each exported symbol, each link target, each contributor credit on each file, spelling policy).
+* The *domain* of `x_f` is the finite set of observed values `{(v, surface, span, sha256(surface))}`. The domain is never widened by the tool.
+* A *constraint* is a relation over slots: equality through a declared comparison map (`agree_modulo(nfc ∘ casefold)`), existence (`link target ∈ filesystem`), bijection (`idris_exports ≅ zig_exports`), order (`completion ≤ evidence_count/required_count`), or absence of path (attribution locality).
+* An *authority* is a designated surface for a slot: the deed for identity, the filesystem for paths, the licence policy for SPDX, `git log` for authorship. Authorities come from the deed's `(anchor)` clause, never from the tool.
+
+=== 4.2 Propagation and the D152 boundary
+
+Run generalised arc consistency to a fixpoint. Domains only shrink, so the
+run terminates and re-running on the result changes nothing: the
+*idempotence* and *monotonicity* obligations are properties of the solver,
+not of each rule. Three outcomes per slot:
+
+[cols="1,2,2",options="header"]
+|===
+|Domain after propagation |Meaning |Output
+
+|singleton |all surfaces agree (modulo declared maps) |nothing, or an `INFO` record of the agreement with its spans
+|non-singleton, authority present |surfaces disagree and one is designated |*proposal*: narrow the others to the authority's value, with every span, every hash, and the authority named
+|non-singleton, no authority |genuine contradiction |*finding for review*; the tool has no licence to pick
+|===
+
+This is D152 made structural. "Reconciliation stops where a change would
+alter meaning" becomes: a proposal exists only along an authority edge, and
+authority edges are declared only for meaning-preserving relations. The
+comparison map may fold case and Unicode; the *proposal* never writes the
+folded form, it writes the authority's literal value. In echo-types terms,
+comparison is on the image of the normalising map and the proposal reports
+the fibre instead of collapsing it. That is the whole of clause 4 for this
+component, and it is a statement about the solver, so it is provable once.
+
+=== 4.3 What the constraint language must not be
+
+Rules as *data* (a constraint table in a `.k9.ncl` contract, validated by
+`k9-validate.sh`), not as programs. A rule that needs computation beyond
+equality-through-map, existence, bijection, order and path-absence is the
+trigger condition for ForthWall, and the first such rule should be written
+down before any VM is. None of the eleven classes in <<corpus>> needs one.
+
+=== 4.4 Findings and patches on the wire
+
+Adopt pons-asinorum's finding shape rather than invent one: `rule_id`
+stamped by the engine, `tier → evidence class` derived (never set by the
+rule), `severity`, `location` in UTF-16 columns, `evidence_note`,
+`counter_condition`. Add two fields pons does not have: `authority`
+(nullable) and `proposal` (nullable patch with the authority's literal
+value). Evidence classes map cleanly: a link-existence check is `DATAFLOW`
+(the filesystem is the ground truth), an ABI/FFI bijection is `PROTOCOL`,
+a spelling-policy inference without a declared slot is `HEURISTIC`, and
+anything an LLM suggested is `SPECULATIVE` and cannot gate. SARIF 2.1.0 out
+for PRs, I-JSON/JCS (D306) for the record, so the output lands on the one
+findings bus the Kautz-ladder plan is asking for.
+
+[#tools]
+== 5. Estate tools: what each actually carries
+
+Measured on shallow clones, 2026-10-27. "Implemented" means code on `main`,
+not a README sentence.
+
+[cols="1,3,3,2",options="header"]
+|===
+|Tool |Implemented today |Role here |Caveat
+
+|*VeriSimDB* (`verisimdb`)
+|Rust crates with real line counts: `verisim-drift` 1,241, `verisim-normalizer` 3,892, `verisim-provenance` 964, `verisim-octad` 4,470. `DriftType`/`DriftEvent`/`DriftDetector`, `NormalizationStrategy` trait, `ProvenanceChain`. `POST /normalizer/trigger/{id}` repairs from the authoritative modality and records the write on the provenance chain (`KNOWN-ISSUES.adoc` §1, resolved 2026-06-11).
+|The *vocabulary and lifecycle* (consonance subject, modal witness, drift report, Declared → Asserted → Consonant → Drifting → Normalised) are exactly this tool's: a repository fact is a consonance subject, each surface a witness, a finding a drift report, a proposal a `NORMALISE` transition. Adopt the model now; adopt the service as drift store and provenance sink behind a trait.
+|`standards/docs/ULTRAPLAN-KAUTZ-LADDER-2026-10-19.adoc` records `verisim-api` shipping in-memory with auth off and the port-8097 instance the hypatia rules target not existing. VeriSimDB's normalizer *auto-repairs*; D152 forbids that here. The trait boundary is where that difference lives: this tool only ever submits proposals, never `NORMALISE`.
+
+|*VCL-UT* (`vcl-ut`)
+|Parser, binder, 11-level safety ladder with a ceiling of L6 reachable from source (issue #25, measured 2026-07-21); admissibility decider in `src/interface/parse/src/decider.rs` (structural identity-distinctness, evidence injection-safety, evidence type-compatibility); `src/core/Transition.idr`. 8 `believe_me` in `src/` today.
+|The *admissibility* framing is the right one for a proposal: a reconciliation patch is a transition that must be admissible under schema, provenance, *freshness* (stale-input refusal is literally VCL-UT's freshness obligation), authority and proof attachment. Reuse the obligation list; do not couple to the VCL parser.
+|L7–L10 not expressible yet; proof-supported layer "intended". Treat as a specification to conform to, not a dependency to link.
+
+|*squeakwell*
+|611 lines of Rust and Idris2: CLI, manifest parser, `engine/mod.rs` with a `RecoveryState` and fail-open VeriSimDB persistence, `verisim.rs`. The nine engine and proof files `EXPLAINME.adoc` lists (`inference.rs`, `conflict_resolution.rs`, `constraints.idr`, `ratchet.idr`, …) do not exist on disk. `ROADMAP.adoc` says Phase 1 (core) is entirely unticked.
+|The *design* is the same machine as §4 with modalities in place of surfaces: loose acceptance → cross-witness inference → conflict resolution by authority → tightening → convergence, with monotonicity and determinism as Idris2 obligations. This repository should be the second instance of that design and, if the owner agrees, the two should share a propagation core rather than each writing one.
+|Concept stage. Its EXPLAINME is itself a row-2 / row-4 finding (file map and completion claim outrun the tree). Do not depend on it; co-design with it.
+
+|*pons-asinorum*
+|M0–M4 landed, 13 rules, four evidence classes, falsifier gate in CI, JSON 0.4.0 + SARIF 2.1.0 reporters, `pons.toml` suppressions (`PROOF-PROGRESS.adoc`, 2026-10-25).
+|Finding model and the *falsifier discipline* (every rule ships a negative corpus; a rule that fires on it is demoted). Its `deferred/rookie-fixtures/` holds 20 corpora, among them `project-identity-mismatch`, `document-reference-missing`, `manifest-license-contradiction`, `readme-language-contradiction`, `template-placeholder`, `conventional-name-typo`: these are this repository's inconsistency classes, already with fixtures, parked. The Kautz-ladder plan calls them "the symbolic floor-raising layer" and says they exist only as fixtures. This repository is their natural home.
+|Pons owns code structure and dataflow; it deliberately does not own prose and cross-document claims (ADR-0004). Adopt the shape, do not fork the engine.
+
+|*invariant-path*
+|Extractor, classifier, annotation store; `schemas/annotation.schema.json` with `source_text`, `target_text`, `path_description`, `invariant_type`, `losses`, `break_condition`; profiles that point at a corpus elsewhere and vendor nothing.
+|Row 3 (ABI ≠ FFI) and the "explanations that cannot all be true" class are *same-claim* questions, its Layer 3 (sortal). Write a `recon-silly-ation` profile for it rather than re-implementing claim identity. Its ADR-0001 doubling attack (one derivation counted twice under two labels) is the same shape as attribution expansion.
+|Layers "decided, not built"; the extractor and store are what exists.
+
+|*trope-checker*
+|Idris2 reference checker + Rust fast-core, conformance suite, Lean grade-algebra proofs (sorry-free), Agda Theorem B. "prevent" profile: deceptive grades (`Falsified`, `Misbound`, `Conflated`) are schema-invalid.
+|The *attribution* aspect: a credit merge must be `Fused(tau)` with provenance or it does not validate. Encode the proposal IR so that "expand credit to repo-wide" is unrepresentable, exactly as trope-checker does with `Conflated`.
+|Needs Idris2 0.8.0; not installable here.
+
+|*echo-types*
+|Agda, `Echo f y := Σ (x : A), (f x ≡ y)`, factorisation and separation proofs; executable shadow in `EchoTypes.jl`.
+|The *theory* home for §4.2: comparison-through-a-map keeps the fibre; the proposal reports it. Cite, do not restate (CLAUDE.md: cite from this library rather than reinvent).
+|Tier-3 results are funext-qualified; the unconditional fragment suffices here.
+
+|*blocky-writer / docmatrix*
+|blocky-writer: Rust PDF core with tests; `INTENT.contractile` carries the clause-4 invariant. docmatrix: conversion core; the composition contract is docmatrix#71, the safety model docmatrix#70.
+|The counterpart sentence for clause 4 (<<beyond>>). Neither is a dependency.
+|Neither repository is attached to this session; issues #70/#71 were read through blocky-writer's summary, not directly.
+
+|*docudactyl*
+|Zig FFI with 20+ modules, Idris2 ABI, Chapel pipeline; audit 2026-09-26 says distributed guarantees unverified.
+|Extraction for non-text surfaces (PDF, images) *if* the reconciler ever reads them. Out of scope for v0.1. Its README licence badge is a flag-only finding (<<beyond>>).
+|Scale claims are estimates per its own README.
+
+|*hypatia / gitbot-fleet*
+|35 Elixir rule modules; fleet mutation paths interlocked with `exit 78`.
+|The *consumer*: emit at `:review` strategy. Licence-related findings stay under the hypatia cap.
+|No mutation path is open; good.
+
+|*nesy-solver / echidna*
+|Dispatch of proof obligations to provers; recommendation from `proof_attempts`.
+|Later: submit the Wave 3 obligations through the same pipeline as other repos.
+|Depends on VeriSimDB reachability.
+
+|*deed_lint.js, kyq / ijson-jcs*
+|`bun 1-formats/deed/tools/deed_lint.js` runs here and passes on the template deed; `ijson-jcs` is the JSON gate.
+|Wave 0 migration gate and the record format for findings.
+|kyq not yet a working gate (D306 transitional checks).
+|===
+
+[#proofs]
+== 6. Proofs and solving
+
+Tier T3 (`docs/status/PROOF-NEEDS.adoc`). Mapping per
+`standards/3-practice/PROOF-POLICY.adoc`: this repository's statements
+about *its own* solver are engineering (Idris2 for the IR and solver
+contract; Creusot on the Rust if the core is Rust); the statements that would
+hold for any propagation-based reconciler are theory (Agda, rechecked in
+Rocq and Lean, no Mathlib). Status tokens are the §5 vocabulary.
+
+[cols="1,3,1,1,2",options="header"]
+|===
+|# |Obligation |Kind |Prover |Trope it instantiates
+
+|R-1 |Propagation is monotone: domains only shrink. |theory |Agda (+Rocq, Lean) |Kleene fixpoint on a finite lattice; squeakwell's "ratchet"
+|R-2 |Propagation terminates and is idempotent: `propagate (propagate R) = propagate R`. |theory |Agda |the `Idempotent` record already in `verification/proofs/agda/Properties.agda` (template); echo-types' idempotence vocabulary
+|R-3 |Determinism: same surfaces and authorities give the same findings, independent of extraction order. |theory |Agda |confluence of arc consistency
+|R-4 |Confinement: a proposal for slot `x` touches only surfaces in `x`'s connected component. |engineering |Idris2 |reachability in the constraint graph
+|R-5 |Attribution locality: no path from a per-file credit slot to any repo-wide authorship slot; credit merges carry `tau`. |engineering |Idris2 |trope-checker `Conflated` unrepresentable; invariant-path doubling attack
+|R-6 |Stale-input refusal: a proposal carries `sha256` of every surface read; application is a function of (proposal, current hashes) that is `Refuse` on any mismatch. |engineering |Idris2 (IR), Creusot (apply) |VCL-UT freshness obligation
+|R-7 |D152 boundary: a proposal exists only along an authority edge. |engineering |Idris2 |echo-types fibre; the solver contract
+|R-8 |Finding wire type: evidence class is a function of tier and cannot be set by a rule; round-trips through I-JSON/JCS. |engineering |Idris2 |pons `Finding` private-field invariant
+|R-9 |ABI/FFI bijection for this repository's own seam. |engineering |Idris2 (template ABI-1..5 become real once the seam names this project) |the first self-finding, row 3
+|R-10 |Bounded model of the apply path with a planted stale input. |`TESTED` |Kani on the Rust apply function, bounds recorded |§4.1 standing exception
+|===
+
+*Solving.* The propagation itself is the solver; nothing here needs SMT. If
+a later rule needs disjunction (two surfaces could each be authoritative
+depending on a third), that is the point to route an obligation through
+nesy-solver rather than to grow the constraint language. Record that
+threshold now so it is not crossed by accident.
+
+*Escape hatches.* Zero in this repository's proof tree today
+(`grep` for `believe_me`, `assert_total`, `postulate`, `sorry`, `Admitted`
+over `src/` and `verification/`: only prose matches, now correctly ignored
+by the aspect test). Keep it at zero; the `check-proofs.sh` + MANIFEST
+convention from the template is the gate that can actually fail.
+
+[#waves]
+== 7. Waves, each gated by an experiment
+
+[cols="1,3,3,2",options="header"]
+|===
+|Wave |Work |Experiment that must pass before the next wave |Depends on
+
+|*W0 Hygiene*
+|Close #68 with ADR 0002 (this branch). Port the template's `check-proofs.sh` + MANIFESTs. Fix `methodology-guard.k9.ncl` so the Dogfood Gate can pass. Hand-author `recon-silly-ation_chora.deed` from the mapping specs (no converter, D313) and lint it. Make the ABI and FFI name the same symbols and enum, or delete the seam until there is something to seam.
+|E0: every local gate green and `deed_lint.js` OK; the 11 red workflows re-measured and the remainder diagnosed, not guessed.
+|none
+
+|*W1 Core*
+|Extractors for the surfaces in §4.1; slot/domain/constraint types; GAC propagation; finding + proposal IR; SARIF and I-JSON reporters; `recon scan .` CLI. Language per <<decisions>> D-1.
+|E1: `recon scan .` on this repository reports rows 1–8 of <<corpus>> and nothing else (precision 1.0 on the planted set, recall ≥ 8/8), with an evidence span and hash on every record.
+|W0
+
+|*W2 Falsifiers*
+|One positive and one negative corpus per class; port the six matching pons rookie fixtures; CI job that fails if any rule fires on its negative corpus.
+|E2: run on 10 RSR-minted repositories chosen by `gv-clade-index` order (not by convenience). Report, per class, hits and how many a human judged true. Publish the table. A class below 0.9 precision is demoted to `HEURISTIC`.
+|W1
+
+|*W3 Proofs*
+|R-1..R-9 as above; Kani harness for R-10. Rechecks per PROOF-POLICY §2 with the route recorded.
+|E3: `just proof-check-all` green via MANIFEST on a toolchain in CI (Guix manifest or container), *watched to fail* first on a planted `believe_me`.
+|W1
+
+|*W4 Sink*
+|`DriftStore` trait with an in-process adapter and a VeriSimDB adapter; findings posted as drift reports with provenance; never `NORMALISE`.
+|E4: round-trip 1,000 findings through the in-process adapter and, if `verisim-api` is reachable, through the service; identical `JCS` bytes back.
+|W1; VeriSimDB reachability for the second half
+
+|*W5 Campaign*
+|Report-only run across the RSR-minted estate at `:review` strategy; a `template-drift` class whose authority is the template's own current file.
+|E5: a dated estate table of drift counts by class, fed back to `rsr-template-repo` as issues on the template, not PRs on three hundred children.
+|W2, hypatia routing
+
+|*Wn ForthWall*
+|Only on the written trigger: a rule needing computation the constraint language cannot express.
+|E-n: that rule, written as a fixture first.
+|a reason
+|===
+
+Benchmarks belong in W1: `recon scan` over this 392-file repository should
+be measured in `benches/` (which the README already promises exists) with
+`scripts/check-bench-regression.sh` from the template guarding it.
+
+[#decisions]
+== 8. Decisions for the owner
+
+Each decision names the most elegant-and-correct arm first, then the most
+dependable arm, then alternatives, with a rating. Ratings: *E* elegance and
+long-term correctness, *D* dependability and security, both out of 5.
+
+=== D-1 Core language and verifier
+
+[cols="1,3,1,1",options="header"]
+|===
+|Arm |Description |E |D
+
+|*A. Rust core + Creusot, Idris2 for the IR and ABI, Zig FFI kept only if a C consumer exists* (recommended, elegant)
+|Follows PROOF-POLICY's mapping with no exception to record. Propagation in Rust; finding/proposal IR as Idris2 types with Rust generated to match (as trope-checker does Idris2 reference + Rust fast-core, validated by a conformance corpus).
+|5 |4
+
+|B. Idris2 reference implementation only, Rust later
+|Smallest trusted base; the solver *is* the proof. Slow to run over 300 repos; the Kautz plan wants a floor-raising layer that runs in CI today.
+|4 |5
+
+|C. Shared `consonance-propagation` crate with squeakwell
+|One propagation core, two front-ends (surfaces, modalities). Elegant and estate-aligned, but squeakwell has no core yet, so this would be *writing squeakwell's core under another repo's name*: a boundary question (IS-NOT) the owner must rule, not an agent.
+|5 |3
+
+|D. Datalog (oikosbot engine) or miniKanren
+|Natural for constraints with disjunction. oikosbot's engine "has never executed" (its `DEBT.adoc`, per the Kautz plan); miniKanren is a research note in the palimpsest archive. Would be a new foundation to maintain.
+|3 |2
+
+|E. ForthWall first
+|Builds the VM before any rule needs it. Rejected by the analysis in §4.3; kept as the deferred Wn.
+|2 |2
+|===
+
+=== D-2 VeriSimDB and squeakwell relationship
+
+*A. Model now, service when reachable, shared core later (recommended).*
+Adopt the consonance vocabulary and the drift-report/transition lifecycle in
+this repository's IR; put VeriSimDB behind `DriftStore` with an in-process
+adapter first; raise the shared-core question with squeakwell as a design
+issue on both repos. E5 D4.
+
+*B. Depend on `verisim-drift` and `verisim-normalizer` crates directly.*
+Fastest to a demo; imports an auto-repair design (`NormalizationStrategy`)
+that D152 forbids and makes this tool a VeriSimDB satellite. E2 D3.
+
+*C. Nothing shared.* Write a third drift model. E1 D4.
+
+=== D-3 Deed migration timing
+
+*A. Hand-author the deed in W0 from the mapping specs, lint with
+`deed_lint.js`, leave A2ML frozen for deletion-only (recommended).* The
+tool's identity slot needs an authority before E1 can report row 1 as a
+proposal rather than a finding. E5 D5.
+
+*B. Wait for kyX's converter (D313).* Correct per ruling for *bulk* work;
+this is one repository, written by hand, which D313 allows. E3 D4.
+
+=== D-4 Issue #68
+
+*A. Comment with ADR 0002 and close as completed (recommended).* The owner's
+comment already says the question is answered. E5 D5.
+
+*B. Leave open as a pointer.* Keeps an answered question in the open count,
+which is itself a row-11 inconsistency. E1 D3.
+
+[#value]
+== 9. Value, speculated honestly
+
+*The negative case.* A reconciler for prose is a near-neighbour of a linter,
+and linters for prose have a poor record: they fire on style, humans mute
+them, and the mute list grows. If this tool is judged by "findings per
+repository" it will be muted within a month.
+
+*The positive case, and it is specific.* The estate has one template and
+roughly three hundred children of it. The template's self-description is a
+constraint network with *no propagation*: when the template changes a path,
+renames a file, fixes a gate, or retires a format, every child keeps the old
+value until a human notices (the Kautz plan's own census found 43 `.md→.adoc`
+renames never propagated in one repository). That is not style; it is
+provenance decay with a known authority (the template's current file) and a
+known relation (lineage). A tool that reports *only* that, with evidence,
+at `:review`, fed back to the template rather than to the children, would
+pay for itself on the first run, because the eleven rows in <<corpus>> are
+the same eleven rows in most of the three hundred.
+
+*What makes it defensible rather than a linter.* Three things no linter has:
+an authority model (so it can say *why* one value wins), a fibre-preserving
+comparison (so it can say two surfaces agree without rewriting either), and
+a refusal class (so it says "cannot pick" instead of guessing). Those are
+D152, echo-types and VCL-UT's admissibility, respectively, and they are what
+the owner has been building elsewhere. The tool is small; the vocabulary it
+inherits is not.
+
+*Learning from the mess.* Scaffolding before substance produces repositories
+whose honesty documents are themselves dishonest, not through anyone's
+intent but because a copied "proof and delivery status" section is a claim
+about a different repository. The remedy is not more scaffolding; it is one
+machine-readable authority (the deed) and a propagator that reads it. Second
+lesson: a gate that cannot fail is worse than no gate (row 9, and the
+template's `check-proofs.sh` header says the same). Every gate added in W0
+is to be watched failing first. Third: the template shipped an ABI and an
+FFI that do not agree, under a README saying they are proven to; the
+cross-domain check that would have caught it is the first thing this tool
+should run on itself.
+
+[#beyond]
+== 10. Beyond this repository (to act on, or keep as a list)
+
+[cols="1,3,1",options="header"]
+|===
+|Where |What |Kind
+
+|`docmatrix#71` |Propose a one-line counterpart to clause 4: "recon-silly-ation reports normalisation candidates with evidence; no component applies them silently." Via the suite's own pattern: a short issue, the neighbour decides. |issue, cross-repo
+
+|`rsr-template-repo` |Template defects every child inherits: `ECOSYSTEM.a2ml` describing the template itself; the ABI/FFI symbol and enum mismatch (`Abi/Foreign.idr` `rsr_*` vs Zig `{{project}}_*`); `README.adoc` linking `AFFIRMATION.adoc` and `benches/`; `ANCHOR` naming absent semantic-authority files; `Mustfile` requiring `SECURITY.md` and `self-validating/k9-svc/`; `dogfood-gate.yml` `eclexiaiser-validate` running inline `python3`. The template already fixed the aspect-test grep; children have not re-adopted it. |issues on the template, not PRs on children
+
+|`pons-asinorum` |Its `deferred/rookie-fixtures/` prose/link/identity corpora have a home here; ask whether pons wants them moved or mirrored (ADR-0004 scope). |issue
+
+|`squeakwell` |Shared propagation core question (D-2); also its `EXPLAINME.adoc` file map names nine files that do not exist, which is a row-2/row-4 finding it may want to fix. |issue, flag
+
+|`docudactyl` |README badge "PMPL 1.0" + text "MPL-2.0 (Palimpsest License)" while docudactyl is not in the Palimpsest register. *Flag only, never edit* (LICENCE-POLICY A2; CLAUDE.md hard rules). |flag to owner
+
+|`verisimdb` |When `verisim-api` is reachable with auth on, this tool is a ready consumer for drift reports with provenance (W4). Nothing to do until then. |note
+
+|`standards` |If D-1 arm A is taken, no exception record is needed. If a Datalog arm is taken, PROOF-POLICY §4 needs an exception record beside the artefact. The Kautz-ladder plan's "findings bus" gap gets a second emitter. |note
+
+|`gv-clade-index` |`CLADE.a2ml` uuid is v4; ADR-008 P3 migration is per repo at next touch. |note
+|===
+
+== Appendix A. Commands used for the census
+
+[source,bash]
+----
+find . -path ./.git -prune -o -type f -print | wc -l            # 392
+find . -name '*.a2ml' -not -path './.git/*' | wc -l             # 118
+find . -name '*.deed'  -not -path './.git/*'                    # none
+grep -c 'export fn' src/interface/ffi/src/main.zig              # 10
+grep -n '%foreign' src/interface/Abi/Foreign.idr                # rsr_* / librsr
+bash scripts/check-root-shape.sh .                              # PASS
+bash scripts/check-no-md-in-docs.sh .                           # PASS
+bash .github/hooks/validate-a2ml.sh | tail -8                   # 0 errors, 6 warnings
+bash .github/hooks/validate-k9.sh   | tail -8                   # 2 errors
+bash tests/workflows/validate_workflows_test.sh | tail -8       # PASS, 8 recommendations
+bash tests/aspect_tests.sh                                      # FAIL on main, PASS on this branch
+bun /path/to/standards/1-formats/deed/tools/deed_lint.js FILE   # OK on the template deed
+for t in idris2 zig agda lean coqc rocq just; do command -v $t; done   # none present
+----
