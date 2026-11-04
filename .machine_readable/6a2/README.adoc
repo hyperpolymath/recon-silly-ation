@@ -2,9 +2,12 @@
 // Copyright (c) Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
 # A2ML 6a2 Directory
 
-This directory contains the 6 core A2ML machine-readable metadata files for this repository.
+This directory now holds only `CLADE.a2ml`, `anchors/` and `0-AI-MANIFEST.a2ml`.
+The six descriptiles listed below moved to `../descriptiles/` (Hypatia SD004).
+A2ML is retired: the repo deed `recon-silly-ation_chora.deed` is authoritative,
+and these legacy files await deletion, not extension.
 
-## Files
+## Files (now in `../descriptiles/`)
 
 - `AGENTIC.a2ml` - AI agent operational gating, safety controls
 - `ECOSYSTEM.a2ml` - Project ecosystem position, relationships, explicit boundaries

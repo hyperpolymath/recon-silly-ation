@@ -1,0 +1,14 @@
+# SPDX-License-Identifier: MPL-2.0
+# Known-fake fixtures, not credentials. Commit 1782c1f (#75, squash) added
+# tests/workflows/review_regressions_test.py, a CodeRabbit-generated Python
+# test whose inputs were placeholder secrets: abcdefghij0123456789ABCD,
+# 'AKIA' + 'A' * 16, and bare PEM header lines with no key body. The file is
+# deleted, but the full-history gitleaks pass still reads that commit, and
+# main's history is not rewritten. Each entry pins one finding in that one
+# commit; any other finding, anywhere, still fails the scan.
+1782c1f7e3f87c2256ed15c72bdc494f13c42af8:tests/workflows/review_regressions_test.py:generic-api-key:143
+1782c1f7e3f87c2256ed15c72bdc494f13c42af8:tests/workflows/review_regressions_test.py:generic-api-key:144
+1782c1f7e3f87c2256ed15c72bdc494f13c42af8:tests/workflows/review_regressions_test.py:generic-api-key:145
+1782c1f7e3f87c2256ed15c72bdc494f13c42af8:tests/workflows/review_regressions_test.py:generic-api-key:148
+1782c1f7e3f87c2256ed15c72bdc494f13c42af8:tests/workflows/review_regressions_test.py:generic-api-key:155
+1782c1f7e3f87c2256ed15c72bdc494f13c42af8:tests/workflows/review_regressions_test.py:private-key:150

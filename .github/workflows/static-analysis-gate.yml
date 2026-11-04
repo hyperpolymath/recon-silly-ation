@@ -257,13 +257,17 @@ jobs:
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/.cargo/bin/panic-attack
-          key: panic-attack-${{ runner.os }}-b5530834a839734d1d181bfe6edb0d43d4233cf4
+          key: panic-attack-http-${{ runner.os }}-b5530834a839734d1d181bfe6edb0d43d4233cf4
 
-      - name: Build pinned panic-attack when uncached
+      # `bridge` is compiled only with the `http` feature (#[cfg(feature =
+      # "http")] in panic-attack's src/main.rs); a default build has no such
+      # subcommand. The cache key carries `http` so a featureless binary
+      # cached earlier is never reused here.
+      - name: Build pinned panic-attack (with http) when uncached
         if: steps.cache-pa.outputs.cache-hit != 'true'
         run: |
           set -euo pipefail
-          cargo install --locked \
+          cargo install --locked --features http \
             --git https://github.com/hyperpolymath/panic-attack.git \
             --rev b5530834a839734d1d181bfe6edb0d43d4233cf4
 
@@ -272,8 +276,27 @@ jobs:
         run: |
           export PATH="$HOME/.cargo/bin:$PATH"
           set -euo pipefail
+          # Patch Bridge reads only these lockfiles, and treats "none found" as
+          # an error by design (panic-attack src/bridge/mod.rs). With no tracked
+          # lockfile there is nothing to triage: record that explicitly, in the
+          # report and the summary, instead of running a tool that must fail or
+          # inventing an all-zero result. Any tracked lockfile turns triage on.
+          LOCKS=$(git ls-files -- ':(glob)**/Cargo.lock' ':(glob)**/mix.lock' \
+            ':(glob)**/package-lock.json' ':(glob)**/requirements.txt')
+          if [ -z "$LOCKS" ]; then
+            jq -n '{status: "not_applicable",
+                    reason: "no tracked Cargo.lock, mix.lock, package-lock.json or requirements.txt",
+                    cves: [], mitigated: 0, unmitigable: 0, concatenative: 0, informational: 0}' \
+              > bridge-report.json
+            echo "::notice title=Patch Bridge::not applicable: no supported lockfile is tracked"
+            echo "status=not_applicable" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "status=triaged" >> "$GITHUB_OUTPUT"
           PB_EXIT=0
-          panic-attack bridge triage --format json . > bridge-report.json 2>"$RUNNER_TEMP/pb.err" || PB_EXIT=$?
+          # --quiet: without it a human banner precedes the JSON on stdout.
+          panic-attack --quiet bridge triage --output-format json --output bridge-report.json . \
+            2>"$RUNNER_TEMP/pb.err" || PB_EXIT=$?
           if [ "$PB_EXIT" -ne 0 ]; then
             cat "$RUNNER_TEMP/pb.err" >&2
             echo "::error::panic-attack bridge triage failed (exit ${PB_EXIT})"
@@ -302,7 +325,17 @@ jobs:
             echo "informational=$INFORMATIONAL"
           } >> "$GITHUB_OUTPUT"
 
+      - name: Write step summary (not applicable)
+        if: steps.triage.outputs.status == 'not_applicable'
+        run: |
+          {
+            echo "## Patch Bridge CVE Triage"
+            echo ""
+            echo "Not applicable: no supported lockfile is tracked, so there are no dependencies to triage."
+          } >> "$GITHUB_STEP_SUMMARY"
+
       - name: Write step summary
+        if: steps.triage.outputs.status == 'triaged'
         env:
           UNMIT: ${{ steps.triage.outputs.unmitigable }}
           MIT: ${{ steps.triage.outputs.mitigated }}

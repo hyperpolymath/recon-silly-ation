@@ -35,7 +35,7 @@ recon-silly-ation_chora.deed  # the repo deed (standards#837, D312): one machine
 .envrc
 .gitattributes
 .gitignore
-.hypatia-ignore            # SD004 exceptions for the six frozen A2ML sources pending deletion
+.gitleaksignore            # pins known-fake fixtures in commit 1782c1f; gitleaks reads it at root
 .tool-versions
 
 # ─── Directories ─────────────────────────────────────────────────────────────
