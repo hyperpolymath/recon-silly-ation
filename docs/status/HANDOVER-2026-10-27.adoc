@@ -116,7 +116,10 @@ is reported as not applicable. A parse error or any other exit 2 still fails.
   `--features http`, passes `--format`, captures the banner with the JSON,
   and silently zero-fills the bridge report; it fails any repository pons
   cannot analyse (exit 2, `no-applicable-input`); its `workflow-linter.yml`
-  requires SPDX on line 1, which `gh actions-lock` breaks.
+  requires SPDX on line 1, which `gh actions-lock` breaks; its
+  `openssf-compliance.yml` placeholder step passes when META or ECOSYSTEM
+  is absent; its `validate.just` `validate-state` exits 0 on a missing or
+  invalid STATE file.
 . CodeRabbit's autofix and docstring agents commit to PR branches without
   knowing the estate's language bans (they added Python here). Consider
   turning those agents off estate-wide and keeping review comments only.
