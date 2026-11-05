@@ -99,6 +99,23 @@ jobs:
           PONS_LOG="$RUNNER_TEMP/pons.log"
           PONS_RC=0
           pons scan --format json . > "$PONS_JSON" 2> "$PONS_LOG" || PONS_RC=$?
+          # pons exits 2 for several reasons. Only "no-applicable-input" where
+          # every inventory entry is either outside scope or has no analysis
+          # adapter is reported as not applicable. A parse error, a required-
+          # language failure or any other exit 2 still fails the job.
+          if [ "$PONS_RC" -eq 2 ] && jq -e '.scanned.coverage_status == "no-applicable-input"
+              and .scanned.files == 0 and (.scanned.coverage_failures | length) == 0
+              and (.findings | length) == 0
+              and all(.scanned.inventory[]; .outcome == "excluded-by-policy" or .outcome == "unsupported")' \
+              "$PONS_JSON" >/dev/null 2>&1; then
+            echo "::notice title=pons-asinorum::not applicable: no file in a language pons can analyse ($(jq '.scanned.skipped | length' "$PONS_JSON") skipped)"
+            {
+              echo "## pons-asinorum Deep Recon"
+              echo ""
+              echo "Not applicable: pons has no analysis adapter for any language in this repository."
+            } >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
           if [ "$PONS_RC" -ne 0 ] || ! jq -e 'type == "object" and (.findings | type == "array")' "$PONS_JSON" >/dev/null 2>&1; then
             cat "$PONS_LOG" >&2 || :
             echo "::error::pons scan failed (exit ${PONS_RC})"

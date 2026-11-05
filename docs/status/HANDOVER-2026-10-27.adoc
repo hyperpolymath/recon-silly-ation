@@ -62,6 +62,10 @@ lockfile it now reports `not_applicable` explicitly instead of a fabricated
 all-zero report. The full-history gitleaks pass still reads the deleted test
 in squash commit 1782c1f; `.gitleaksignore` pins exactly those seven
 known-fake fingerprints, and a newly planted key still fails the scan.
+pons, reached once assail stopped failing, exits 2 because it has no adapter
+for any language here (Idris2, Zig, shell); that one case, matched on pons's
+own `no-applicable-input` label with every file out of scope or unsupported,
+is reported as not applicable. A parse error or any other exit 2 still fails.
 |===
 
 == Owner decisions taken (2026-10-27, via selector)
@@ -94,6 +98,8 @@ known-fake fingerprints, and a newly planted key still fails the scan.
   crate brings `Cargo.lock`, which turns triage on. Bump the pinned
   panic-attack to at least `be6ac46` (panic-attack#254) then: the current pin
   also errors on a lockfile with zero external dependencies.
+* pons-asinorum is likewise not applicable until W1: it analyses Rust,
+  Python, PHP and JavaScript, none of which this repository holds yet.
 
 == Open, for the owner
 
@@ -108,7 +114,8 @@ known-fake fingerprints, and a newly planted key still fails the scan.
 . Template defects found here, for rsr-template-repo (solutions at source):
   its `static-analysis-gate.yml` builds panic-attack without
   `--features http`, passes `--format`, captures the banner with the JSON,
-  and silently zero-fills the bridge report; its `workflow-linter.yml`
+  and silently zero-fills the bridge report; it fails any repository pons
+  cannot analyse (exit 2, `no-applicable-input`); its `workflow-linter.yml`
   requires SPDX on line 1, which `gh actions-lock` breaks.
 . CodeRabbit's autofix and docstring agents commit to PR branches without
   knowing the estate's language bans (they added Python here). Consider
