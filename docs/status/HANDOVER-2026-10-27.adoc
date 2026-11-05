@@ -60,7 +60,7 @@ subcommand), called with `--format` (the flag is `--output-format`), and a
 stdout banner ahead of the JSON (now `--quiet --output`). With no tracked
 lockfile it now reports `not_applicable` explicitly instead of a fabricated
 all-zero report. The full-history gitleaks pass still reads the deleted test
-in squash commit 1782c1f; `.gitleaksignore` pins exactly those seven
+in squash commit 1782c1f; `.gitleaksignore` pins exactly those six
 known-fake fingerprints, and a newly planted key still fails the scan.
 pons, reached once assail stopped failing, exits 2 because it has no adapter
 for any language here (Idris2, Zig, shell); that one case, matched on pons's
