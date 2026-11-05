@@ -2,7 +2,7 @@
 // Copyright (c) Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
 = recon-silly-ation Roadmap
 
-STATE's journal. Milestones mirror `.machine_readable/6a2/STATE.a2ml`
+STATE's journal. Milestones mirror `.machine_readable/descriptiles/STATE.a2ml`
 `[route-to-mvp]` (legacy A2ML, frozen; the deed will carry them after
 migration). Percentages are evidence-backed, not aspirational: a milestone
 is complete when the gates named in `TEST-NEEDS.adoc` pass.

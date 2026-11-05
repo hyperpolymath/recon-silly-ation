@@ -30,7 +30,7 @@ MANIFESTs: a missing prover is fatal, never a skip.
 clean. Idris2 ABI bound to the symbols and result codes the Zig FFI
 exports, with a real ABI/FFI contract check as Aspect 3.
 
-|the PR carrying this file
+|#75
 |CI repair. Five workflows were rejected before any job ran, because the
 repository runs GitHub's actions lockfile and they called `standards`
 reusable workflows the lock cannot cover; `release.yml` had the same
@@ -41,6 +41,31 @@ moved it to `www/.well-known/`; replaced by the template's
 `dot-wellknown-enforcement.yml`. `actions.lock` rebuilt (both sections) and
 two lines of Dependabot drift corrected. `security.txt` Policy pointed at a
 `SECURITY.md` that does not exist; now `SECURITY.adoc`.
+CodeRabbit's agents pushed four commits onto the branch before merge: header
+and docstring fixes, a hardened well-known migrator and release flow (kept),
+a Python regression test and an SD004 suppression file (both undone below).
+
+|the follow-up PR
+|Makes main's CI honest and green. Workflow Linter: SPDX may sit anywhere in
+the leading comment block, because `gh actions-lock` prepends its own comment
+on every regeneration. The Python test is removed: Python is banned, and its
+fake secrets also tripped gitleaks and the Hypatia and panic-attack critical
+gates. Its migration cases are ported to `tests/wellknown_migration_test.sh`
+(58 checks, run by the Well-Known workflow and `just aspect`, shown to fail
+against a broken migrator). The six descriptiles move from `6a2/` to
+`descriptiles/` with every reference, instead of suppressing SD004. Hypatia
+RE008: the SARIF gate tests the PR author, not `github.actor`. Patch Bridge
+had three stacked defects: built without `--features http` (so no `bridge`
+subcommand), called with `--format` (the flag is `--output-format`), and a
+stdout banner ahead of the JSON (now `--quiet --output`). With no tracked
+lockfile it now reports `not_applicable` explicitly instead of a fabricated
+all-zero report. The full-history gitleaks pass still reads the deleted test
+in squash commit 1782c1f; `.gitleaksignore` pins exactly those six
+known-fake fingerprints, and a newly planted key still fails the scan.
+pons, reached once assail stopped failing, exits 2 because it has no adapter
+for any language here (Idris2, Zig, shell); that one case, matched on pons's
+own `no-applicable-input` label with every file out of scope or unsupported,
+is reported as not applicable. A parse error or any other exit 2 still fails.
 |===
 
 == Owner decisions taken (2026-10-27, via selector)
@@ -66,6 +91,15 @@ two lines of Dependabot drift corrected. `security.txt` Policy pointed at a
   in the ultraplan is the specification for the first scan.
 * SonarCloud reported 39 issues on #74 with the gate passing; the host was
   blocked from the session, so they were not read.
+* SonarCloud's quality gate (not a required check) has read "B security
+  rating on new code" since #75. sonarcloud.io is blocked from the session,
+  so the finding behind it is unread; read it on the dashboard.
+* Patch Bridge is `not_applicable` until a lockfile is tracked. W1's Rust
+  crate brings `Cargo.lock`, which turns triage on. Bump the pinned
+  panic-attack to at least `be6ac46` (panic-attack#254) then: the current pin
+  also errors on a lockfile with zero external dependencies.
+* pons-asinorum is likewise not applicable until W1: it analyses Rust,
+  Python, PHP and JavaScript, none of which this repository holds yet.
 
 == Open, for the owner
 
@@ -77,6 +111,18 @@ two lines of Dependabot drift corrected. `security.txt` Policy pointed at a
   repository"): docmatrix#71 clause-4 counterpart; template defects every
   child inherits; pons-asinorum's parked rookie fixtures; squeakwell's
   EXPLAINME file map; docudactyl README licence badge (*flag only*).
+. Template defects found here, for rsr-template-repo (solutions at source):
+  its `static-analysis-gate.yml` builds panic-attack without
+  `--features http`, passes `--format`, captures the banner with the JSON,
+  and silently zero-fills the bridge report; it fails any repository pons
+  cannot analyse (exit 2, `no-applicable-input`); its `workflow-linter.yml`
+  requires SPDX on line 1, which `gh actions-lock` breaks; its
+  `openssf-compliance.yml` placeholder step passes when META or ECOSYSTEM
+  is absent; its `validate.just` `validate-state` exits 0 on a missing or
+  invalid STATE file.
+. CodeRabbit's autofix and docstring agents commit to PR branches without
+  knowing the estate's language bans (they added Python here). Consider
+  turning those agents off estate-wide and keeping review comments only.
 
 == Where to start next
 

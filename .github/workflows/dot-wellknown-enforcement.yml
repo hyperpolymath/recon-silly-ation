@@ -10,6 +10,8 @@ on:
       - 'www/schemas/**'
       - '.well-known/**'   # legacy location — migration window (issue #53)
       - 'security.txt'
+      - 'scripts/migrate-wellknown-to-www.sh'
+      - 'tests/wellknown_migration_test.sh'
   pull_request:
     paths:
       - 'www/.well-known/**'
@@ -17,6 +19,8 @@ on:
       - 'www/schemas/**'
       - '.well-known/**'   # legacy location — migration window (issue #53)
       - 'security.txt'
+      - 'scripts/migrate-wellknown-to-www.sh'
+      - 'tests/wellknown_migration_test.sh'
   schedule:
     # Weekly expiry check (Mondays 09:00 UTC)
     - cron: '0 9 * * 1'
@@ -134,6 +138,8 @@ jobs:
                 ;;
             esac
           done < <(tail -n +2 wellknown-migration.tsv)
+      - name: Migrator regression tests
+        run: bash tests/wellknown_migration_test.sh
       - name: www bundle self-test
         run: |
           if [ -d www/tests ]; then
