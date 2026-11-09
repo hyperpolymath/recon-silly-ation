@@ -159,7 +159,7 @@ source yet). This is a count of rows, not a measure of confidence
 |`proven`
 |As R-9a; watched to fail: `MkHandle 0 Oh` is rejected (`Mismatch between: True and False`), `MkHandle 1 Oh` accepted (2026-11-09)
 |`src/interface/Abi/Types.idr:Handle` (erased field `So (ptr /= 0)`), `createHandle`
-|Idris2 side only. It does not say the pointer is live, aligned or owned; Zig's `?*Handle` carries those.
+|Idris2 side only. It does not say the pointer is live, aligned or owned, and nothing establishes those: Zig's `?*Handle` does not, and a caller can keep a `Handle` after `free`. Callers must ensure them.
 
 |ABI-2
 |Memory layout of every struct that crosses the seam (`HasSize`, `HasAlignment`).
@@ -231,8 +231,10 @@ written by hand.
 |2026-11-09, Idris2
 |`idris2 --version`: `Idris 2, version 0.7.0`, built from the `v0.7.0` tag
 (commit `2778007`) on Chez Scheme 9.5.8. Invocation:
-`bash scripts/check-proofs.sh idris2`. Source: the commit that adds this
-row. Result: `src/interface/Abi/{Types,Layout,Foreign}.idr` PASS, no holes.
+`bash scripts/check-proofs.sh idris2`. Source: commit `9a4e24d`, the last
+commit to change `src/interface/Abi/{Types,Layout,Foreign}.idr` (the
+`Bits32` change); rerun on those sources on 2026-11-09 after it. Result:
+`src/interface/Abi/{Types,Layout,Foreign}.idr` PASS, no holes.
 Watched to fail: a duplicated code (`fromCodeResultCode` rejected), and a
 proof replaced by a hole (`unsolved holes: 1`), and a null `Handle`
 (ABI-1). Axioms: none; no `believe_me`, `assert_total` or `postulate`

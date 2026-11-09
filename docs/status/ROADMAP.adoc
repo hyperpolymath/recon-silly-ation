@@ -22,6 +22,10 @@ measured census it rests on.
       validation failing on `methodology-guard.k9.ncl`, template placeholders
       still in `ECOSYSTEM.a2ml`, dangling references in `README.adoc` and
       `ANCHOR.a2ml`. These are the first fixtures for the tool itself.
+* [ ] `just validate-rsr` passes. It fails, truthfully, on two gaps: the
+      118 frozen `.a2ml` files still to delete (D-3), and the deed's missing
+      `(policies …)` clauses, which the template's validator requires and its
+      own deed carries; this deed left them out as template canon.
 
 === M1 — Typed ABI/FFI seam (100% present, 0% specific to this project)
 * [x] Idris2 `Abi/{Types,Layout,Foreign}.idr` + Zig `src/interface/ffi`.
