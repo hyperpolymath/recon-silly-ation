@@ -13,10 +13,13 @@ The obligations themselves are defined in
 
 == Census
 
-2 rows `proven`, 2 `tested-only`, 1 `argued`, 10 `open`: 15 rows in all.
-Theory obligations: 3, all `ungraded` (no Agda source yet). This is a count
-of rows, not a measure of confidence (README-EXPLAINME §5, PROOF-POLICY
-§8.4).
+3 rows `proven`, 2 `tested-only`, 4 `argued`, 16 `open`: 25 rows in all.
+Of those, 18 are this repository's own obligations (R-1 to R-10, R-9 split
+into R-9a to R-9h) and 7 are the template's mandatory obligations (ABI-1 to
+ABI-5, TP-1, TP-2, from `docs/status/PROOF-NEEDS.adoc`) as they apply to
+this repository's own seam. Theory obligations: 3, all `ungraded` (no Agda
+source yet). This is a count of rows, not a measure of confidence
+(README-EXPLAINME §5, PROOF-POLICY §8.4).
 
 [[ledger]]
 == Ledger
@@ -47,18 +50,39 @@ of rows, not a measure of confidence (README-EXPLAINME §5, PROOF-POLICY
 |A text comparison of the two source tables, not a semantic parse of Zig.
 
 |R-9d
-|Every `%foreign` symbol the Idris2 ABI binds is exported by the Zig FFI, from the library `build.zig` builds.
+|Every `%foreign` symbol the Idris2 ABI binds is declared `export fn` in the Zig FFI source, under the library name `build.zig` declares.
 |`tested-only`
 |`tests/aspect_tests.sh` Aspect 3, every run
 |`tests/aspect_tests.sh` (symbols, library name)
-|Names only. Signatures are R-9e.
+|Source text only: a declaration left inside a comment would satisfy it, and it says nothing about what the built library exports (R-9g). Names only; signatures are R-9e.
 
 |R-9e
-|Each binding's C types match the Zig signature: `c_int` read as `Int32`, `u32` as `Bits32`, pointers as `Bits64`.
+|Each binding's C types match the Zig signature: `c_int` read as `Bits32` (same width; every code is non-negative), `u32` as `Bits32`, pointers as `Bits64`.
 |`argued`
 |-
 |`src/interface/Abi/Foreign.idr` (doc comments), reviewed 2026-11-09
 |Read by hand. `Bits64` for a pointer holds on 64-bit targets only; WASM32 is not covered.
+
+|R-9f
+|Reverse direction: every function the Zig FFI exports is bound by the Idris2 ABI, so the seam is a bijection rather than an injection.
+|`open`
+|-
+|`src/interface/ffi/src/main.zig`
+|Fails today: `get_string`, `free_string`, `process_array`, `build_info` and `register_callback` are exported and not bound. Aspect 3 only warns about them. Either bind them or stop exporting them.
+
+|R-9g
+|The library `build.zig` actually builds exports every bound symbol.
+|`open`
+|-
+|`src/interface/ffi/build.zig`
+|Needs a check on the built artefact (its dynamic symbol table), not the source text R-9d reads.
+
+|R-9h
+|A program built with Idris2's RefC backend calls through the seam.
+|`open`
+|-
+|`src/interface/Abi/Foreign.idr`
+|RefC code generation succeeds with the `Bits32` return (2026-11-09; `Int32` made it fail), but the C compile fails: no C header declares the symbols. Idris2 does not generate one, and the repository ships none.
 
 |R-1
 |Propagation is monotone: domains only shrink.
@@ -89,7 +113,7 @@ of rows, not a measure of confidence (README-EXPLAINME §5, PROOF-POLICY
 |Engineering, Idris2. No IR yet.
 
 |R-5
-|Attribution locality: no path from a per-file credit slot to a repo-wide authorship slot.
+|Attribution locality: no path from a per-file credit slot to a repo-wide authorship slot, and every credit merge carries its provenance `tau` (`Fused(tau)`; a merge without it does not validate).
 |`open`
 |-
 |ultraplan §6
@@ -129,6 +153,55 @@ of rows, not a measure of confidence (README-EXPLAINME §5, PROOF-POLICY
 |-
 |ultraplan §6
 |Kani, PROOF-POLICY §4.1; will be `tested-only` with its bounds. No Rust code yet.
+
+|ABI-1
+|Non-null pointers: a `Handle` can never hold a null pointer.
+|`proven`
+|As R-9a; watched to fail: `MkHandle 0 Oh` is rejected (`Mismatch between: True and False`), `MkHandle 1 Oh` accepted (2026-11-09)
+|`src/interface/Abi/Types.idr:Handle` (erased field `So (ptr /= 0)`), `createHandle`
+|Idris2 side only. It does not say the pointer is live, aligned or owned; Zig's `?*Handle` carries those.
+
+|ABI-2
+|Memory layout of every struct that crosses the seam (`HasSize`, `HasAlignment`).
+|`argued`
+|-
+|`src/interface/Abi/Foreign.idr` (summary item 3)
+|Vacuous today: no struct crosses by value, and `Handle` is an opaque pointer. `Abi/Layout.idr` proves alignment for its example struct only. Becomes `open` the day a struct crosses.
+
+|ABI-3
+|Platform type sizes, per target.
+|`open`
+|-
+|`src/interface/Abi/Types.idr` (`CType`)
+|Only 64-bit is assumed (R-9e). The template's `Platform.idr` is quarantined.
+
+|ABI-4
+|FFI return types match the C side.
+|`argued`
+|-
+|R-9e
+|The same obligation as R-9e, listed under the template's ID.
+
+|ABI-5
+|C ABI compliance (`CABICompliant`, `FieldsAligned`).
+|`argued`
+|-
+|As ABI-2
+|Vacuous for the same reason as ABI-2.
+
+|TP-1
+|Core data types are well formed.
+|`open`
+|-
+|-
+|No core data types exist yet; they arrive with W1's IR (R-8).
+
+|TP-2
+|Public API type safety for exported functions.
+|`open`
+|-
+|-
+|Per PROOF-POLICY §1 an API obligation is Idris2's, not Lean's as the template file suggests. R-9d to R-9h cover the seam today.
 |===
 
 == Theory obligations and Proof Witness Grades
@@ -161,8 +234,15 @@ written by hand.
 `bash scripts/check-proofs.sh idris2`. Source: the commit that adds this
 row. Result: `src/interface/Abi/{Types,Layout,Foreign}.idr` PASS, no holes.
 Watched to fail: a duplicated code (`fromCodeResultCode` rejected), and a
-proof replaced by a hole (`unsolved holes: 1`). Axioms: none; no
-`believe_me`, `assert_total` or `postulate` (`scripts/scan-dangerous.sh`).
+proof replaced by a hole (`unsolved holes: 1`), and a null `Handle`
+(ABI-1). Axioms: none; no `believe_me`, `assert_total` or `postulate`
+(`scripts/scan-dangerous.sh`).
+
+|2026-11-09, Idris2 RefC
+|Same compiler, `--cg refc`, a `Main` calling `process`. With the return
+typed `Int32`: `INTERNAL ERROR: Unknonw FFI type in C backend: Int_32`.
+With `Bits32`: code generation succeeds and the C compile then stops for
+want of a header declaring the symbols (R-9h). The Chez backend accepts both.
 
 |2026-11-09, Agda
 |Agda 2.6.3, standard-library 1.7.3 (Ubuntu packages).
@@ -184,7 +264,9 @@ it names and must be rerun after any change to the files it covers.
 
 `verification/proofs/` holds proofs shipped by `rsr-template-repo`. They
 prove example statements, not properties of this repository, so they are
-not rows of the ledger. Their gate state:
+not rows of the ledger; the template's mandatory obligations they stand for
+(ABI-1 to ABI-5, TP-1, TP-2) are, restated for this repository's seam
+above. Their gate state:
 
 [cols="2,1,3",options="header"]
 |===
@@ -211,5 +293,5 @@ own MANIFEST quarantines them. The fix belongs there.
 ----
 bash scripts/check-proofs.sh idris2   # also: agda, coq, lean4
 bash scripts/scan-dangerous.sh        # escape hatches in proof sources
-bash tests/aspect_tests.sh            # R-9c, R-9d
+bash tests/aspect_tests.sh            # R-9c, R-9d (and warns on R-9f)
 ----

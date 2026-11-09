@@ -53,10 +53,16 @@ thisPlatform = Linux -- Simplified for template
 public export
 data Result = Ok | Error | InvalidParam | OutOfMemory | NullPointer
 
-||| The C integer each constructor crosses the seam as. `Int32` because the
-||| Zig enum is `enum(c_int)`: a 32-bit C `int`, not Idris's 64-bit `Int`.
+||| The C integer each constructor crosses the seam as. The Zig enum is
+||| `enum(c_int)`, a 32-bit C `int`, so the code is 32 bits wide, not Idris's
+||| 64-bit `Int`. It is `Bits32` rather than `Int32` because Idris2 0.7.0's
+||| RefC backend rejects an `Int32` foreign return ('Unknonw FFI type in C
+||| backend: Int_32'); `Bits32` builds and runs on Chez and RefC alike
+||| (checked 2026-11-09). Every code here is non-negative, so the bit
+||| pattern is the same; a negative C code reads as a large `Bits32` and
+||| decodes to `Nothing`.
 public export
-resultCode : Result -> Int32
+resultCode : Result -> Bits32
 resultCode Ok = 0
 resultCode Error = 1
 resultCode InvalidParam = 2
@@ -66,7 +72,7 @@ resultCode NullPointer = 4
 ||| Decode a C integer from the seam. Anything outside the table is Nothing:
 ||| the caller decides what an unknown code means, never this module.
 public export
-fromCode : Int32 -> Maybe Result
+fromCode : Bits32 -> Maybe Result
 fromCode 0 = Just Ok
 fromCode 1 = Just Error
 fromCode 2 = Just InvalidParam

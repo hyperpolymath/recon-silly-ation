@@ -25,8 +25,11 @@ measured census it rests on.
 
 === M1 — Typed ABI/FFI seam (100% present, 0% specific to this project)
 * [x] Idris2 `Abi/{Types,Layout,Foreign}.idr` + Zig `src/interface/ffi`.
-* [ ] ABI and FFI name the same symbols (today: `rsr_*`/`librsr` in Idris2,
-      `recon_silly_ation_*` in Zig) and the same `Result` enum (4 vs 5 cases).
+* [x] ABI and FFI name the same symbols (`recon_silly_ation_*` in
+      `librecon_silly_ation`) and the same five-case `Result` enum, aligned
+      in #74; checked by Aspect 3.
+* [ ] The seam is a bijection: five Zig exports are not bound (R-9f), and
+      no check reads the built library (R-9g) or builds with a C header (R-9h).
 * [ ] `integration_test.zig` has real bodies.
 
 === M2 — Reconciliation core: surfaces, slots, constraint propagation (0%)
@@ -38,10 +41,12 @@ measured census it rests on.
       rule ships with a falsifier corpus.
 * [ ] Self-dogfood: the tool reports this repository's own drift.
 
-=== M3 — Proofs (ledger: docs/status/PROOF-STATUS.adoc; 2 proven of 15 rows)
-* [x] R-9: the Result code table round-trips and is injective, checked by
-      Idris2 0.7.0 through `check-proofs.sh` (2026-11-09); the Zig half is
-      tested by Aspect 3's value comparison.
+=== M3 — Proofs (ledger: docs/status/PROOF-STATUS.adoc; 3 proven of 25 rows)
+* [x] R-9a to R-9c: the Result code table round-trips and is injective,
+      checked by Idris2 0.7.0 through `check-proofs.sh` (2026-11-09); the Zig
+      half is tested by Aspect 3's value comparison.
+* [ ] The rest of R-9: R-9d `tested-only` (symbol names, source text),
+      R-9e `argued` (C types), R-9f, R-9g and R-9h `open`.
 * [x] Template proofs ground-truthed: 2 Idris2 modules, Agda and Coq pass;
       4 Idris2 modules quarantined with their compiler errors (the template
       quarantines the same four); Lean not run.

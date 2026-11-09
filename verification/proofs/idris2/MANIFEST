@@ -7,9 +7,9 @@
 # listed every module as gated; that first run decided as follows.
 #
 # This repository's own ABI seam (src/interface/Abi/): obligation R-9.
-src/interface|Abi/Types.idr|gated| own; resultCode/fromCode at Int32 (C int); fromCodeResultCode (round trip) and resultCodeInjective
+src/interface|Abi/Types.idr|gated| own; resultCode/fromCode at Bits32 (32-bit C int; RefC rejects Int32); fromCodeResultCode (round trip), resultCodeInjective, non-null Handle
 src/interface|Abi/Layout.idr|gated| template example struct only; no struct crosses this seam by value (Handle is opaque)
-src/interface|Abi/Foreign.idr|gated| own; every %foreign symbol is a main.zig export (tests/aspect_tests.sh Aspect 3)
+src/interface|Abi/Foreign.idr|gated| own; Aspect 3 compares each %foreign name with the export fn text of main.zig (source text, not the built library)
 #
 # Template placeholders (rsr-template-repo). Not obligations of this
 # repository; the fix belongs in the template, whose own MANIFEST quarantines

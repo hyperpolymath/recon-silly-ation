@@ -81,44 +81,62 @@ Caveat:
 == Proof Ledger
 
 Derived from `docs/status/PROOF-STATUS.adoc`, which is canonical and holds
-the receipts, the template placeholders and the theory grades. 2 rows
-`proven`, 2 `tested-only`, 1 `argued`, 10 `open`, of 15. The open rows
-(R-1 to R-8, R-10) are listed there; they wait on code that does not exist
-yet.
+the receipts, the template placeholders and the theory grades. 3 rows
+`proven`, 2 `tested-only`, 4 `argued`, 16 `open`, of 25. The rows that are
+proven, tested or argued are listed below. The open ones, listed in
+PROOF-STATUS, are:
+
+* the rest of the ABI seam: the reverse direction (R-9f), the built
+library's exports (R-9g) and a RefC build (R-9h);
+* the core's obligations (R-1 to R-8, R-10), which wait on code that does
+not exist yet;
+* ABI-3, TP-1 and TP-2.
 
 [cols="2,1,2,2,2",options="header"]
 |===
 | Obligation | Status | Checker (version, flags) | Where | Trust boundary
 
-| `Result` code table round-trips
+| `Result` code table round-trips (R-9a)
 | proven
 | Idris2 0.7.0, `%default total`, `scripts/check-proofs.sh idris2` (no holes)
 | `src/interface/Abi/Types.idr:fromCodeResultCode`
 | Idris2 table only
 
-| `Result` code table is injective
+| `Result` code table is injective (R-9b)
 | proven
 | As above
 | `src/interface/Abi/Types.idr:resultCodeInjective`
 | Derived from the round trip
 
-| Zig enum values equal the Idris2 codes
+| A `Handle` is never null (ABI-1)
+| proven
+| As above
+| `src/interface/Abi/Types.idr:Handle`
+| Idris2 side only; not liveness or ownership
+
+| Zig enum values equal the Idris2 codes (R-9c)
 | tested-only
 | `tests/aspect_tests.sh` Aspect 3, every run
 | `tests/aspect_tests.sh`
 | Text comparison of the two tables
 
-| Every bound symbol is exported by the Zig FFI
+| Every bound symbol is declared exported in the Zig source (R-9d)
 | tested-only
 | `tests/aspect_tests.sh` Aspect 3, every run
 | `tests/aspect_tests.sh`
-| Names only
+| Source text, names only; not the built library
 
-| Binding C types match the Zig signatures
+| Binding C types match the Zig signatures (R-9e, ABI-4)
 | argued
 | -
 | `src/interface/Abi/Foreign.idr`
 | Read by hand; 64-bit targets only
+
+| Struct layout and C ABI compliance (ABI-2, ABI-5)
+| argued
+| -
+| `src/interface/Abi/Foreign.idr`
+| Vacuous while no struct crosses by value
 |===
 
 == License

@@ -7,7 +7,7 @@ v0.1.0, 2026-10-27
 :toclevels: 3
 :sectnums:
 :icons: font
-:status: DRAFT v0.1.0 — census measured 2026-10-27 on branch `claude/nice-tesla-539nnf` (base `58d7350`); the decisions in <<decisions>> are OPEN and put to the owner through the selector
+:status: DRAFT v0.1.0 — census measured 2026-10-27 on branch `claude/nice-tesla-539nnf` (base `58d7350`); the decisions in <<decisions>> were put to the owner through the selector and taken on 2026-10-27 (D-1 to D-4, each the recommended arm; see the handover)
 
 [.lead]
 This document does five things. It measures the repository as it is, with
@@ -75,8 +75,8 @@ network, the findings bus in pons-asinorum's evidence-class shape, and the
 falsifier corpora, and point it at this repository. The first green run is
 the one that reports the eleven findings in <<corpus>>.
 
-*The recommended arm* for the owner's three open decisions is in
-<<decisions>>: Rust core verified with Creusot (Pearlite contracts) and Verus,
+*The arms the owner chose* (2026-10-27, the recommended arm of each decision in
+<<decisions>>): Rust core verified with Creusot (Pearlite contracts) and Verus,
 the default Rust toolset since owner ruling 2026-11-07, plus Idris2 for the finding
 and patch IR (the estate's mapped provers), the VeriSimDB *model* adopted now
 behind a trait and its *service* adopted when it is reachable, and
@@ -423,7 +423,7 @@ grade it.
 |R-6 |Stale-input refusal: a proposal carries `sha256` of every surface read; application is a function of (proposal, current hashes) that is `Refuse` on any mismatch. |engineering |Idris2 (IR), Creusot/Pearlite and Verus (apply) |VCL-UT freshness obligation
 |R-7 |D152 boundary: a proposal exists only along an authority edge. |engineering |Idris2 |echo-types fibre; the solver contract
 |R-8 |Finding wire type: evidence class is a function of tier and cannot be set by a rule; round-trips through I-JSON/JCS. |engineering |Idris2 |pons `Finding` private-field invariant
-|R-9 |ABI/FFI bijection for this repository's own seam. |engineering |Idris2: `fromCodeResultCode` and `resultCodeInjective` `PROVEN` (idris2 0.7.0, 2026-11-09); the Zig half `TESTED` by Aspect 3's value table |the first self-finding, row 3
+|R-9 |ABI/FFI bijection for this repository's own seam. |engineering |Idris2: `fromCodeResultCode` and `resultCodeInjective` `PROVEN` (idris2 0.7.0, 2026-11-09); the Zig half `TESTED` by Aspect 3's value table; the rest split into R-9d to R-9h in `PROOF-STATUS.adoc`, three of them open |the first self-finding, row 3
 |R-10 |Bounded model of the apply path with a planted stale input. |`TESTED` |Kani on the Rust apply function, bounds recorded |§4.1 standing exception
 |===
 
@@ -488,6 +488,10 @@ be measured in `benches/` (which the README already promises exists) with
 
 [#decisions]
 == 8. Decisions for the owner
+
+All four were decided on 2026-10-27, each on its recommended arm: D-1 arm A,
+D-2 arm A, D-3 arm A (deed hand-authored in W0), D-4 arm A (ADR 0002, #68
+closed). The arms and ratings stay below as the record of what was weighed.
 
 Each decision names the most elegant-and-correct arm first, then the most
 dependable arm, then alternatives, with a rating. Ratings: *E* elegance and

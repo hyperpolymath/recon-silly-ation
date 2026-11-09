@@ -87,7 +87,8 @@ is reported as not applicable. A parse error or any other exit 2 still fails.
   errors, scan-dangerous, deed lint, workflow validation.
 * *Proofs, as of 2026-11-09* (ledger: `docs/status/PROOF-STATUS.adoc`): the
   Idris2 ABI typechecks under Idris2 0.7.0; the result-code table is
-  `proven` to round-trip and be injective, and its C width is now `Int32`.
+  `proven` to round-trip and be injective, and its C width is now 32 bits
+  (`Bits32`: Idris2's RefC backend rejects an `Int32` foreign return).
   Aspect 3 compares the Zig and Idris2 code tables value by value. The
   template proofs were ground-truthed: four Idris2 modules are quarantined
   with their compiler errors, Agda and Coq pass, Lean was not run. Nothing
