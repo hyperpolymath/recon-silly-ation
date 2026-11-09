@@ -1,0 +1,55 @@
+# SPDX-License-Identifier: MPL-2.0
+# Proof gate in CI (PROOF-POLICY §6): every MANIFEST-listed proof, checked by
+# scripts/check-proofs.sh with the toolchain from the Guix manifest in
+# build/proofs/, at the Guix revision pinned in build/proofs/channels.scm.
+name: Proof check (Guix)
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/interface/**'
+      - 'verification/proofs/**'
+      - 'scripts/check-proofs.sh'
+      - 'build/proofs/**'
+      - '.github/workflows/proof-check.yml'
+  pull_request:
+    paths:
+      - 'src/interface/**'
+      - 'verification/proofs/**'
+      - 'scripts/check-proofs.sh'
+      - 'build/proofs/**'
+      - '.github/workflows/proof-check.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  proofs:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        prover: [idris2, agda, coq, lean4]
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - name: Install Guix (Ubuntu package) and start its daemon
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y guix
+          sudo systemctl start guix-daemon
+          guix --version
+      - name: Check ${{ matrix.prover }} proofs with the pinned Guix toolchain
+        env:
+          PROOF_PROVERS: ${{ matrix.prover }}
+        run: |
+          guix time-machine -C build/proofs/channels.scm -- \
+            shell --rebuild-cache -m build/proofs/manifest.scm -- \
+            bash build/proofs/check-in-guix.sh "$PROOF_PROVERS"
