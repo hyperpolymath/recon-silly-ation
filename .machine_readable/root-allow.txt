@@ -31,6 +31,7 @@ coordination.k9            # repo-local session binding (template-mandated)
 recon-silly-ation_chora.deed  # the repo deed (standards#837, D312): one machine-readable record per repo; read with scripts/deed-field.sh
 
 # ─── Conventional dotfiles (tool-required at root) ───────────────────────────
+.coderabbit.yaml           # CodeRabbit reads its config from the root only; copied from rsr-template-repo: reviews stay on, every finishing-touch agent (docstrings, unit tests, simplify, autofix, fix_ci, merge conflicts) is off
 .editorconfig
 .envrc
 .gitattributes
