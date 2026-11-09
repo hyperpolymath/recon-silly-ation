@@ -51,5 +51,5 @@ jobs:
           PROOF_PROVERS: ${{ matrix.prover }}
         run: |
           guix time-machine -C build/proofs/channels.scm -- \
-            shell -m build/proofs/manifest.scm -- \
+            shell --rebuild-cache -m build/proofs/manifest.scm -- \
             bash build/proofs/check-in-guix.sh "$PROOF_PROVERS"

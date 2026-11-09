@@ -16,7 +16,8 @@ cd "$(dirname "${BASH_SOURCE[0]}")/../.."
 
 agda_setup() {
   local lib
-  lib=$(find "${GUIX_ENVIRONMENT:?run inside guix shell}/lib/agda" -name '*.agda-lib' -path '*stdlib*' | head -1)
+  # -L: in a Guix profile, lib/agda and the library under it are symlinks.
+  lib=$(find -L "${GUIX_ENVIRONMENT:?run inside guix shell}/lib/agda" -name '*.agda-lib' -path '*stdlib*' | head -1)
   [ -n "$lib" ] || { echo "FAIL: no standard library .agda-lib under $GUIX_ENVIRONMENT/lib/agda" >&2; return 1; }
   AGDA_DIR=$(mktemp -d)
   export AGDA_DIR
@@ -27,13 +28,15 @@ agda_setup() {
 
 failed=0
 for p in "$@"; do
+  # A prover whose toolchain or setup fails counts as a failure and is not
+  # checked; the other provers still run.
   case "$p" in
     idris2) idris2 --version ;;
-    agda)   agda --version; agda_setup ;;
+    agda)   agda --version && agda_setup ;;
     coq)    coqc --version ;;
     lean4)  lean --version ;;
     *) echo "unknown prover: $p" >&2; exit 2 ;;
-  esac
+  esac || { echo "FAIL: $p toolchain or setup" >&2; failed=$((failed + 1)); continue; }
   bash scripts/check-proofs.sh "$p" || failed=$((failed + 1))
 done
 exit "$failed"

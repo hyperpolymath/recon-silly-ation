@@ -5,7 +5,8 @@
 ;; reproducible (PROOF-POLICY §6). Used as:
 ;;
 ;;   guix time-machine -C build/proofs/channels.scm -- \
-;;     shell -m build/proofs/manifest.scm -- bash build/proofs/check-in-guix.sh idris2
+;;     shell --rebuild-cache -m build/proofs/manifest.scm -- \
+;;     bash build/proofs/check-in-guix.sh idris2
 ;;
 ;; Guix moved from Savannah to Codeberg in 2025; the introduction (first signed
 ;; commit and its key) is the one in the Guix manual, unchanged by the move.

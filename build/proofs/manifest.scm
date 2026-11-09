@@ -10,9 +10,10 @@
 ;; repository's proofs were checked with, bootstrapped from its Chez Scheme
 ;; sources. Once it builds here it is a candidate to offer upstream to Guix.
 ;;
-;; EXPERIMENTAL until CI has built it: the source hash is a placeholder that
-;; the first build replaces (Guix prints the actual hash on a mismatch), and
-;; Guix's Chez Scheme is 10.x while Idris2 0.7.0 predates Chez 10.
+;; EXPERIMENTAL until CI has built it: Guix's Chez Scheme is 10.x, and Idris2
+;; 0.7.0 predates Chez 10. The source hash below is `guix hash -x
+;; --serializer=nar` of the v0.7.0 checkout (commit 2778007), computed with
+;; Guix 1.4.0 on 2026-11-09.
 
 (use-modules (guix packages)
              (guix gexp)
@@ -36,7 +37,7 @@
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "0000000000000000000000000000000000000000000000000000"))))
+                "0qxfwsm2gxjxwzni85jb5b4snvjf77knqs9bnd2bqznrfxgxw2sp"))))
     (build-system gnu-build-system)
     (arguments
      (list
