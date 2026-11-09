@@ -71,7 +71,9 @@ is reported as not applicable. A parse error or any other exit 2 still fails.
 == Owner decisions taken (2026-10-27, via selector)
 
 * *D-1 core language:* Rust verified with Creusot; finding/proposal IR as
-  Idris2 types; Zig FFI only if a C consumer appears.
+  Idris2 types; Zig FFI only if a C consumer appears. Owner ruling
+  2026-11-07 (PROOF-POLICY §1.2) makes the Rust toolset Creusot with
+  Pearlite contracts and Verus; the arm is unchanged.
 * *D-2 VeriSimDB/squeakwell:* adopt the consonance model now, VeriSimDB as
   a service behind a `DriftStore` trait when reachable, raise a shared
   propagation core with squeakwell as a design issue. Never submit
@@ -83,10 +85,14 @@ is reported as not applicable. A parse error or any other exit 2 still fails.
 
 * Every local gate passes: aspect 5/5, root shape, K9 0 errors, A2ML 0
   errors, scan-dangerous, deed lint, workflow validation.
-* *No proof has been compiled.* No Idris2, Zig, Agda, Lean or Rocq ran in
-  the session or runs in CI. The Idris2 ABI on `main` (`src/interface/Abi/`)
-  is aligned by name, checked by Aspect 3, and uncompiled. MANIFESTs list
-  every module as `gated` and say they are not ground-truthed.
+* *Proofs, as of 2026-11-09* (ledger: `docs/status/PROOF-STATUS.adoc`): the
+  Idris2 ABI typechecks under Idris2 0.7.0; the result-code table is
+  `proven` to round-trip and be injective, and its C width is now 32 bits
+  (`Bits32`: Idris2's RefC backend rejects an `Int32` foreign return).
+  Aspect 3 compares the Zig and Idris2 code tables value by value. The
+  template proofs were ground-truthed: four Idris2 modules are quarantined
+  with their compiler errors, Agda and Coq pass, Lean was not run. Nothing
+  runs in CI yet, so each receipt holds for its commit only.
 * *No reconciliation code exists.* `src/core/` is empty. The 12-row corpus
   in the ultraplan is the specification for the first scan.
 * SonarCloud reported 39 issues on #74 with the gate passing; the host was
@@ -126,11 +132,11 @@ is reported as not applicable. A parse error or any other exit 2 still fails.
 
 == Where to start next
 
-. *W3 E3 first, cheaply:* add a CI job running `just proof-check-idris2` in
-  a digest-pinned Idris2 image (trope-checker uses
-  `ghcr.io/stefan-hoeck/idris2-pack@sha256:…`). The first run will demote
-  some MANIFEST entries to `quarantine` with the compiler's error; that is
-  the gate working.
+. *W3 E3:* add a CI job running `scripts/check-proofs.sh idris2` (and agda,
+  coq) on every push. The MANIFEST verdicts are now ground-truthed, so the
+  first CI run should pass. PROOF-POLICY §6 wants the toolchain from a
+  Guix manifest or the repo's container; any other route needs a recorded
+  deviation.
 . *W1:* Rust crate under `src/core/`: surface extractors, slot/domain/
   constraint types, propagation to a fixpoint, findings in pons-asinorum's
   evidence-class shape plus `authority` and `proposal`, SARIF and

@@ -17,11 +17,11 @@ proofs/
 │   │   ├── Foreign.idr     # FFI return type proofs
 │   │   └── Compliance.idr  # C ABI compliance
 │   └── Types.idr    # Core data type well-formedness
-├── lean4/           # Lean4 proofs (algebra, lattices)
+├── lean4/           # Lean recheck legs of Agda theory (PROOF-POLICY §2)
 │   └── ApiTypes.lean
-├── agda/            # Agda proofs (induction, metatheory)
+├── agda/            # Agda: source of truth for theory (PROOF-POLICY §1)
 │   └── Properties.agda
-├── coq/             # Coq proofs (type systems, compilation)
+├── coq/             # Rocq recheck legs of Agda theory (PROOF-POLICY §2)
 │   └── TypeSafety.v
 └── tlaplus/         # TLA+ specs (distributed protocols)
     └── StateMachine.tla
@@ -53,8 +53,10 @@ CI enforces this via `panic-attack assail --proofs-only`.
 
 == Adding New Proofs
 
-1. Choose the appropriate prover (see PROOF-NEEDS.md)
+1. Choose the prover by PROOF-POLICY §1 in hyperpolymath/standards (Idris2 for
+   APIs and ABIs, Agda for theory, Creusot/Pearlite and Verus for Rust)
 2. Create the `.idr`/`.lean`/`.agda`/`.v`/`.tla` file in the right directory
 3. Ensure `%default total` (Idris2) or equivalent
 4. Run the verification command
-5. Update PROOF-STATUS.md
+5. Add a row to `docs/status/PROOF-STATUS.adoc` and list the file in its
+   prover's MANIFEST (`scripts/check-proofs.sh` fails on an unlisted proof)

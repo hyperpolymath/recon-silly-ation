@@ -1,6 +1,9 @@
 # Lean4 proof manifest — read by scripts/check-proofs.sh lean4
 # Format: <source-root>|<module-relative-to-source-root>|gated|quarantine|<note>
-# NOT GROUND-TRUTHED (no lean on PATH, 2026-10-27). Toolchain pin: lean-toolchain.
+# Template placeholder (rsr-template-repo), not an obligation of this repo;
+# an API-type statement, which PROOF-POLICY §1 assigns to Idris2, not Lean.
+# NOT GROUND-TRUTHED: no Lean toolchain could be installed in the 2026-11-09
+# session (the elan installer was refused). Toolchain pin: lean-toolchain.
 # The file differs from rsr-template-repo's copy, so its 2026-07-17
 # quarantine verdict (`Nat.zero_le max` type mismatch) is not assumed here.
 verification/proofs/lean4|ApiTypes.lean|gated| template TP-2; unverified

@@ -22,11 +22,18 @@ measured census it rests on.
       validation failing on `methodology-guard.k9.ncl`, template placeholders
       still in `ECOSYSTEM.a2ml`, dangling references in `README.adoc` and
       `ANCHOR.a2ml`. These are the first fixtures for the tool itself.
+* [ ] `just validate-rsr` passes. It fails, truthfully, on two gaps: the
+      118 frozen `.a2ml` files still to delete (D-3), and the deed's missing
+      `(policies …)` clauses, which the template's validator requires and its
+      own deed carries; this deed left them out as template canon.
 
 === M1 — Typed ABI/FFI seam (100% present, 0% specific to this project)
 * [x] Idris2 `Abi/{Types,Layout,Foreign}.idr` + Zig `src/interface/ffi`.
-* [ ] ABI and FFI name the same symbols (today: `rsr_*`/`librsr` in Idris2,
-      `recon_silly_ation_*` in Zig) and the same `Result` enum (4 vs 5 cases).
+* [x] ABI and FFI name the same symbols (`recon_silly_ation_*` in
+      `librecon_silly_ation`) and the same five-case `Result` enum, aligned
+      in #74; checked by Aspect 3.
+* [ ] The seam is a bijection: five Zig exports are not bound (R-9f), and
+      no check reads the built library (R-9g) or builds with a C header (R-9h).
 * [ ] `integration_test.zig` has real bodies.
 
 === M2 — Reconciliation core: surfaces, slots, constraint propagation (0%)
@@ -38,13 +45,23 @@ measured census it rests on.
       rule ships with a falsifier corpus.
 * [ ] Self-dogfood: the tool reports this repository's own drift.
 
-=== M3 — Proofs (0/7 mandatory, 0/N project-specific)
-* [ ] ABI-1..5, TP-1..2 (template obligations) checked by `check-proofs.sh`
-      with a MANIFEST, not by a gate that cannot fail.
+=== M3 — Proofs (ledger: docs/status/PROOF-STATUS.adoc; 3 proven of 25 rows)
+* [x] R-9a to R-9c: the Result code table round-trips and is injective,
+      checked by Idris2 0.7.0 through `check-proofs.sh` (2026-11-09); the Zig
+      half is tested by Aspect 3's value comparison.
+* [ ] The rest of R-9: R-9d `tested-only` (symbol names, source text),
+      R-9e `argued` (C types), R-9f, R-9g and R-9h `open`.
+* [x] Template proofs ground-truthed: 2 Idris2 modules, Agda and Coq pass;
+      4 Idris2 modules quarantined with their compiler errors (the template
+      quarantines the same four); Lean not run.
+* [ ] A CI job that runs `check-proofs.sh` on every push (PROOF-POLICY §6:
+      Guix manifest or container, else a recorded deviation).
 * [ ] Project obligations: propagation monotone and idempotent; confinement
       (edits stay in the constraint component); attribution locality (no
       propagation path from per-file credit to repo-wide authorship);
-      stale-input refusal. Prover per `standards/3-practice/PROOF-POLICY.adoc`.
+      stale-input refusal. Prover per `standards/3-practice/PROOF-POLICY.adoc`:
+      Idris2 for the IR, Creusot/Pearlite and Verus for the Rust, Agda
+      (rechecked in Rocq and Lean) for theory, `ungraded` until checked.
 
 === M4 — ForthWall (0%, deferred)
 * Bounded rule VM beneath the reconciler. Not on the MVP path: v0.1 rules are

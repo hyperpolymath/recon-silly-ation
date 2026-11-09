@@ -3,9 +3,11 @@
 --
 -- Typing Proof: Core data type well-formedness
 -- Template — replace with your project's core types.
--- All proofs MUST be constructive (no believe_me, no assert_total).
+-- All proofs MUST be constructive and total; proof escape hatches are forbidden.
 
 module Types
+
+import Data.Nat
 
 %default total
 
@@ -15,7 +17,7 @@ public export
 record Bounded (max : Nat) where
   constructor MkBounded
   value : Nat
-  {auto 0 inBounds : LTE value max}
+  {auto inBounds : LTE value max}
 
 ||| Proof that a Bounded value is always <= max.
 export

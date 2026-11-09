@@ -11,39 +11,90 @@
 # Validate RSR compliance
 validate-rsr:
     #!/usr/bin/env bash
+    cd "{{justfile_directory()}}"
     echo "=== RSR Compliance Check ==="
     MISSING=""
-    for f in .editorconfig .gitignore Justfile README.adoc LICENSE 0-AI-MANIFEST.a2ml; do
+    for f in .editorconfig .gitignore Justfile README.adoc LICENSE; do
         [ -f "$f" ] || MISSING="$MISSING $f"
     done
-    for f in .machine_readable/descriptiles/STATE.a2ml .machine_readable/descriptiles/META.a2ml .machine_readable/descriptiles/ECOSYSTEM.a2ml .machine_readable/6a2/anchors/ANCHOR.a2ml .machine_readable/policies/MAINTENANCE-AXES.a2ml .machine_readable/policies/MAINTENANCE-CHECKLIST.a2ml .machine_readable/policies/SOFTWARE-DEVELOPMENT-APPROACH.a2ml; do
+    # The repo deed's filename carries the repo slug (<stem>_chora.deed), so
+    # this is a glob.
+    ls *_chora.deed >/dev/null 2>&1 || MISSING="$MISSING repo-deed (*_chora.deed)"
+    # .a2ml is retired: a repo carrying one is non-conformant, whatever else holds.
+    bash scripts/check-no-a2ml.sh . >/dev/null || MISSING="$MISSING no-a2ml(run scripts/check-no-a2ml.sh)"
+    for f in docs/legal/EXHIBIT-A-ETHICAL-USE.txt docs/legal/EXHIBIT-B-QUANTUM-SAFE.txt LICENSES/MPL-2.0.txt; do
         [ -f "$f" ] || MISSING="$MISSING $f"
     done
-    for f in licensing/exhibits/EXHIBIT-A-ETHICAL-USE.txt licensing/exhibits/EXHIBIT-B-QUANTUM-SAFE.txt licensing/texts/MPL-2.0.txt; do
-        [ -f "$f" ] || MISSING="$MISSING $f"
-    done
-    if [ ! -d "src/interface/abi" ] && [ ! -d "src/interface/Abi" ]; then
-        MISSING="$MISSING src/interface/abi"
+    # The polyglot seam (Idris2 ABI over a Zig FFI) is INHERITED from the
+    # template's spine, not required of every repository: an archetype whose
+    # preset declares neither the abi nor the ffi capability prunes src/interface/
+    # at mint (ADR-0003, archetypes/<name>/prune.txt). A minted Rust CLI is not
+    # incomplete for lacking a seam it did not ask for. So: a tree that carries
+    # the seam must carry all of it; a tree that carries none of it is complete
+    # without it. Deleting one part of a present seam still fails.
+    if [ -d src/interface ]; then
+        if [ ! -d "src/interface/abi" ] && [ ! -d "src/interface/Abi" ]; then
+            MISSING="$MISSING src/interface/abi"
+        fi
+        for f in src/interface/ffi src/interface/generated; do
+            [ -d "$f" ] || MISSING="$MISSING $f"
+        done
     fi
-    for f in src/interface/ffi src/interface/generated; do
-        [ -d "$f" ] || MISSING="$MISSING $f"
-    done
     for f in docs/governance/MAINTENANCE-CHECKLIST.adoc docs/governance/SOFTWARE-DEVELOPMENT-APPROACH.adoc; do
         [ -f "$f" ] || MISSING="$MISSING $f"
     done
-    if [ -f ".machine_readable/descriptiles/META.a2ml" ]; then
-        grep -q 'axis-1 = "must > intend > like"' .machine_readable/descriptiles/META.a2ml || MISSING="$MISSING META.a2ml:axis-1"
-        grep -q 'axis-2 = "corrective > adaptive > perfective"' .machine_readable/descriptiles/META.a2ml || MISSING="$MISSING META.a2ml:axis-2"
-        grep -q 'axis-3 = "systems > compliance > effects"' .machine_readable/descriptiles/META.a2ml || MISSING="$MISSING META.a2ml:axis-3"
-        grep -q 'scoping-first = true' .machine_readable/descriptiles/META.a2ml || MISSING="$MISSING META.a2ml:scoping-first"
-        grep -q 'idris-unsound-scan = "believe_me/assert_total"' .machine_readable/descriptiles/META.a2ml || MISSING="$MISSING META.a2ml:idris-unsound-scan"
-        grep -q 'audit-focus = "systems in place, documentation explains actual state, safety/security accounted for, observed effects reviewed"' .machine_readable/descriptiles/META.a2ml || MISSING="$MISSING META.a2ml:audit-focus"
-        grep -q 'compliance-focus = "seams/compromises/exception register, bounded exceptions, anti-drift checks"' .machine_readable/descriptiles/META.a2ml || MISSING="$MISSING META.a2ml:compliance-focus"
-        grep -q 'effects-evidence = "benchmark execution/results and maintainer status dialogue/review"' .machine_readable/descriptiles/META.a2ml || MISSING="$MISSING META.a2ml:effects-evidence"
-        grep -q 'compliance-tooling = "panic-attack"' .machine_readable/policies/MAINTENANCE-AXES.a2ml || MISSING="$MISSING MAINTENANCE-AXES.a2ml:compliance-tooling"
-        grep -q 'effects-tooling = "ecological checking with sustainabot guidance"' .machine_readable/policies/MAINTENANCE-AXES.a2ml || MISSING="$MISSING MAINTENANCE-AXES.a2ml:effects-tooling"
-        grep -q 'source-human = "docs/governance/MAINTENANCE-CHECKLIST.adoc"' .machine_readable/policies/MAINTENANCE-CHECKLIST.a2ml || MISSING="$MISSING MAINTENANCE-CHECKLIST.a2ml:source-human"
-        grep -q 'source-human = "docs/governance/SOFTWARE-DEVELOPMENT-APPROACH.adoc"' .machine_readable/policies/SOFTWARE-DEVELOPMENT-APPROACH.a2ml || MISSING="$MISSING SOFTWARE-DEVELOPMENT-APPROACH.a2ml:source-human"
+    # Identity, lifecycle, maintenance axes, the anchor and the maintenance
+    # policies are all clauses of the repo deed (rsr-template-repo#209).
+    DEED=$(bash scripts/deed-field.sh --find . || true)
+    if [ -n "$DEED" ] && bash scripts/deed-field.sh --has "$DEED" status; then
+        # Prints the field, or nothing when it is absent.
+        field() { bash scripts/deed-field.sh "$DEED" "$1" "$2" || true; }
+        # Adds a MISSING entry unless deed field CLAUSE KEY equals the expected value.
+        want() {
+            [ "$(field "$1" "$2")" = "$3" ] || MISSING="$MISSING $DEED:$1:$2"
+        }
+        [ -n "$(field "" repo-uuid)" ] || MISSING="$MISSING $DEED:repo-uuid"
+        # CLADE-003/006 on the deed: a closed code set, and the code must agree
+        # with its name. UNASSIGNED fails on purpose: an unchosen clade must
+        # never be mistakable for a chosen one.
+        case "$(field clade primary)|$(field clade primary-name)" in
+            "fv|Formal Verification & Proofs"|"nl|Nextgen Languages"|"rm|Repo Management & Tooling"|\
+            "gv|Governance & Standards"|"db|Databases"|"ap|Applications"|"ix|Infrastructure & Cloud"|\
+            "dx|Developer Ecosystem"|"pt|Protocols & Interop"|"ax|AI & Neurosymbolic"|\
+            "gm|Games & Interactive"|"sc|Security") ;;
+            *) MISSING="$MISSING $DEED:clade(primary/primary-name unset or mismatched)" ;;
+        esac
+        # CLADE-004/005: the lifecycle phase is a closed set.
+        case "$(field status phase)" in
+            reserved|incubating|active|dormant|merged|superseded|archived|extinct) ;;
+            *) MISSING="$MISSING $DEED:status:phase" ;;
+        esac
+        case "$(field maturity level)" in
+            experimental|alpha|beta|production|lts) ;;
+            *) MISSING="$MISSING $DEED:maturity:level" ;;
+        esac
+        # The ecosystem clause names the repo the deed's header names.
+        # Both empty would compare equal; an identity must be present.
+        [ -n "$(field "" canonical-name)" ] \
+            && [ "$(field ecosystem project)" = "$(field "" canonical-name)" ] \
+            || MISSING="$MISSING $DEED:ecosystem:project"
+        want meta axis-1 "must > intend > like"
+        want meta axis-2 "corrective > adaptive > perfective"
+        want meta axis-3 "systems > compliance > effects"
+        want meta scoping-first true
+        want meta/scoping idris-unsound-scan "believe_me/assert_total"
+        want meta/axis-3 audit-focus "systems in place, documentation explains actual state, safety/security accounted for, observed effects reviewed"
+        want meta/axis-3 compliance-focus "seams/compromises/exception register, bounded exceptions, anti-drift checks"
+        want meta/axis-3 effects-evidence "benchmark execution/results and maintainer status dialogue/review"
+        for c in anchor policies/maintenance-axes policies/maintenance-checklist policies/software-development-approach; do
+            bash scripts/deed-field.sh --has "$DEED" "$c" || MISSING="$MISSING $DEED:($c)"
+        done
+        want policies/maintenance-axes/axis-3-audit compliance-tooling "panic-attack"
+        want policies/maintenance-axes/axis-3-audit effects-tooling "ecological checking with sustainabot guidance"
+        want policies/maintenance-checklist/metadata source-human "docs/governance/MAINTENANCE-CHECKLIST.adoc"
+        want policies/software-development-approach/metadata source-human "docs/governance/SOFTWARE-DEVELOPMENT-APPROACH.adoc"
+    else
+        MISSING="$MISSING repo-deed:(status …)-clause"
     fi
     if [ -n "$MISSING" ]; then
         echo "MISSING:$MISSING"
@@ -51,19 +102,34 @@ validate-rsr:
     fi
     echo "RSR compliance: PASS"
 
-# Validate STATE.a2ml syntax
+# Validate the repo's lifecycle state: the deed's (status …) and
+# (maturity …) clauses.
 validate-state:
-    @if [ -f ".machine_readable/descriptiles/STATE.a2ml" ]; then \
-        grep -q '^\[metadata\]' .machine_readable/descriptiles/STATE.a2ml && \
-        grep -q 'project\s*=' .machine_readable/descriptiles/STATE.a2ml && \
-        echo "STATE.a2ml: valid" || echo "STATE.a2ml: INVALID (missing required sections)"; \
-    else \
-        echo "No .machine_readable/descriptiles/STATE.a2ml found"; \
+    #!/usr/bin/env bash
+    cd "{{justfile_directory()}}"
+    DEED=$(bash scripts/deed-field.sh --find . || true)
+    if [ -n "$DEED" ] && bash scripts/deed-field.sh --has "$DEED" status; then
+        phase=$(bash scripts/deed-field.sh "$DEED" status phase || true)
+        level=$(bash scripts/deed-field.sh "$DEED" maturity level || true)
+        # The same closed sets validate-rsr enforces (CLADE-004/005): a
+        # misspelt phase or level is not a state.
+        case "$phase" in
+            reserved|incubating|active|dormant|merged|superseded|archived|extinct) ;;
+            *) echo "$DEED: INVALID (status :phase '$phase' is not one of reserved|incubating|active|dormant|merged|superseded|archived|extinct)"; exit 1 ;;
+        esac
+        case "$level" in
+            experimental|alpha|beta|production|lts) ;;
+            *) echo "$DEED: INVALID (maturity :level '$level' is not one of experimental|alpha|beta|production|lts)"; exit 1 ;;
+        esac
+        echo "$DEED: valid (phase $phase, maturity $level)"
+    else
+        echo "No repo state found: the repo deed has no (status …) clause"
+        exit 1
     fi
 
-# Validate AI installation guide completeness (finishbot pre-release check)
 validate-ai-install:
     #!/usr/bin/env bash
+    cd "{{justfile_directory()}}"
     echo "=== AI Installation Guide Check ==="
     GUIDE="docs/AI_INSTALLATION_GUIDE.adoc"
     README="README.adoc"
@@ -114,6 +180,22 @@ validate-ai-install:
         README_TODOS=$(grep -c '\[TODO-AI-INSTALL' "$README" 2>/dev/null || true)
         if [ "$README_TODOS" -gt 0 ]; then
             echo "INCOMPLETE: $README has $README_TODOS unfilled [TODO-AI-INSTALL] markers"
+            ERRORS=$((ERRORS + 1))
+        fi
+    fi
+
+    # The rest of the provisioning set's AI and manual-setup documents. Their
+    # locations come from the provisioning engine, so this check and `just doctor`
+    # agree on where the warm-ups live (root, docs/onboarding/ or docs/).
+    if [ -f build/just/provision-lib.sh ]; then
+        for d in $(bash build/just/provision-lib.sh set-files | grep -E '(^|/)(SETUP|llm-warmup-[a-z]+)\.adoc$'); do
+            if [ ! -f "$d" ]; then
+                echo "MISSING: $d"
+                ERRORS=$((ERRORS + 1))
+            fi
+        done
+        if ! grep -q '^\[\[ai-install\]\]' "$README" 2>/dev/null; then
+            echo "MISSING: [[ai-install]] anchor in $README (see build/just/provision.just ai-setup)"
             ERRORS=$((ERRORS + 1))
         fi
     fi

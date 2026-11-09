@@ -2,16 +2,21 @@
 # Format: <source-root>|<module-relative-to-source-root>|gated|quarantine|<note>
 # gated      = must compile.  quarantine = known-broken, must keep failing.
 #
-# NOT GROUND-TRUTHED. Written 2026-10-27 in a session with no idris2 on PATH.
-# Every module is listed as gated, which is the script's default for a new
-# proof: the first run with a toolchain decides, and a FAIL there is the gate
-# working, not a regression. These files differ from rsr-template-repo's
-# (import Data.Nat added, erased-quantity annotations changed), so the
-# template's 2026-07-17 quarantine verdicts do not transfer. Demote a module to
-# quarantine only with the compiler's error pasted into the note.
-verification/proofs/idris2|ABI/Foreign.idr|gated| template ABI-4; compiled under idris2 0.7.0 in the template, unverified here
-verification/proofs/idris2|ABI/Layout.idr|gated| template ABI-2; unverified
-verification/proofs/idris2|ABI/Platform.idr|gated| template ABI-3; unverified
-verification/proofs/idris2|ABI/Pointers.idr|gated| template ABI-1; unverified
-verification/proofs/idris2|ABI/Compliance.idr|gated| template ABI-5; depends on ABI.Layout and ABI.Platform; unverified
-verification/proofs/idris2|Types.idr|gated| template TP-1; unverified
+# Ground-truthed 2026-11-09 under idris2 0.7.0 (Chez Scheme 9.5.8, built from
+# the v0.7.0 tag). The 2026-10-27 entries were written without a compiler and
+# listed every module as gated; that first run decided as follows.
+#
+# This repository's own ABI seam (src/interface/Abi/): obligation R-9.
+src/interface|Abi/Types.idr|gated| own; resultCode/fromCode at Bits32 (32-bit C int; RefC rejects Int32); fromCodeResultCode (round trip), resultCodeInjective, non-null Handle
+src/interface|Abi/Layout.idr|gated| template example struct only; no struct crosses this seam by value (Handle is opaque)
+src/interface|Abi/Foreign.idr|gated| own; Aspect 3 compares each %foreign name with the export fn text of main.zig (source text, not the built library)
+#
+# Template placeholders (rsr-template-repo). Not obligations of this
+# repository; the fix belongs in the template, whose own MANIFEST quarantines
+# the same four with the same errors.
+verification/proofs/idris2|ABI/Foreign.idr|gated| template ABI-4; compiles
+verification/proofs/idris2|Types.idr|gated| template TP-1; synced from rsr-template-repo main 2026-11-09 (adds import Data.Nat), compiles
+verification/proofs/idris2|ABI/Layout.idr|quarantine| Undefined name NonZero; Undefined name modNatNZ (needs Data.Nat); the template records a further unification failure
+verification/proofs/idris2|ABI/Platform.idr|quarantine| Undefined name LTE (needs Data.Nat); No type declaration for ABI.Platform.ptrSizeAtLeast4
+verification/proofs/idris2|ABI/Pointers.idr|quarantine| ABI.Pointers.SafePtr.(.nonNull) is not accessible in this context (erased field projected); unification failure in handlePtrEq
+verification/proofs/idris2|ABI/Compliance.idr|quarantine| imports quarantined ABI.Layout and ABI.Platform; fails on their errors

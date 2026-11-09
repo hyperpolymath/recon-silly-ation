@@ -56,9 +56,13 @@ isInitialized h = do
 --------------------------------------------------------------------------------
 
 ||| Raw FFI call for main processing. The Zig side returns `Result` as a
-||| c_int code (0 = ok), not a value: see Abi.Types.resultCode.
+||| c_int code (0 = ok), not a value: see Abi.Types.resultCode. The return
+||| is 32 bits to match C `int` (Idris's `Int` is 64-bit, and the upper half
+||| of the return register is unspecified for an `int` return). It is
+||| `Bits32`, not `Int32`, because RefC in Idris2 0.7.0 cannot generate code
+||| for an `Int32` foreign return; see Abi.Types.resultCode.
 %foreign "C:recon_silly_ation_process,librecon_silly_ation"
-prim__process : Bits64 -> Bits32 -> PrimIO Int
+prim__process : Bits64 -> Bits32 -> PrimIO Bits32
 
 ||| Safe wrapper. Right () on code 0; Left on any other known code; an
 ||| unknown code is reported as Error rather than guessed at.
@@ -99,9 +103,11 @@ errorDescription NullPointer = "Null pointer"
 ||| Summary of ABI safety properties:
 ||| 1. All functions are total (total keyword enforced).
 ||| 2. Pointers are verified non-null before being wrapped in Handle.
-||| 3. Memory layouts are proven C-ABI compliant in Abi.Layout.
+||| 3. Abi.Layout proves C-ABI alignment for its example struct only. No
+|||    struct crosses this seam by value: Handle is an opaque pointer.
 ||| 4. FFI boundary uses explicitly tagged types from Abi.Types, and the
-|||    Result code table round-trips (Abi.Types.fromCodeResultCode).
+|||    Result code table round-trips (Abi.Types.fromCodeResultCode)
+|||    and is injective (Abi.Types.resultCodeInjective).
 public export
 abiSafetyGuarantees : String
 abiSafetyGuarantees = "recon-silly-ation ABI: 4 stated safety properties for FFI integration"
