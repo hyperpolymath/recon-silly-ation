@@ -77,6 +77,50 @@ Caveat:
   are deliberately still generic — they are seed kits for future
   doc-authoring and component authoring, not this repo's own identity.
 
+[[proof-ledger]]
+== Proof Ledger
+
+Derived from `docs/status/PROOF-STATUS.adoc`, which is canonical and holds
+the receipts, the template placeholders and the theory grades. 2 rows
+`proven`, 2 `tested-only`, 1 `argued`, 10 `open`, of 15. The open rows
+(R-1 to R-8, R-10) are listed there; they wait on code that does not exist
+yet.
+
+[cols="2,1,2,2,2",options="header"]
+|===
+| Obligation | Status | Checker (version, flags) | Where | Trust boundary
+
+| `Result` code table round-trips
+| proven
+| Idris2 0.7.0, `%default total`, `scripts/check-proofs.sh idris2` (no holes)
+| `src/interface/Abi/Types.idr:fromCodeResultCode`
+| Idris2 table only
+
+| `Result` code table is injective
+| proven
+| As above
+| `src/interface/Abi/Types.idr:resultCodeInjective`
+| Derived from the round trip
+
+| Zig enum values equal the Idris2 codes
+| tested-only
+| `tests/aspect_tests.sh` Aspect 3, every run
+| `tests/aspect_tests.sh`
+| Text comparison of the two tables
+
+| Every bound symbol is exported by the Zig FFI
+| tested-only
+| `tests/aspect_tests.sh` Aspect 3, every run
+| `tests/aspect_tests.sh`
+| Names only
+
+| Binding C types match the Zig signatures
+| argued
+| -
+| `src/interface/Abi/Foreign.idr`
+| Read by hand; 64-bit targets only
+|===
+
 == License
 
 This project is licensed under the Mozilla Public License, v. 2.0. See the `LICENSE` file for details.

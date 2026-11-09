@@ -1,5 +1,7 @@
 # Agda proof manifest — read by scripts/check-proofs.sh agda
 # Format: <source-root>|<module-relative-to-source-root>|gated|quarantine|<note>
-# NOT GROUND-TRUTHED (no agda on PATH, 2026-10-27). Byte-identical to the
-# template's copy, which compiled under `agda --safe` on 2026-07-17.
-verification/proofs/agda|Properties.agda|gated| template; compiled in the template 2026-07-17, unverified here
+# Template placeholder (rsr-template-repo), not an obligation of this repo.
+# Ground-truthed 2026-11-09: PASS under the PROOF-POLICY §2.1 invocation
+# `agda --safe --without-K --cubical-compatible`, Agda 2.6.3, standard-library
+# 1.7.3 (Ubuntu packages); a planted postulate fails as it should.
+verification/proofs/agda|Properties.agda|gated| template; compiles (2026-11-09)

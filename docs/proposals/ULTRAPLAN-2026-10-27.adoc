@@ -76,7 +76,8 @@ falsifier corpora, and point it at this repository. The first green run is
 the one that reports the eleven findings in <<corpus>>.
 
 *The recommended arm* for the owner's three open decisions is in
-<<decisions>>: Rust core verified with Creusot plus Idris2 for the finding
+<<decisions>>: Rust core verified with Creusot (Pearlite contracts) and Verus,
+the default Rust toolset since owner ruling 2026-11-07, plus Idris2 for the finding
 and patch IR (the estate's mapped provers), the VeriSimDB *model* adopted now
 behind a trait and its *service* adopted when it is reachable, and
 ForthWall deferred with a written trigger condition.
@@ -226,7 +227,7 @@ it is currently violated, and which estate tool owns the weave.
 |echo-types (fibre vocabulary); invariant-path (same-claim check)
 
 |*Proof*
-|Obligations mapped per PROOF-POLICY: code → Creusot, IR/ABI → Idris2, theory → Agda with Rocq/Lean rechecks; `TESTED` for bounded checks; no escape hatches.
+|Obligations mapped per PROOF-POLICY: Rust code → Creusot/Pearlite and Verus, IR/ABI → Idris2, theory → Agda with Rocq/Lean rechecks; `TESTED` for bounded checks; no escape hatches.
 |7 template obligations, 0 done; template proof modules; no MANIFEST; `check-proofs.sh` absent so `just proof-check-*` cannot fail honestly.
 |`standards/3-practice/PROOF-POLICY.adoc`; `rsr-template-repo/scripts/check-proofs.sh`
 
@@ -396,9 +397,19 @@ not a README sentence.
 Tier T3 (`docs/status/PROOF-NEEDS.adoc`). Mapping per
 `standards/3-practice/PROOF-POLICY.adoc`: this repository's statements
 about *its own* solver are engineering (Idris2 for the IR and solver
-contract; Creusot on the Rust if the core is Rust); the statements that would
+contract; Creusot with Pearlite contracts and Verus on the Rust, per
+PROOF-POLICY §1.2, owner ruling 2026-11-07); the statements that would
 hold for any propagation-based reconciler are theory (Agda, rechecked in
 Rocq and Lean, no Mathlib). Status tokens are the §5 vocabulary.
+
+_Amended 2026-11-09 to the policy as it now stands._ Theory entrypoints run
+`agda --safe --without-K --cubical-compatible` (§2.1), which
+`scripts/check-proofs.sh agda` now does. Theory rows carry a Proof Witness
+Grade (§8) derived from receipts, never asserted: R-1 to R-3 have no Agda
+source yet, so each is `ungraded`. Engineering rows (Idris2, Creusot, Verus,
+Kani) carry §5 tokens only and no grade. The ledger is
+`docs/status/PROOF-STATUS.adoc`; mathesis may catalogue it but does not
+grade it.
 
 [cols="1,3,1,1,2",options="header"]
 |===
@@ -409,10 +420,10 @@ Rocq and Lean, no Mathlib). Status tokens are the §5 vocabulary.
 |R-3 |Determinism: same surfaces and authorities give the same findings, independent of extraction order. |theory |Agda |confluence of arc consistency
 |R-4 |Confinement: a proposal for slot `x` touches only surfaces in `x`'s connected component. |engineering |Idris2 |reachability in the constraint graph
 |R-5 |Attribution locality: no path from a per-file credit slot to any repo-wide authorship slot; credit merges carry `tau`. |engineering |Idris2 |trope-checker `Conflated` unrepresentable; invariant-path doubling attack
-|R-6 |Stale-input refusal: a proposal carries `sha256` of every surface read; application is a function of (proposal, current hashes) that is `Refuse` on any mismatch. |engineering |Idris2 (IR), Creusot (apply) |VCL-UT freshness obligation
+|R-6 |Stale-input refusal: a proposal carries `sha256` of every surface read; application is a function of (proposal, current hashes) that is `Refuse` on any mismatch. |engineering |Idris2 (IR), Creusot/Pearlite and Verus (apply) |VCL-UT freshness obligation
 |R-7 |D152 boundary: a proposal exists only along an authority edge. |engineering |Idris2 |echo-types fibre; the solver contract
 |R-8 |Finding wire type: evidence class is a function of tier and cannot be set by a rule; round-trips through I-JSON/JCS. |engineering |Idris2 |pons `Finding` private-field invariant
-|R-9 |ABI/FFI bijection for this repository's own seam. |engineering |Idris2 (template ABI-1..5 become real once the seam names this project) |the first self-finding, row 3
+|R-9 |ABI/FFI bijection for this repository's own seam. |engineering |Idris2: `fromCodeResultCode` and `resultCodeInjective` `PROVEN` (idris2 0.7.0, 2026-11-09); the Zig half `TESTED` by Aspect 3's value table |the first self-finding, row 3
 |R-10 |Bounded model of the apply path with a planted stale input. |`TESTED` |Kani on the Rust apply function, bounds recorded |§4.1 standing exception
 |===
 
@@ -489,7 +500,7 @@ long-term correctness, *D* dependability and security, both out of 5.
 |Arm |Description |E |D
 
 |*A. Rust core + Creusot, Idris2 for the IR and ABI, Zig FFI kept only if a C consumer exists* (recommended, elegant)
-|Follows PROOF-POLICY's mapping with no exception to record. Propagation in Rust; finding/proposal IR as Idris2 types with Rust generated to match (as trope-checker does Idris2 reference + Rust fast-core, validated by a conformance corpus).
+|Follows PROOF-POLICY's mapping with no exception to record. Owner chose this arm (D-1, 2026-10-27); the 2026-11-07 ruling widens its Rust toolset to Creusot/Pearlite and Verus without changing the arm. Propagation in Rust; finding/proposal IR as Idris2 types with Rust generated to match (as trope-checker does Idris2 reference + Rust fast-core, validated by a conformance corpus).
 |5 |4
 
 |B. Idris2 reference implementation only, Rust later

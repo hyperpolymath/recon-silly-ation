@@ -8,8 +8,9 @@
 ||| that the two name the same symbols, and `Result` below carries the same
 ||| integer codes as the Zig `Result` enum, in the same order.
 |||
-||| Aligned 2026-10-27 (ultraplan corpus row 3). Not yet compiled by an
-||| Idris2 toolchain in the authoring session; see the PR.
+||| Aligned 2026-10-27 (ultraplan corpus row 3). Typechecked under Idris2
+||| 0.7.0 (`idris2 --typecheck src/interface/abi.ipkg`), gated through
+||| verification/proofs/idris2/MANIFEST; see docs/status/PROOF-STATUS.adoc.
 
 module Abi.Types
 
@@ -52,9 +53,10 @@ thisPlatform = Linux -- Simplified for template
 public export
 data Result = Ok | Error | InvalidParam | OutOfMemory | NullPointer
 
-||| The C integer each constructor crosses the seam as.
+||| The C integer each constructor crosses the seam as. `Int32` because the
+||| Zig enum is `enum(c_int)`: a 32-bit C `int`, not Idris's 64-bit `Int`.
 public export
-resultCode : Result -> Int
+resultCode : Result -> Int32
 resultCode Ok = 0
 resultCode Error = 1
 resultCode InvalidParam = 2
@@ -64,7 +66,7 @@ resultCode NullPointer = 4
 ||| Decode a C integer from the seam. Anything outside the table is Nothing:
 ||| the caller decides what an unknown code means, never this module.
 public export
-fromCode : Int -> Maybe Result
+fromCode : Int32 -> Maybe Result
 fromCode 0 = Just Ok
 fromCode 1 = Just Error
 fromCode 2 = Just InvalidParam
@@ -82,6 +84,18 @@ fromCodeResultCode Error = Refl
 fromCodeResultCode InvalidParam = Refl
 fromCodeResultCode OutOfMemory = Refl
 fromCodeResultCode NullPointer = Refl
+
+||| `Just` is injective (local, so the proof below needs no extra import).
+justInjective : {0 x, y : a} -> Just x = Just y -> x = y
+justInjective Refl = Refl
+
+||| No two constructors share a code: the table is injective. Derived from the
+||| round trip alone, so it needs no reasoning about primitive integers.
+export
+resultCodeInjective : (a, b : Result) -> resultCode a = resultCode b -> a = b
+resultCodeInjective a b prf =
+  justInjective (trans (sym (fromCodeResultCode a))
+                       (trans (cong fromCode prf) (fromCodeResultCode b)))
 
 ||| Results are decidably equal (table generated, one clause per pair)
 public export

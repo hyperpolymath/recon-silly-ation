@@ -38,13 +38,21 @@ measured census it rests on.
       rule ships with a falsifier corpus.
 * [ ] Self-dogfood: the tool reports this repository's own drift.
 
-=== M3 — Proofs (0/7 mandatory, 0/N project-specific)
-* [ ] ABI-1..5, TP-1..2 (template obligations) checked by `check-proofs.sh`
-      with a MANIFEST, not by a gate that cannot fail.
+=== M3 — Proofs (ledger: docs/status/PROOF-STATUS.adoc; 2 proven of 15 rows)
+* [x] R-9: the Result code table round-trips and is injective, checked by
+      Idris2 0.7.0 through `check-proofs.sh` (2026-11-09); the Zig half is
+      tested by Aspect 3's value comparison.
+* [x] Template proofs ground-truthed: 2 Idris2 modules, Agda and Coq pass;
+      4 Idris2 modules quarantined with their compiler errors (the template
+      quarantines the same four); Lean not run.
+* [ ] A CI job that runs `check-proofs.sh` on every push (PROOF-POLICY §6:
+      Guix manifest or container, else a recorded deviation).
 * [ ] Project obligations: propagation monotone and idempotent; confinement
       (edits stay in the constraint component); attribution locality (no
       propagation path from per-file credit to repo-wide authorship);
-      stale-input refusal. Prover per `standards/3-practice/PROOF-POLICY.adoc`.
+      stale-input refusal. Prover per `standards/3-practice/PROOF-POLICY.adoc`:
+      Idris2 for the IR, Creusot/Pearlite and Verus for the Rust, Agda
+      (rechecked in Rocq and Lean) for theory, `ungraded` until checked.
 
 === M4 — ForthWall (0%, deferred)
 * Bounded rule VM beneath the reconciler. Not on the MVP path: v0.1 rules are

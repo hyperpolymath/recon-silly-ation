@@ -25,6 +25,9 @@
 #   4. `idris2 --check X && ok` — `idris2 --check` EXITS 0 ON A MISSING IMPORT
 #      (verified against 0.7.0) while printing `Error: ...`.  Testing the exit
 #      code alone is unsound; for idris2 we require exit 0 AND no `Error:` line.
+#   5. `idris2 --check` also exits 0, with no `Error:`, on a module whose proof
+#      is an unsolved hole (`= ?todo`), verified against 0.7.0 on 2026-11-09.
+#      For idris2 we also require the REPL's `:m` to answer `No holes`.
 #
 # They share one shape: a null check that emits reassuring text.  If you extend
 # this script, the test to apply is not "does it pass?" but "have I watched it
@@ -80,9 +83,17 @@ check_one() {
   local root="$1" rel="$2" out rc
   set +e
   case "$PROVER" in
-    idris2) out="$(cd "$ROOT/$root" && idris2 --check "$rel" 2>&1)"; rc=$? ;;
+    idris2) out="$(cd "$ROOT/$root" && idris2 --check "$rel" 2>&1)"; rc=$?
+            # Hole #5: --check accepts unsolved holes (?name). Ask the REPL.
+            if [ "$rc" -eq 0 ] && ! grep -qE "$ERROR_RE" <<<"$out"; then
+              holes="$(cd "$ROOT/$root" && printf ':m\n:q\n' | idris2 --no-banner "$rel" 2>&1)"
+              if ! grep -q 'No holes' <<<"$holes"; then
+                out="$out"$'\n'"Error: unsolved holes: $(grep -o '[0-9]* holes\{0,1\}:.*' <<<"$holes" | head -1)"
+              fi
+            fi ;;
     lean4)  out="$(cd "$ROOT/$root" && lean          "$rel" 2>&1)"; rc=$? ;;
-    agda)   out="$(cd "$ROOT/$root" && agda --safe    "$rel" 2>&1)"; rc=$? ;;
+    # PROOF-POLICY §2.1 (2026-11-01): the canonical theory-proof invocation.
+    agda)   out="$(cd "$ROOT/$root" && agda --safe --without-K --cubical-compatible "$rel" 2>&1)"; rc=$? ;;
     coq)    out="$(cd "$ROOT/$root" && coqc           "$rel" 2>&1)"; rc=$? ;;
   esac
   set -e
@@ -159,7 +170,12 @@ echo "=== manifest coverage ($PROOF_DIR) ==="
 listed="$(sort -u "$listed_tmp")"
 found="$(cd "$ROOT" && find "$PROOF_DIR" -name "*.$EXT" -not -path '*/build/*' 2>/dev/null | sort)"
 unlisted="$(comm -13 <(printf '%s\n' "$listed") <(printf '%s\n' "$found") || true)"
-missing="$(comm -23 <(printf '%s\n' "$listed") <(printf '%s\n' "$found") || true)"
+# Stale means "the listed file does not exist". A MANIFEST may also gate
+# modules outside $PROOF_DIR, such as the repository's own ABI seam under
+# src/, so existence is checked on disk, not against the $PROOF_DIR scan.
+missing="$(while IFS= read -r entry; do
+  if [ -n "$entry" ] && [ ! -f "$ROOT/$entry" ]; then printf '%s\n' "$entry"; fi
+done <<<"$listed")"
 
 if [ -n "${unlisted//[[:space:]]/}" ]; then
   echo "FAIL: .$EXT proofs on disk but absent from $MANIFEST_FILE:"
