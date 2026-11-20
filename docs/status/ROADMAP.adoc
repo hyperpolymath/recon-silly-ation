@@ -53,9 +53,13 @@ measured census it rests on.
       R-9e `argued` (C types), R-9f, R-9g and R-9h `open`.
 * [x] Template proofs ground-truthed: 2 Idris2 modules, Agda and Coq pass;
       4 Idris2 modules quarantined with their compiler errors (the template
-      quarantines the same four); Lean not run.
-* [ ] A CI job that runs `check-proofs.sh` on every push (PROOF-POLICY §6:
-      Guix manifest or container, else a recorded deviation).
+      quarantines the same four); Lean passes since 2026-11-17 (ApiTypes.lean synced from the template).
+* [x] A CI job that runs `check-proofs.sh` (PROOF-POLICY §6, Guix manifest):
+      `proof-check.yml`, one job per prover with the toolchain from
+      `build/proofs/manifest.scm` at the Guix revision pinned in
+      `channels.scm`. All four (idris2, agda, coq, lean4) passed on #82
+      (2026-11-17). Idris2 0.7.0 is packaged here, and Agda runs with its
+      primitive modules compiled; both fixes are to offer upstream to Guix.
 * [ ] Project obligations: propagation monotone and idempotent; confinement
       (edits stay in the constraint component); attribution locality (no
       propagation path from per-file credit to repo-wide authorship);

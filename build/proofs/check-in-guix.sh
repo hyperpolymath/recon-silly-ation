@@ -11,14 +11,20 @@
 # exit status is the number of provers that failed; nothing is skipped.
 set -euo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")/../.."
+# Agda reads and prints Unicode (ℕ, ≡); without a UTF-8 locale it fails with
+# "Error when handling error". glibc provides C.UTF-8 without a locale package.
+export LC_ALL=C.UTF-8
 
 [ "$#" -gt 0 ] || { echo "usage: $0 PROVER..." >&2; exit 2; }
 
 agda_setup() {
-  local lib
+  local lib n
   # -L: in a Guix profile, lib/agda and the library under it are symlinks.
-  lib=$(find -L "${GUIX_ENVIRONMENT:?run inside guix shell}/lib/agda" -name '*.agda-lib' -path '*stdlib*' | head -1)
-  [ -n "$lib" ] || { echo "FAIL: no standard library .agda-lib under $GUIX_ENVIRONMENT/lib/agda" >&2; return 1; }
+  # The stdlib directory also holds the .agda-lib files of its examples and
+  # tests (io, list, ...), so take standard-library.agda-lib by name.
+  lib=$(find -L "${GUIX_ENVIRONMENT:?run inside guix shell}/lib/agda" -name 'standard-library.agda-lib')
+  n=$(printf '%s' "$lib" | grep -c .)
+  [ "$n" -eq 1 ] || { echo "FAIL: expected one standard-library.agda-lib under $GUIX_ENVIRONMENT/lib/agda, found $n" >&2; return 1; }
   AGDA_DIR=$(mktemp -d)
   export AGDA_DIR
   printf '%s\n' "$lib" > "$AGDA_DIR/libraries"
