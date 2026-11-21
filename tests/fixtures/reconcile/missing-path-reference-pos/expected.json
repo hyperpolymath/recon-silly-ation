@@ -1,0 +1,81 @@
+{
+  "base": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "findings": [
+    {
+      "class": "missing-path-reference",
+      "evidence": [
+        {
+          "excerpt": "src/old_main.zig",
+          "path": "README.adoc",
+          "rev": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "span": {
+            "end": {
+              "col": 20,
+              "line": 3
+            },
+            "start": {
+              "col": 1,
+              "line": 3
+            }
+          }
+        }
+      ],
+      "id": "ab9e0bd633f761780a4ef99ac465c539e59849fe3bc3d1ad47db0b32847775c6",
+      "introduced": true,
+      "message": "Path 'src/old_main.zig' is mentioned but is not in the repository.",
+      "path": "README.adoc",
+      "severity": "warning",
+      "span": {
+        "end": {
+          "col": 20,
+          "line": 3
+        },
+        "start": {
+          "col": 1,
+          "line": 3
+        }
+      },
+      "tool": "sillybot"
+    },
+    {
+      "class": "missing-path-reference",
+      "evidence": [
+        {
+          "excerpt": "./docs/removed/",
+          "path": "README.adoc",
+          "rev": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "span": {
+            "end": {
+              "col": 20,
+              "line": 4
+            },
+            "start": {
+              "col": 1,
+              "line": 4
+            }
+          }
+        }
+      ],
+      "id": "4053bd5a4cb7ff4beabfac969813556cd52f5db7578f070681048b378c137fe9",
+      "introduced": true,
+      "message": "Path './docs/removed/' is mentioned but is not in the repository.",
+      "path": "README.adoc",
+      "severity": "warning",
+      "span": {
+        "end": {
+          "col": 20,
+          "line": 4
+        },
+        "start": {
+          "col": 1,
+          "line": 4
+        }
+      },
+      "tool": "sillybot"
+    }
+  ],
+  "head": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "pr": 1,
+  "repo": "o/fixture",
+  "schema": "findings/v0"
+}

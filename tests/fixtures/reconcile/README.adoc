@@ -1,0 +1,38 @@
+// SPDX-License-Identifier: CC-BY-SA-4.0
+// Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+= reconcile v0 planted fixtures
+
+These cases test the reconcile v0 checker in `src/interface/ffi/src/reconcile.zig`.
+Run them with `tests/reconcile_fixtures.sh`.
+
+Each case holds a `head.json` bundle (`reconcile-input/v0`), an optional `base.json` for the merge base, and the `expected.json` output (`findings/v0`).
+The JSON files carry no SPDX header because JSON has no comments.
+This file's licence covers them.
+
+== Cases
+
+[cols="1,3"]
+|===
+|Case |What it plants
+
+|`dead-internal-link-pos`
+|A missing sibling file, a link that climbs above the repo root, and a missing include. Expect three errors.
+
+|`dead-internal-link-neg`
+|Sibling, parent, root-absolute, directory, `./` and include links that all exist. Expect none.
+
+|`dead-anchor-pos`
+|A missing anchor in another doc, a missing local anchor, and one that differs only in letter case. Expect three errors. The case-only one is explained, never fixed (ADR 0002).
+
+|`dead-anchor-neg`
+|A heading id, an explicit anchor, a fragment-only link, a target doc outside the bundle (cannot be judged), and an empty fragment. Expect none.
+
+|`missing-path-reference-pos`
+|Two path mentions that are not in the repo. Expect two warnings.
+
+|`missing-path-reference-neg`
+|Present files and directories, `./` and `/` forms, a glob, placeholders, a command and an external URL. Expect none.
+
+|`introduced-vs-base`
+|A dead link that already existed at the base but moved ten lines, and a new dead link. Expect one finding with `introduced: false` and one with `introduced: true`.
+|===
