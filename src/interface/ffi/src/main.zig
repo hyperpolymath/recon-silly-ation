@@ -156,6 +156,62 @@ export fn recon_silly_ation_free_string(str: ?[*:0]const u8) void {
 }
 
 //==============================================================================
+// Reconcile (report-only, ADR 0002)
+//==============================================================================
+
+const reconcile = @import("reconcile.zig");
+
+/// Run reconcile v0. `head` and optional `base` are reconcile-input/v0 JSON
+/// bundles. Returns findings/v0 JSON, which the caller frees with
+/// recon_silly_ation_free_string. Returns null on error; see last_error.
+export fn recon_silly_ation_reconcile(
+    head: ?[*]const u8,
+    head_len: u32,
+    base: ?[*]const u8,
+    base_len: u32,
+    pr: i64,
+) ?[*:0]const u8 {
+    const h = head orelse {
+        setError("Null head buffer");
+        return null;
+    };
+    var arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
+    defer arena.deinit();
+    const base_slice: ?[]const u8 = if (base) |b| b[0..base_len] else null;
+    const out = reconcile.run(arena.allocator(), h[0..head_len], base_slice, pr) catch |e| {
+        setError(switch (e) {
+            error.BadSchema => "Input is not reconcile-input/v0 with docmodel/v0 docs",
+            error.RepoMismatch => "Head and base bundles name different repos",
+            error.OutOfMemory => "Out of memory",
+            else => "Input is not valid JSON for reconcile-input/v0",
+        });
+        return null;
+    };
+    const result = std.heap.page_allocator.dupeZ(u8, out) catch {
+        setError("Failed to allocate result");
+        return null;
+    };
+    clearError();
+    return result.ptr;
+}
+
+test {
+    _ = reconcile;
+}
+
+test "reconcile export round trip" {
+    const input =
+        \\{"schema":"reconcile-input/v0","repo":"o/r","rev":"r1","files":["a.md"],"docs":[]}
+    ;
+    const out = recon_silly_ation_reconcile(input.ptr, input.len, null, 0, 1) orelse return error.NullResult;
+    defer recon_silly_ation_free_string(out);
+    try std.testing.expect(std.mem.indexOf(u8, std.mem.span(out), "\"findings/v0\"") != null);
+    try std.testing.expect(recon_silly_ation_reconcile(null, 0, null, 0, 0) == null);
+    const bad = "{}";
+    try std.testing.expect(recon_silly_ation_reconcile(bad.ptr, bad.len, null, 0, 0) == null);
+}
+
+//==============================================================================
 // Array/Buffer Operations
 //==============================================================================
 

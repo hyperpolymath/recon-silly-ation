@@ -26,6 +26,18 @@ pub fn build(b: *std.Build) void {
     });
     b.installArtifact(lib);
 
+    // `reconcile` CLI: report-only consistency checks (ADR 0002).
+    const cli_module = b.createModule(.{
+        .root_source_file = b.path("src/reconcile_cli.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
+    const cli = b.addExecutable(.{
+        .name = "reconcile",
+        .root_module = cli_module,
+    });
+    b.installArtifact(cli);
+
     // `zig build test` — runs the in-source unit tests in src/main.zig.
     const main_tests = b.addTest(.{
         .root_module = main_module,

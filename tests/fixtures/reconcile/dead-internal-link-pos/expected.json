@@ -1,0 +1,117 @@
+{
+  "base": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "findings": [
+    {
+      "class": "dead-internal-link",
+      "evidence": [
+        {
+          "excerpt": "missing.adoc",
+          "path": "docs/guide.adoc",
+          "rev": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "span": {
+            "end": {
+              "col": 20,
+              "line": 4
+            },
+            "start": {
+              "col": 1,
+              "line": 4
+            }
+          }
+        }
+      ],
+      "id": "cbbb6c8398aafc304701e18409884fc03559130880bb7b4d9e2e9bbdeba900c5",
+      "introduced": true,
+      "message": "Link target 'missing.adoc' resolves to 'docs/missing.adoc', which is not in the repository.",
+      "path": "docs/guide.adoc",
+      "severity": "error",
+      "span": {
+        "end": {
+          "col": 20,
+          "line": 4
+        },
+        "start": {
+          "col": 1,
+          "line": 4
+        }
+      },
+      "tool": "sillybot"
+    },
+    {
+      "class": "dead-internal-link",
+      "evidence": [
+        {
+          "excerpt": "../../outside.adoc",
+          "path": "docs/guide.adoc",
+          "rev": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "span": {
+            "end": {
+              "col": 20,
+              "line": 5
+            },
+            "start": {
+              "col": 1,
+              "line": 5
+            }
+          }
+        }
+      ],
+      "id": "fc0887c19cdd99028bd6357b38403ec5395eab01a18b98348e69d165ad1548de",
+      "introduced": true,
+      "message": "Link target '../../outside.adoc' climbs above the repository root.",
+      "path": "docs/guide.adoc",
+      "severity": "error",
+      "span": {
+        "end": {
+          "col": 20,
+          "line": 5
+        },
+        "start": {
+          "col": 1,
+          "line": 5
+        }
+      },
+      "tool": "sillybot"
+    },
+    {
+      "class": "dead-internal-link",
+      "evidence": [
+        {
+          "excerpt": "partials/nav.adoc",
+          "path": "docs/guide.adoc",
+          "rev": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "span": {
+            "end": {
+              "col": 20,
+              "line": 6
+            },
+            "start": {
+              "col": 1,
+              "line": 6
+            }
+          }
+        }
+      ],
+      "id": "364c6f5754e05a59c98dd5d67031b13820b4b4fa1f78ba541194f8e7d47145b7",
+      "introduced": true,
+      "message": "Link target 'partials/nav.adoc' resolves to 'docs/partials/nav.adoc', which is not in the repository.",
+      "path": "docs/guide.adoc",
+      "severity": "error",
+      "span": {
+        "end": {
+          "col": 20,
+          "line": 6
+        },
+        "start": {
+          "col": 1,
+          "line": 6
+        }
+      },
+      "tool": "sillybot"
+    }
+  ],
+  "head": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "pr": 1,
+  "repo": "o/fixture",
+  "schema": "findings/v0"
+}

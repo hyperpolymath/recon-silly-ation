@@ -1,0 +1,117 @@
+{
+  "base": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "findings": [
+    {
+      "class": "dead-anchor",
+      "evidence": [
+        {
+          "excerpt": "docs/guide.adoc#configure",
+          "path": "README.adoc",
+          "rev": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "span": {
+            "end": {
+              "col": 20,
+              "line": 4
+            },
+            "start": {
+              "col": 1,
+              "line": 4
+            }
+          }
+        }
+      ],
+      "id": "52abd087e2e1fd12449b2f1eff5d310ecff21391f288511767c50372de434d70",
+      "introduced": true,
+      "message": "Anchor 'configure' is not defined in 'docs/guide.adoc'.",
+      "path": "README.adoc",
+      "severity": "error",
+      "span": {
+        "end": {
+          "col": 20,
+          "line": 4
+        },
+        "start": {
+          "col": 1,
+          "line": 4
+        }
+      },
+      "tool": "sillybot"
+    },
+    {
+      "class": "dead-anchor",
+      "evidence": [
+        {
+          "excerpt": "#usage",
+          "path": "README.adoc",
+          "rev": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "span": {
+            "end": {
+              "col": 20,
+              "line": 5
+            },
+            "start": {
+              "col": 1,
+              "line": 5
+            }
+          }
+        }
+      ],
+      "id": "6a9600f93105cd00c728cdf4987229fc6ae8ed28cbe4677508c53d9f53cc03f3",
+      "introduced": true,
+      "message": "Anchor 'usage' is not defined in 'README.adoc'.",
+      "path": "README.adoc",
+      "severity": "error",
+      "span": {
+        "end": {
+          "col": 20,
+          "line": 5
+        },
+        "start": {
+          "col": 1,
+          "line": 5
+        }
+      },
+      "tool": "sillybot"
+    },
+    {
+      "class": "dead-anchor",
+      "evidence": [
+        {
+          "excerpt": "#Install",
+          "path": "README.adoc",
+          "rev": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "span": {
+            "end": {
+              "col": 20,
+              "line": 6
+            },
+            "start": {
+              "col": 1,
+              "line": 6
+            }
+          }
+        }
+      ],
+      "id": "a7d3ce5b896e63f0eea57033f6a83d2ec2fcd92cd8771767e7f9782ae9103bc6",
+      "introduced": true,
+      "message": "Anchor 'Install' is not defined in 'README.adoc'. 'install' differs only in letter case; it is reported, not changed.",
+      "path": "README.adoc",
+      "severity": "error",
+      "span": {
+        "end": {
+          "col": 20,
+          "line": 6
+        },
+        "start": {
+          "col": 1,
+          "line": 6
+        }
+      },
+      "tool": "sillybot"
+    }
+  ],
+  "head": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "pr": 1,
+  "repo": "o/fixture",
+  "schema": "findings/v0"
+}

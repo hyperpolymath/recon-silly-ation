@@ -1,0 +1,81 @@
+{
+  "base": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "findings": [
+    {
+      "class": "dead-internal-link",
+      "evidence": [
+        {
+          "excerpt": "new.adoc",
+          "path": "README.adoc",
+          "rev": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "span": {
+            "end": {
+              "col": 20,
+              "line": 5
+            },
+            "start": {
+              "col": 1,
+              "line": 5
+            }
+          }
+        }
+      ],
+      "id": "34064f26200bcc577529eb8a452a3f5cd3851e590cea8dd4ce0d3cd44fee4794",
+      "introduced": true,
+      "message": "Link target 'new.adoc' resolves to 'new.adoc', which is not in the repository.",
+      "path": "README.adoc",
+      "severity": "error",
+      "span": {
+        "end": {
+          "col": 20,
+          "line": 5
+        },
+        "start": {
+          "col": 1,
+          "line": 5
+        }
+      },
+      "tool": "sillybot"
+    },
+    {
+      "class": "dead-internal-link",
+      "evidence": [
+        {
+          "excerpt": "old.adoc",
+          "path": "README.adoc",
+          "rev": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "span": {
+            "end": {
+              "col": 20,
+              "line": 14
+            },
+            "start": {
+              "col": 1,
+              "line": 14
+            }
+          }
+        }
+      ],
+      "id": "138c4127bcf5c768ea8f32ad0ddfc591b053e395be6708d482053ff45c1dd111",
+      "introduced": false,
+      "message": "Link target 'old.adoc' resolves to 'old.adoc', which is not in the repository.",
+      "path": "README.adoc",
+      "severity": "error",
+      "span": {
+        "end": {
+          "col": 20,
+          "line": 14
+        },
+        "start": {
+          "col": 1,
+          "line": 14
+        }
+      },
+      "tool": "sillybot"
+    }
+  ],
+  "head": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "pr": 1,
+  "repo": "o/fixture",
+  "schema": "findings/v0"
+}
