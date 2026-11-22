@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "docs-pr-pipeline/findings/v0",
+  "title": "Findings v0 (sillybot and plasma output, verdict input)",
+  "description": "All findings for one PR run. 'introduced' is decided by comparing head with the merge base: only introduced error findings can block.",
+  "type": "object",
+  "required": ["schema", "repo", "pr", "base", "head", "findings"],
+  "additionalProperties": false,
+  "properties": {
+    "schema": { "const": "findings/v0" },
+    "repo": { "type": "string" },
+    "pr": { "type": "integer" },
+    "base": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+    "head": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+    "findings": { "type": "array", "items": { "$ref": "#/$defs/finding" } },
+    "verdict": { "enum": ["pass", "needs-correction", "fail"], "description": "Set by the verdict stage only." }
+  },
+  "$defs": {
+    "finding": {
+      "type": "object",
+      "required": ["id", "tool", "class", "severity", "introduced", "path", "span", "message", "evidence"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "description": "Stable: sha256 of tool, class, path and normalised evidence." },
+        "tool": { "enum": ["sillybot", "plasma"] },
+        "class": { "enum": ["dead-internal-link", "dead-anchor", "missing-path-reference", "spdx-missing", "spdx-unparsable", "rename-not-propagated", "spelling-policy"] },
+        "severity": { "enum": ["error", "warning", "info"] },
+        "introduced": { "type": "boolean", "description": "False when the same finding exists at the merge base." },
+        "path": { "type": "string" },
+        "span": { "$ref": "docmodel.schema.json#/$defs/span" },
+        "message": { "type": "string" },
+        "evidence": { "type": "array", "minItems": 1, "items": { "type": "object", "required": ["path", "rev", "span", "excerpt"], "additionalProperties": false,
+          "properties": { "path": { "type": "string" }, "rev": { "type": "string" }, "span": { "$ref": "docmodel.schema.json#/$defs/span" }, "excerpt": { "type": "string", "maxLength": 400 } } } },
+        "fix": { "type": ["object", "null"], "required": ["confidence", "path", "span", "expect_sha256", "replacement"], "additionalProperties": false,
+          "properties": {
+            "confidence": { "enum": ["unambiguous", "ambiguous"] },
+            "path": { "type": "string" },
+            "span": { "$ref": "docmodel.schema.json#/$defs/span" },
+            "expect_sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$", "description": "Hash of the exact text the span holds now. Plasma refuses the fix if it differs." },
+            "replacement": { "type": "string" } } }
+      }
+    }
+  }
+}
