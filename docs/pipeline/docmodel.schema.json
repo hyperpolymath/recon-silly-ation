@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "docmodel.schema.json",
+  "title": "Doc model v0 (docudactyl docs-ingest output)",
+  "description": "One parsed prose file. Spans are 1-based line and column, end exclusive. All paths are repo-relative with '/' separators.",
+  "type": "object",
+  "required": ["schema", "repo", "rev", "path", "format", "sha256", "spdx", "headings", "anchors", "links", "references"],
+  "additionalProperties": false,
+  "properties": {
+    "schema": { "const": "docmodel/v0" },
+    "repo": { "type": "string", "description": "owner/name" },
+    "rev": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+    "path": { "type": "string" },
+    "format": { "enum": ["asciidoc", "markdown"] },
+    "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "spdx": { "type": ["string", "null"], "description": "Raw SPDX-License-Identifier value, or null when absent." },
+    "title": { "type": ["string", "null"] },
+    "headings": { "type": "array", "items": { "type": "object", "required": ["level", "text", "span"], "additionalProperties": false,
+      "properties": { "level": { "type": "integer", "minimum": 0, "maximum": 6 }, "text": { "type": "string" }, "id": { "type": ["string", "null"] }, "span": { "$ref": "#/$defs/span" } } } },
+    "anchors": { "type": "array", "items": { "type": "object", "required": ["id", "span"], "additionalProperties": false,
+      "properties": { "id": { "type": "string" }, "span": { "$ref": "#/$defs/span" } } } },
+    "links": { "type": "array", "items": { "type": "object", "required": ["kind", "target", "span"], "additionalProperties": false,
+      "properties": {
+        "kind": { "enum": ["internal-file", "internal-anchor", "external-url", "include"] },
+        "target": { "type": "string" },
+        "fragment": { "type": ["string", "null"] },
+        "text": { "type": ["string", "null"] },
+        "span": { "$ref": "#/$defs/span" } } } },
+    "references": { "type": "array", "description": "Inline code or literal mentions that look like repo paths or commands.", "items": { "type": "object", "required": ["kind", "value", "span"], "additionalProperties": false,
+      "properties": { "kind": { "enum": ["path", "command"] }, "value": { "type": "string" }, "span": { "$ref": "#/$defs/span" } } } }
+  },
+  "$defs": {
+    "span": { "type": "object", "required": ["start", "end"], "additionalProperties": false,
+      "properties": { "start": { "$ref": "#/$defs/pos" }, "end": { "$ref": "#/$defs/pos" } } },
+    "pos": { "type": "object", "required": ["line", "col"], "additionalProperties": false,
+      "properties": { "line": { "type": "integer", "minimum": 1 }, "col": { "type": "integer", "minimum": 1 } } }
+  }
+}
