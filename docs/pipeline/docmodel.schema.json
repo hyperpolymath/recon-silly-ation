@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "docs-pr-pipeline/docmodel/v0",
+  "$id": "docmodel.schema.json",
   "title": "Doc model v0 (docudactyl docs-ingest output)",
   "description": "One parsed prose file. Spans are 1-based line and column, end exclusive. All paths are repo-relative with '/' separators.",
   "type": "object",

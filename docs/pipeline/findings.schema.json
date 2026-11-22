@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "docs-pr-pipeline/findings/v0",
+  "$id": "findings.schema.json",
   "title": "Findings v0 (sillybot and plasma output, verdict input)",
   "description": "All findings for one PR run. 'introduced' is decided by comparing head with the merge base: only introduced error findings can block.",
   "type": "object",

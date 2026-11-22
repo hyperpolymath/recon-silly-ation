@@ -52,15 +52,18 @@ Stage 3. Walk and correct (plasma). `plasma facts --with-contents` before. `plas
 
 Stage 4. Verdict. One required check run, `docs-pipeline/verdict`:
 
-* pass: no findings at error level and plasma check is clean.
-* needs-correction: every error finding has a verified unambiguous fix. The fixes are offered for review (see below). The PR is blocked until they are taken or waived.
-* fail: any ambiguous error finding, a tool disagreement, a parse failure, or stale input (base moved). A human reads the comment.
+Only error findings with `introduced: true` count toward the verdict. Inherited errors, which were already present at the merge base, stay in the report but never block.
+
+* pass: no introduced findings at error level and plasma check is clean.
+* needs-correction: every introduced error finding has a verified unambiguous fix. The fixes are offered for review (see below). The PR is blocked until they are taken or waived.
+* fail: any ambiguous introduced error finding, a tool disagreement, a parse failure, or stale input (base moved). A human reads the comment.
 
 How corrective edits come back (decision D2). Recommended: the workflow never pushes. It posts the verified fixes as GitHub "suggested changes" review comments, and uploads one `plasma-fix.patch` artifact. An owning session then applies the accepted ones as one SR-011 signed commit, with the owner's go for that exact commit. This keeps every commit owner-signed and reviewable, and matches recon-silly-ation's rule that automatic mutation stays off.
 
 Trust and safety:
 
-* Run on `pull_request`, not `pull_request_target`. Read-only token. No secrets needed. Fork PRs work the same.
+* Scan on `pull_request`, not `pull_request_target`. The scan job has a read-only token and no secrets, so fork PRs work the same. It uploads the verdict, the findings and the fix patch as an artifact.
+* A separate publisher job posts the check run and the suggested-change review. A read-only token cannot create a review, so this job alone gets `pull-requests: write` and `checks: write`. It runs on `workflow_run` after the scan, never checks out or runs contributor code, and validates the artifact against `findings.schema.json` before posting.
 * Pin all tool versions by commit SHA in the reusable workflow.
 * Tools are built once into a container image or release binaries, not compiled per run.
 
