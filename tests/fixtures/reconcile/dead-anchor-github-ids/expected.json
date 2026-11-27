@@ -1,0 +1,117 @@
+{
+  "base": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "findings": [
+    {
+      "class": "dead-anchor",
+      "evidence": [
+        {
+          "excerpt": "#custom-thing",
+          "path": "README.adoc",
+          "rev": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "span": {
+            "end": {
+              "col": 52,
+              "line": 23
+            },
+            "start": {
+              "col": 3,
+              "line": 23
+            }
+          }
+        }
+      ],
+      "id": "9c272c41932a12617a27f227be0b5212538f0cac57248f76e29b1bbe841a22de",
+      "introduced": true,
+      "message": "Anchor 'custom-thing' is not defined in 'README.adoc'.",
+      "path": "README.adoc",
+      "severity": "error",
+      "span": {
+        "end": {
+          "col": 52,
+          "line": 23
+        },
+        "start": {
+          "col": 3,
+          "line": 23
+        }
+      },
+      "tool": "sillybot"
+    },
+    {
+      "class": "dead-anchor",
+      "evidence": [
+        {
+          "excerpt": "#quick-start-2",
+          "path": "README.adoc",
+          "rev": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "span": {
+            "end": {
+              "col": 56,
+              "line": 24
+            },
+            "start": {
+              "col": 3,
+              "line": 24
+            }
+          }
+        }
+      ],
+      "id": "79c08e061196f905ba66430facfcf0da4ad23a2266719a3c4a1219e675adc80e",
+      "introduced": true,
+      "message": "Anchor 'quick-start-2' is not defined in 'README.adoc'.",
+      "path": "README.adoc",
+      "severity": "error",
+      "span": {
+        "end": {
+          "col": 56,
+          "line": 24
+        },
+        "start": {
+          "col": 3,
+          "line": 24
+        }
+      },
+      "tool": "sillybot"
+    },
+    {
+      "class": "dead-anchor",
+      "evidence": [
+        {
+          "excerpt": "#nope",
+          "path": "README.adoc",
+          "rev": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "span": {
+            "end": {
+              "col": 30,
+              "line": 25
+            },
+            "start": {
+              "col": 3,
+              "line": 25
+            }
+          }
+        }
+      ],
+      "id": "4dac8ffcd14a104e26dbd34298acf2c2363589bccc98ab9b016ee7aaba26bec7",
+      "introduced": true,
+      "message": "Anchor 'nope' is not defined in 'README.adoc'.",
+      "path": "README.adoc",
+      "severity": "error",
+      "span": {
+        "end": {
+          "col": 30,
+          "line": 25
+        },
+        "start": {
+          "col": 3,
+          "line": 25
+        }
+      },
+      "tool": "sillybot"
+    }
+  ],
+  "head": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "pr": 1,
+  "repo": "o/fixture",
+  "schema": "findings/v0"
+}

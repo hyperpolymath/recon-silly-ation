@@ -27,6 +27,9 @@ This file's licence covers them.
 |`dead-anchor-neg`
 |A heading id, an explicit anchor, a fragment-only link, a target doc outside the bundle (cannot be judged), and an empty fragment. Expect none.
 
+|`dead-anchor-github-ids`
+|AsciiDoc heading links in GitHub's id form (no prefix, `-` separator, duplicates numbered from 1), in the default form, through inline markup, in another doc, and in a doc with its own `idprefix` (GitHub ignores it). Expect none of those. Expect three errors: an auto form of a heading with an explicit id, a duplicate numbered from 2, and a missing heading. The bundle is real docs-ingest output.
+
 |`missing-path-reference-pos`
 |Two path mentions that are not in the repo. Expect two warnings.
 
