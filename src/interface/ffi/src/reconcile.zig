@@ -18,6 +18,7 @@
 // - dead-anchor: a fragment that names no anchor or heading id in the
 //   target document (error). Checked only when the target document is in
 //   the bundle; otherwise the anchor cannot be judged and is not reported.
+//   An AsciiDoc heading also answers to the id GitHub gives it.
 // - missing-path-reference: an inline path mention that names no file or
 //   directory in the repo (warning; mentions are less certain than links).
 
@@ -163,10 +164,77 @@ pub fn resolve(arena: std.mem.Allocator, from: ?[]const u8, target: []const u8) 
     return try std.mem.join(arena, "/", parts.items);
 }
 
-fn hasAnchor(doc: DocModel, id: []const u8) bool {
+fn hasAnchor(arena: std.mem.Allocator, doc: DocModel, id: []const u8) !bool {
     for (doc.anchors) |a| if (std.mem.eql(u8, a.id, id)) return true;
     for (doc.headings) |h| if (h.id) |hid| if (std.mem.eql(u8, hid, id)) return true;
+    if (std.mem.eql(u8, doc.format, "asciidoc")) {
+        for (try githubAdocIds(arena, doc)) |gid| if (std.mem.eql(u8, gid, id)) return true;
+    }
     return false;
+}
+
+fn isExplicitAnchor(doc: DocModel, id: []const u8) bool {
+    for (doc.anchors) |a| if (std.mem.eql(u8, a.id, id)) return true;
+    return false;
+}
+
+/// Asciidoctor section id, as docs-ingest makes it: drop simple inline
+/// markup, lowercase, keep word characters, space, '-' and '.', join runs
+/// of space, '.', '-' (and the separator) with the separator, add the prefix.
+fn adocId(arena: std.mem.Allocator, text: []const u8, prefix: []const u8, sep: u8) ![]const u8 {
+    var out: std.ArrayList(u8) = .empty;
+    try out.appendSlice(arena, prefix);
+    var in_sep = false;
+    var wrote = false;
+    var i: usize = 0;
+    while (i < text.len) : (i += 1) {
+        const c = std.ascii.toLower(text[i]);
+        if (c == '<') {
+            if (std.mem.indexOfScalarPos(u8, text, i, '>')) |e| {
+                i = e;
+                continue;
+            }
+        }
+        if (c == '*' or c == '`' or c == '#') continue;
+        if (c == ' ' or c == '.' or c == '-' or c == sep) {
+            in_sep = true;
+            continue;
+        }
+        if (!(std.ascii.isAlphanumeric(c) or c == '_' or c >= 0x80)) continue;
+        if (in_sep and wrote) try out.append(arena, sep);
+        in_sep = false;
+        wrote = true;
+        try out.append(arena, c);
+    }
+    return out.items;
+}
+
+/// The ids GitHub gives a document's AsciiDoc headings. GitHub's renderer
+/// (github/markup) sets idprefix '' and idseparator '-' as locked API
+/// attributes, and numbers duplicates from 1. So `== Reporting a
+/// Vulnerability` is `reporting-a-vulnerability` on GitHub and
+/// `_reporting_a_vulnerability` in a default Asciidoctor render, whatever
+/// the document's own idprefix and idseparator say. A link that works on
+/// GitHub is not dead.
+///
+/// Headings with no id (sectids off) and headings with an explicit id (also
+/// listed as an anchor) get no GitHub form: GitHub uses the same id.
+fn githubAdocIds(arena: std.mem.Allocator, doc: DocModel) ![]const []const u8 {
+    var bases: std.ArrayList([]const u8) = .empty;
+    var out: std.ArrayList([]const u8) = .empty;
+    for (doc.headings) |h| {
+        const hid = h.id orelse continue;
+        if (isExplicitAnchor(doc, hid)) continue;
+        const base = try adocId(arena, h.text, "", '-');
+        if (base.len == 0) continue;
+        var seen: usize = 0;
+        for (bases.items) |b| if (std.mem.eql(u8, b, base)) {
+            seen += 1;
+        };
+        try bases.append(arena, base);
+        try out.append(arena, if (seen == 0) base else try std.fmt.allocPrint(arena, "{s}-{d}", .{ base, seen }));
+    }
+    return out.items;
 }
 
 /// Compare through a normalising map (ASCII case fold), per ADR 0002: used
@@ -234,7 +302,7 @@ fn collect(arena: std.mem.Allocator, b: Bundle) ![]Raw {
                 if (l.fragment) |fr| {
                     if (fr.len == 0) continue;
                     const target_doc = findDoc(b.docs, resolved.?) orelse continue;
-                    if (!hasAnchor(target_doc, fr)) {
+                    if (!try hasAnchor(arena, target_doc, fr)) {
                         try out.append(arena, try deadAnchor(arena, doc.path, l.span, resolved.?, fr, target_doc, shown));
                     }
                 }
@@ -242,7 +310,7 @@ fn collect(arena: std.mem.Allocator, b: Bundle) ![]Raw {
                 var fr = l.fragment orelse l.target;
                 if (fr.len > 0 and fr[0] == '#') fr = fr[1..];
                 if (fr.len == 0) continue;
-                if (!hasAnchor(doc, fr)) {
+                if (!try hasAnchor(arena, doc, fr)) {
                     const shown = try std.fmt.allocPrint(arena, "#{s}", .{fr});
                     try out.append(arena, try deadAnchor(arena, doc.path, l.span, doc.path, fr, doc, shown));
                 }
@@ -386,6 +454,28 @@ test "placeholders are not path mentions" {
     try t.expect(isPlaceholder("<repo>/README.adoc"));
     try t.expect(isPlaceholder("$HOME/x"));
     try t.expect(!isPlaceholder("docs/guide.adoc"));
+}
+
+test "asciidoc headings answer to GitHub ids" {
+    var a = std.heap.ArenaAllocator.init(t.allocator);
+    defer a.deinit();
+    const ar = a.allocator();
+    try t.expectEqualStrings("_reporting_a_vulnerability", try adocId(ar, "Reporting a Vulnerability", "_", '_'));
+    try t.expectEqualStrings("the-api-v2-guide", try adocId(ar, "The `api.v2` *Guide*", "", '-'));
+    const sp: Span = .{ .start = .{ .line = 1, .col = 1 }, .end = .{ .line = 1, .col = 2 } };
+    const hs = [_]Heading{
+        .{ .level = 1, .text = "Quick Start", .id = "_quick_start", .span = sp },
+        .{ .level = 1, .text = "Quick Start", .id = "_quick_start_2", .span = sp },
+        .{ .level = 1, .text = "Custom Thing", .id = "custom", .span = sp },
+        .{ .level = 1, .text = "Install It", .id = "id_install_it", .span = sp },
+        .{ .level = 0, .text = "Title", .span = sp },
+    };
+    const anchors = [_]Anchor{.{ .id = "custom", .span = sp }};
+    var doc: DocModel = .{ .schema = "docmodel/v0", .repo = "o/r", .rev = "r", .path = "a.adoc", .format = "asciidoc", .sha256 = "", .headings = &hs, .anchors = &anchors, .links = &.{}, .references = &.{} };
+    for ([_][]const u8{ "quick-start", "quick-start-1", "_quick_start_2", "install-it", "custom" }) |id| try t.expect(try hasAnchor(ar, doc, id));
+    for ([_][]const u8{ "quick-start-2", "custom-thing", "title" }) |id| try t.expect(!try hasAnchor(ar, doc, id));
+    doc.format = "markdown";
+    try t.expect(!try hasAnchor(ar, doc, "quick-start-1"));
 }
 
 const sample_head =
